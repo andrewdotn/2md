@@ -1,0 +1,17 @@
+{
+    "name": "2md",
+    "version": "0.0.0",
+    "license": "Apache-2.0",
+    "scripts": {
+        "test": "mocha -r ./babel-register --exclude 'node_modules/**' 'src/**/*-test.ts'"
+    },
+    "devDependencies": {
+        "@types/fs-extra": "^8.0.0",
+        "@types/jsdom": "^12.2.4",
+        "mocha": "^6.2.1"
+    },
+    "dependencies": {
+        "fs-extra": "^8.1.0",
+        "jsdom": "^15.1.1"
+    }
+}

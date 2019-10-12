@@ -1,10 +1,10 @@
-import {randomBytes} from "crypto";
-import {resolve} from "path";
-import {expect} from "chai";
-import {readFile} from "fs-extra";
-import {run} from "./main";
-import {A, B, Doc, H, L, parse, toMd} from "./2md";
-import { inspect } from 'util';
+import { randomBytes } from "crypto";
+import { resolve } from "path";
+import { expect } from "chai";
+import { readFile } from "fs-extra";
+import {run, toMd} from "./main";
+import { A, B, Doc, H, L } from "./2md";
+import {parse} from "./parse";
 
 describe("run", function() {
   it("raises an error if the command does not exist", async function() {
@@ -33,9 +33,9 @@ describe("2md", function() {
     it("can parse the first sample", async function() {
       const html = await fixture("quote1.html");
       const expected = new Doc([
-        new H(["The end of 32-bit apps (and other removals)"], {level: 2}),
+        new H(["The end of 32-bit apps (and other removals)"], { level: 2 }),
 
-          "Mac hardware and macOS made the jump from 32 bits to 64 bits a long time ago, but Catalina will be the very first version of macOS that is totally unable to run 32-bit software. For (what I hope will be) the last time, let's review the Mac's entire 64-bit timeline from start to finish:",
+        "Mac hardware and macOS made the jump from 32 bits to 64 bits a long time ago, but Catalina will be the very first version of macOS that is totally unable to run 32-bit software. For (what I hope will be) the last time, let's review the Mac's entire 64-bit timeline from start to finish:",
         new L([
           new B(["June 2003"]),
           ": The PowerPC G5 CPU is ",
@@ -64,8 +64,6 @@ describe("2md", function() {
       const [html, md] = await Promise.all(
         ["html", "md"].map(ext => fixture(`quote1.${ext}`))
       );
-      // Not implemented yet
-      this.skip();
       expect(toMd(html)).to.eql(md);
     });
   });

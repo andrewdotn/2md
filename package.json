@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "Apache-2.0",
   "scripts": {
-    "test": "mocha -r ./babel-register --exclude 'node_modules/**' 'src/**/*-test.ts'",
+    "test": "tsc && yarn run pretty:check && mocha -r ./babel-register --exclude 'node_modules/**' 'src/**/*-test.ts'",
     "pretty": "prettier --write '*.js' '*.json' 'src/**/*.ts'",
     "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts'"
   },

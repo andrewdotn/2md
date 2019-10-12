@@ -1,7 +1,7 @@
 export class RenderContext {
   append(s: string, newline = false) {
     if (newline) {
-      this.result += '\n';
+      this.result += "\n";
       this.result += this.prefix;
     }
 
@@ -22,8 +22,8 @@ export class RenderContext {
 
   maxWidth = 80;
   col = 0;
-  prefix = '';
-  result = '';
+  prefix = "";
+  result = "";
   linkCounter = 1;
   onBlockEnd: string[] = [];
 }
@@ -40,7 +40,7 @@ export abstract class IlNode {
 
   render(r: RenderContext) {
     for (let c of this.children) {
-      if (typeof(c) === 'string') {
+      if (typeof c === "string") {
         r.append(c);
       } else {
         c.render(r);
@@ -59,19 +59,19 @@ export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 /** Heading */
 export class H extends IlNode {
   constructor(
-      children: (IlNode | string)[],
-      { level }: { level: HeadingLevel }
+    children: (IlNode | string)[],
+    { level }: { level: HeadingLevel }
   ) {
     super(children);
     this.level = level;
   }
 
   render(r: RenderContext) {
-    r.prefix = '#'.repeat(this.level) + ' ';
-    r.append('', true);
+    r.prefix = "#".repeat(this.level) + " ";
+    r.append("", true);
     super.render(r);
     r.prefix = r.prefix.substring(0, r.prefix.length - (this.level + 1));
-    r.append('', true);
+    r.append("", true);
   }
 
   level: HeadingLevel;
@@ -86,7 +86,7 @@ export class A extends IlNode {
 
   render(r: RenderContext) {
     const num = r.linkCounter++;
-    r.append('[');
+    r.append("[");
     super.render(r);
     r.append(`][${num}]`);
     // XXX: escape/quote bad hrefs, e.g., containing newlines?
@@ -99,9 +99,9 @@ export class A extends IlNode {
 /** Bold */
 export class B extends IlNode {
   render(r: RenderContext) {
-    r.append('**');
+    r.append("**");
     super.render(r);
-    r.append('**');
+    r.append("**");
   }
 }
 
@@ -114,11 +114,10 @@ export class P extends IlNode {}
 /** List item */
 export class L extends IlNode {
   render(r: RenderContext) {
-    r.prefix = '  - ';
-    r.append('', true);
+    r.prefix = "  - ";
+    r.append("", true);
     super.render(r);
     r.prefix = r.prefix.substring(0, r.prefix.length - 4);
-    r.append('', true);
+    r.append("", true);
   }
 }
-

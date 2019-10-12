@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom";
-import { IlNode, HeadingLevel, Doc, A, I, L, B, H } from './2md';
+import { IlNode, HeadingLevel, Doc, A, I, L, B, H } from "./2md";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
   if (!/^H[1-6]$/.test(nodeName)) throw new Error("Not a heading");

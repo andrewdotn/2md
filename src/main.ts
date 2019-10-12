@@ -1,6 +1,7 @@
 import { spawn } from "child_process";
 import { inspect } from "util";
-import { toMd } from "./2md";
+import { parse } from "./parse";
+import { RenderContext } from "./2md";
 
 export function run(
   cmd: string[]
@@ -37,6 +38,16 @@ export function run(
       return resolve(output);
     });
   });
+}
+
+export function toMd(html: string): string {
+  const intermediate = parse(html);
+
+  const rendered = new RenderContext();
+  intermediate.render(rendered);
+  rendered.finish();
+
+  return rendered.result;
 }
 
 async function main() {

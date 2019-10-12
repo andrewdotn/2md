@@ -2,9 +2,9 @@ import { randomBytes } from "crypto";
 import { resolve } from "path";
 import { expect } from "chai";
 import { readFile } from "fs-extra";
-import {run, toMd} from "./main";
+import { run, toMd } from "./main";
 import { A, B, Doc, H, L } from "./2md";
-import {parse} from "./parse";
+import { parse } from "./parse";
 
 describe("run", function() {
   it("raises an error if the command does not exist", async function() {

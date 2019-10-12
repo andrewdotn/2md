@@ -1,12 +1,12 @@
 import { JSDOM } from "jsdom";
-import { IlNode, HeadingLevel, Doc, A, I, L, B, H } from "./2md";
+import { IrNode, HeadingLevel, Doc, A, I, L, B, H } from "./2md";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
   if (!/^H[1-6]$/.test(nodeName)) throw new Error("Not a heading");
   return <HeadingLevel>(nodeName.charCodeAt(1) - "0".charCodeAt(0));
 }
 
-function parse1(ilNode: IlNode, htmlNode: Node) {
+function parse1(ilNode: IrNode, htmlNode: Node) {
   if (
     htmlNode.nodeType == htmlNode.TEXT_NODE &&
     htmlNode.textContent !== null
@@ -56,7 +56,7 @@ function parseHtml(html: string): Document {
   return dom.window.document;
 }
 
-function visitPre(root: IlNode | string, fn: (node: IlNode | string) => void) {
+function visitPre(root: IrNode | string, fn: (node: IrNode | string) => void) {
   fn(root);
   if (typeof root !== "string") {
     for (let c of root.children) {
@@ -66,9 +66,10 @@ function visitPre(root: IlNode | string, fn: (node: IlNode | string) => void) {
 }
 
 /**
- * If two subsequent nodes are strings, concatenate them.
+ * If two subsequent nodes are strings, concatenate them. This optimization pass
+ * should be quick, and is here entirely to make unit test input cleaner.
  */
-function concatenateStrings(root: IlNode | string) {
+function concatenateStrings(root: IrNode | string) {
   if (typeof root === "string") return;
   for (let i = 0; i < root.children.length - 1; i++) {
     if (
@@ -81,7 +82,7 @@ function concatenateStrings(root: IlNode | string) {
   }
 }
 
-export function parse(html: string): IlNode {
+export function parse(html: string): IrNode {
   const doc = parseHtml(html);
   const root = new Doc([]);
   for (let i = 0; i < doc.childNodes.length; i++) {

@@ -1,44 +1,22 @@
-export class RenderContext {
-  append(s: string, newline = false) {
-    if (newline) {
-      this.result += "\n";
-      this.result += this.prefix;
-    }
+import { Rendering } from "./render";
 
-    this.result += s;
-    this.col += s.length;
-  }
-
-  /** Used for collecting link info to push at a good time */
-  addBlock(s: string) {
-    this.onBlockEnd.push(s);
-  }
-
-  finish() {
-    while (this.onBlockEnd.length > 0) {
-      this.result += `\n${this.onBlockEnd.shift()}\n`;
-    }
-  }
-
-  maxWidth = 80;
-  col = 0;
-  prefix = "";
-  result = "";
-  linkCounter = 1;
-  onBlockEnd: string[] = [];
-}
-
-export abstract class IlNode {
-  constructor(children: (IlNode | string)[]) {
+/**
+ * Intermediate representation of the document. We use vanilla computing science
+ * techniques: HTML input DOM is transformed into an abstract syntax tree of in
+ * an intermediate representation format, roughly representing important
+ * markdown elements, which then gets rendered to text.
+ */
+export abstract class IrNode {
+  constructor(children: (IrNode | string)[]) {
     this.children = children;
     this.name = this.constructor.name;
   }
 
-  push(child: IlNode | string) {
+  push(child: IrNode | string) {
     this.children.push(child);
   }
 
-  render(r: RenderContext) {
+  render(r: Rendering) {
     for (let c of this.children) {
       if (typeof c === "string") {
         r.append(c);
@@ -48,57 +26,57 @@ export abstract class IlNode {
     }
   }
 
-  children: (IlNode | string)[];
+  children: (IrNode | string)[];
   readonly name: string;
 }
 
-export class Doc extends IlNode {}
+export class Doc extends IrNode {}
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 /** Heading */
-export class H extends IlNode {
+export class H extends IrNode {
   constructor(
-    children: (IlNode | string)[],
+    children: (IrNode | string)[],
     { level }: { level: HeadingLevel }
   ) {
     super(children);
     this.level = level;
   }
 
-  render(r: RenderContext) {
+  render(r: Rendering) {
     r.prefix = "#".repeat(this.level) + " ";
-    r.append("", true);
+    r.ensureStartOfLine();
     super.render(r);
     r.prefix = r.prefix.substring(0, r.prefix.length - (this.level + 1));
-    r.append("", true);
+    r.ensureStartOfLine();
   }
 
   level: HeadingLevel;
 }
 
 /** Link */
-export class A extends IlNode {
-  constructor(children: (IlNode | string)[], { href }: { href: string }) {
+export class A extends IrNode {
+  constructor(children: (IrNode | string)[], { href }: { href: string }) {
     super(children);
     this.href = href;
   }
 
-  render(r: RenderContext) {
+  render(r: Rendering) {
     const num = r.linkCounter++;
     r.append("[");
     super.render(r);
     r.append(`][${num}]`);
     // XXX: escape/quote bad hrefs, e.g., containing newlines?
-    r.addBlock(`[${num}]: ${this.href}`);
+    r.addTrailer(`[${num}]: ${this.href}`);
   }
 
   href: string;
 }
 
 /** Bold */
-export class B extends IlNode {
-  render(r: RenderContext) {
+export class B extends IrNode {
+  render(r: Rendering) {
     r.append("**");
     super.render(r);
     r.append("**");
@@ -106,14 +84,17 @@ export class B extends IlNode {
 }
 
 /** Italics */
-export class I extends IlNode {}
-
-/** Paragraph */
-export class P extends IlNode {}
+export class I extends IrNode {
+  render(r: Rendering) {
+    r.append("*");
+    super.render(r);
+    r.append("*");
+  }
+}
 
 /** List item */
-export class L extends IlNode {
-  render(r: RenderContext) {
+export class L extends IrNode {
+  render(r: Rendering) {
     r.prefix = "  - ";
     r.append("", true);
     super.render(r);

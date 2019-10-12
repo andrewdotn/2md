@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import { inspect } from "util";
 import { parse } from "./parse";
-import { RenderContext } from "./2md";
+import { Rendering } from "./render";
 
 export function run(
   cmd: string[]
@@ -43,7 +43,7 @@ export function run(
 export function toMd(html: string): string {
   const intermediate = parse(html);
 
-  const rendered = new RenderContext();
+  const rendered = new Rendering();
   intermediate.render(rendered);
   rendered.finish();
 

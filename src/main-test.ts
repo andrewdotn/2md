@@ -50,7 +50,7 @@ describe("2md", function() {
           new A(["allows for 64-bit processes under the hood"], {
             href: "https://arstechnica.com/gadgets/2005/04/macosx-10-4/4/"
           }),
-          "—they can be spun off from another process or run via the Terminal."
+          "--they can be spun off from another process or run via the Terminal."
         ]),
         "\n"
       ]);

@@ -45,11 +45,13 @@ export class H extends IrNode {
   }
 
   render(r: Rendering) {
-    r.prefix = "#".repeat(this.level) + " ";
+    const prefix = "#".repeat(this.level) + " ";
+    r.pushPrefix(prefix);
     r.ensureStartOfLine();
     super.render(r);
-    r.prefix = r.prefix.substring(0, r.prefix.length - (this.level + 1));
+    r.popPrefix(prefix);
     r.ensureStartOfLine();
+    r.newLine();
   }
 
   level: HeadingLevel;
@@ -95,10 +97,10 @@ export class I extends IrNode {
 /** List item */
 export class L extends IrNode {
   render(r: Rendering) {
-    r.prefix = "  - ";
-    r.append("", true);
+    r.ensureStartOfLine();
+    r.newLine();
+    r.pushPrefix("  - ", "    ");
     super.render(r);
-    r.prefix = r.prefix.substring(0, r.prefix.length - 4);
-    r.append("", true);
+    r.popPrefix("  - ", "    ");
   }
 }

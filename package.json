@@ -10,11 +10,13 @@
   "devDependencies": {
     "@types/fs-extra": "^8.0.0",
     "@types/jsdom": "^12.2.4",
+    "@types/lodash": "^4.14.144",
     "mocha": "^6.2.1",
     "prettier": "^1.18.2"
   },
   "dependencies": {
     "fs-extra": "^8.1.0",
-    "jsdom": "^15.1.1"
+    "jsdom": "^15.1.1",
+    "lodash": "^4.17.15"
   }
 }

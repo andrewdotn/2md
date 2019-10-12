@@ -40,6 +40,12 @@ export function run(
 }
 
 async function main() {
+  // Getting the clipboard as HTML is relatively easy in swift:
+  // https://stackoverflow.com/a/36109230/14558 but it’s not obvious how to call
+  // that API from nodejs, though I’m sure a native extension could be written.
+  //
+  // https://github.com/sindresorhus/clipboardy shells out to pbpaste
+  // and electron calls into Chromium’s native clipboard access code
   const osaOutput = await run([
     "osascript",
     "-e",

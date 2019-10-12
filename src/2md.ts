@@ -3,12 +3,27 @@ import { JSDOM } from "jsdom";
 abstract class IlNode {
   constructor(children: (IlNode | string)[]) {
     this.children = children;
+    this.name = this.constructor.name;
   }
+
+  push(child: IlNode | string) {
+    this.children.push(child);
+  }
+
   children: (IlNode | string)[];
+  readonly name: string;
 }
 
 export class Doc extends IlNode {}
-export class H extends IlNode {}
+
+type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+export class H extends IlNode {
+  constructor(children: (IlNode | string)[], { level }: { level: HeadingLevel }) {
+    super(children);
+    this.level = level;;
+  }
+  level: HeadingLevel
+}
 export class A extends IlNode {
   constructor(children: (IlNode | string)[], { href }: { href: string }) {
     super(children);
@@ -16,35 +31,104 @@ export class A extends IlNode {
   }
   href: string;
 }
+
 export class B extends IlNode {}
+export class I extends IlNode {}
 export class P extends IlNode {}
 export class L extends IlNode {}
 
-export function parse(html: string): IlNode {
-  return new Doc([]);
+function extractHeadingLevel(nodeName: string): HeadingLevel {
+  if (!/^H[1-6]$/.test(nodeName))
+    throw new Error('Not a heading');
+  return <HeadingLevel>(nodeName.charCodeAt(1) - '0'.charCodeAt(0));
 }
 
-function walk(accum: [string], node: Node) {
-  if (node.nodeType == node.TEXT_NODE) {
-    accum[0] += node.textContent;
-  } else if (node.nodeType == node.ELEMENT_NODE) {
-    console.log(node.nodeName);
+function parse1(ilNode: IlNode, htmlNode: Node) {
+  if (htmlNode.nodeType == htmlNode.TEXT_NODE && htmlNode.textContent !== null) {
+    ilNode.push(htmlNode.textContent);
+  } else if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
+    const e = <Element>htmlNode;
+    let receiver = ilNode;
+      switch (htmlNode.nodeName) {
+        case 'STRONG':
+          receiver = new B([]);
+          break;
+        case 'H1':
+        case 'H2':
+        case 'H3':
+        case 'H4':
+        case 'H5':
+        case 'H6':
+          receiver = new H([], {level: extractHeadingLevel(htmlNode.nodeName)});
+          break;
+        case 'B':
+        case 'STRONG':
+          receiver = new B([]);
+          break;
+        case 'I':
+        case 'EM':
+          receiver = new I([]);
+          break;
+        case 'LI':
+          receiver = new L([]);
+          break;
+        case 'A':
+          receiver = new A([], {href: e.getAttribute('href') || ''});
+          break;
+      }
+    if (ilNode !== receiver)
+      ilNode.push(receiver);
 
-    for (let i = 0; i < node.childNodes.length; i++) {
-      const c = node.childNodes[i];
-      walk(accum, c);
+    for (let i = 0; i < htmlNode.childNodes.length; i++) {
+      const c = htmlNode.childNodes[i];
+      parse1(receiver, c);
     }
   }
 }
 
-export function toMd(html: string): string {
+function parseHtml(html: string): Document {
   const dom = new JSDOM(html);
-  const doc = dom.window.document;
+  return dom.window.document;
+}
 
-  let ret: [string] = [""];
+function visitPre(root: IlNode | string, fn: (node: IlNode | string) => void) {
+  fn(root);
+  if (typeof(root) !== 'string') {
+    for (let c of root.children) {
+      visitPre(c, fn);
+    }
+  }
+}
+
+/**
+ * If two subsequent nodes are strings, concatenate them.
+ */
+function concatenateStrings(root: IlNode | string) {
+  if (typeof(root) === 'string')
+    return;
+  for (let i = 0; i < root.children.length - 1; i++) {
+    if (typeof(root.children[i]) === 'string'
+      && typeof(root.children[i + 1]) === 'string') {
+        root.children[i] += root.children[i + 1];
+        root.children.splice(i + 1, 1);
+    }
+  }
+}
+
+export function parse(html: string): IlNode {
+  const doc = parseHtml(html);
+  const root = new Doc([]);
   for (let i = 0; i < doc.childNodes.length; i++) {
-    walk(ret, doc.childNodes[i]);
+    parse1(root, doc.childNodes[i]);
   }
 
-  return ret[0];
+  visitPre(root, concatenateStrings);
+
+  return root;
+}
+
+export function toMd(html: string): string {
+  const intermediate = parse(html);
+
+  return '';
 }

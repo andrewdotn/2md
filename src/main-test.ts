@@ -51,8 +51,7 @@ describe("2md", function() {
             href: "https://arstechnica.com/gadgets/2005/04/macosx-10-4/4/"
           }),
           "--they can be spun off from another process or run via the Terminal."
-        ]),
-        "\n"
+        ])
       ]);
       const parsed = parse(html);
       expect(parsed).to.deep.equal(expected);

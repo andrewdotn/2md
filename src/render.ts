@@ -30,6 +30,8 @@ function* wordPieces(s: string): Generator<RegExpExecArray> {
 
 export class Rendering {
   append(s: string, newline = false) {
+    s = s.replace(/\n/g, " ");
+
     if (newline) {
       this.ensureStartOfLine();
     }
@@ -73,9 +75,7 @@ export class Rendering {
 
   ensureStartOfLine() {
     if (!this.atStartOfLine) {
-      this.result += "\n";
-      this.col = 0;
-      this.atStartOfLine = true;
+      this.newLine();
     }
   }
 
@@ -110,11 +110,12 @@ export class Rendering {
   }
 
   finish() {
+    this.ensureStartOfLine();
     while (this.trailers.length > 0) {
       this.result += `\n${this.trailers.shift()}`;
     }
     if (!this.result.endsWith("\n")) {
-      this.result += "\n";
+      this.newLine();
     }
   }
 

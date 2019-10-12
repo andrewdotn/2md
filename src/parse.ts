@@ -11,7 +11,9 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
     htmlNode.nodeType == htmlNode.TEXT_NODE &&
     htmlNode.textContent !== null
   ) {
-    ilNode.push(htmlNode.textContent);
+    if (htmlNode.textContent != "\n") {
+      ilNode.push(htmlNode.textContent);
+    }
   } else if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
     const e = <Element>htmlNode;
     let receiver = ilNode;

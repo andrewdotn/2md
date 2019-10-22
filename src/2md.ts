@@ -104,3 +104,11 @@ export class L extends IrNode {
     r.popPrefix("  - ", "    ");
   }
 }
+
+export class C extends IrNode {
+  render(r: Rendering) {
+    r.append("`");
+    super.render(r);
+    r.append("`");
+  }
+}

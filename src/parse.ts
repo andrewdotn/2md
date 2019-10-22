@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom";
-import { IrNode, HeadingLevel, Doc, A, I, L, B, H } from "./2md";
+import { IrNode, HeadingLevel, Doc, A, I, L, B, H, C } from "./2md";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
   if (!/^H[1-6]$/.test(nodeName)) throw new Error("Not a heading");
@@ -42,6 +42,9 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
         break;
       case "A":
         receiver = new A([], { href: e.getAttribute("href") || "" });
+        break;
+      case "CODE":
+        receiver = new C([]);
         break;
     }
     if (ilNode !== receiver) ilNode.push(receiver);

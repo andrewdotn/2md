@@ -1,26 +1,11 @@
-import { randomBytes } from "crypto";
 import { resolve } from "path";
 import { expect } from "chai";
 import { readFile } from "fs-extra";
-import { run, toMd } from "./main";
+import remark from "remark";
+import html from "remark-html";
+import { toMd } from "./main";
 import { A, B, Doc, H, L } from "./2md";
 import { parse } from "./parse";
-
-describe("run", function() {
-  it("raises an error if the command does not exist", async function() {
-    const dummyCommand = randomBytes(10).toString("hex");
-    let thrown = false;
-    let error: Error = new Error();
-    try {
-      await run([dummyCommand]);
-    } catch (e) {
-      thrown = true;
-      error = e;
-    }
-    expect(thrown).to.eql(true);
-    expect(/ENOENT/.test(error.toString())).to.eql(true);
-  });
-});
 
 async function fixture(filename: string): Promise<string> {
   const path = resolve(__dirname, "../fixtures", filename);
@@ -65,5 +50,22 @@ describe("2md", function() {
       );
       expect(toMd(html)).to.eql(md);
     });
+  });
+
+  describe("round-trip", function() {
+    function roundTripTest(filename: string) {
+      it(`can round-trip ${filename}`, async function() {
+        const md = await fixture(filename);
+        const rendered = await remark()
+          .use(html)
+          .process(md);
+        const backToMd = toMd(rendered.contents.toString());
+        expect(md).to.eql(backToMd);
+      });
+    }
+
+    for (let filename of ["round-trip1.md", "inline-code.md"]) {
+      roundTripTest(filename);
+    }
   });
 });

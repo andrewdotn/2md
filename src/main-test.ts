@@ -6,6 +6,7 @@ import html from "remark-html";
 import { toMd } from "./main";
 import { A, B, Doc, H, L, P } from "./2md";
 import { parse } from "./parse";
+import { BlockRendering } from "./render";
 
 async function fixture(filename: string): Promise<string> {
   const path = resolve(__dirname, "../fixtures", filename);
@@ -75,5 +76,14 @@ describe("2md", function() {
     ]) {
       roundTripTest(filename);
     }
+  });
+
+  describe("--wrap-in-backquote", function() {
+    it("works", function() {
+      const intermediate = parse(`foo`, { wrapInBackquote: true });
+      const rendering = new BlockRendering();
+      intermediate.render(rendering);
+      expect(rendering.finish()).to.eql(`> foo\n`);
+    });
   });
 });

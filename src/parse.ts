@@ -107,11 +107,26 @@ function replaceEmDashes(node: IrNode) {
   }
 }
 
-export function parse(html: string): IrNode {
+const defaultParseOptions = {
+  wrapInBackquote: false
+};
+
+export type ParseOptions = Partial<typeof defaultParseOptions>;
+
+export function parse(html: string, options?: ParseOptions): IrNode {
+  options = Object.assign(defaultParseOptions, options);
+
   const doc = parseHtml(html);
   const root = new Doc([]);
+  let parseRoot = root;
+
+  if (options.wrapInBackquote) {
+    parseRoot = new Q([]);
+    root.push(parseRoot);
+  }
+
   for (let i = 0; i < doc.childNodes.length; i++) {
-    parse1(root, doc.childNodes[i]);
+    parse1(parseRoot, doc.childNodes[i]);
   }
 
   visitPre(root, concatenateStrings);

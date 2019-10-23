@@ -1,12 +1,12 @@
 import yargs from "yargs";
 import { run } from "./run";
-import { parse, parseHtml } from "./parse";
+import { parse, parseHtml, ParseOptions } from "./parse";
 import { BlockRendering } from "./render";
 import { readFile } from "fs-extra";
 import { inspect } from "util";
 
-export function toMd(html: string): string {
-  const intermediate = parse(html);
+export function toMd(html: string, options?: ParseOptions): string {
+  const intermediate = parse(html, options);
 
   const rendered = new BlockRendering();
   intermediate.render(rendered);
@@ -55,7 +55,7 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
     // enabled by default because we don’t want users to have to pull in
     // markdown libraries too.
     .option("dev-mode-md-to-html-first", { type: "boolean", hidden: true })
-    .argv;
+    .option("wrap-in-backquote", { type: "boolean", default: true }).argv;
 
   let input: string;
   if (argv._.length == 1) {
@@ -74,6 +74,9 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
   }
 
   const outputFormat: OutputFormat = <OutputFormat>argv.outputFormat;
+  const parseOptions: ParseOptions = {
+    wrapInBackquote: <boolean>argv.wrapInBackquote
+  };
 
   let output: string;
   switch (outputFormat) {
@@ -86,20 +89,25 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
       output = firstElement === null ? "" : firstElement.outerHTML;
       break;
     }
+
+    // There’s some duplication between these next cases and toMd(). It’s minor
+    // for now so I’m leaving it alone, but we could break out of a subroutine
+    // once the desired format is computed, rather than duplicating prefixes of
+    // the code that runs the input through the parse-and-render toolchain.
     case "ir": {
-      const intermediate = parse(input);
+      const intermediate = parse(input, parseOptions);
       output = inspect(intermediate, false, 10);
       break;
     }
     case "blocks": {
-      const intermediate = parse(input);
+      const intermediate = parse(input, parseOptions);
       const rendering = new BlockRendering();
       intermediate.render(rendering);
       output = inspect(rendering.result, false, 10);
       break;
     }
     case "md": {
-      output = toMd(input);
+      output = toMd(input, parseOptions);
       break;
     }
     default: {

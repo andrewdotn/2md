@@ -68,7 +68,11 @@ describe("2md", function() {
       });
     }
 
-    for (let filename of ["round-trip1.md", "inline-code.md"]) {
+    for (let filename of [
+      "blockquote1.md",
+      "inline-code.md",
+      "round-trip1.md"
+    ]) {
       roundTripTest(filename);
     }
   });

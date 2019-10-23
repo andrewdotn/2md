@@ -1,4 +1,4 @@
-import { BlockRendering } from "./render";
+import { BlockRendering, Prefix } from "./render";
 
 /**
  * Intermediate representation of the document. We use vanilla computing science
@@ -45,7 +45,7 @@ export class H extends IrNode {
   }
 
   render(r: BlockRendering) {
-    const prefix = "#".repeat(this.level) + " ";
+    const prefix = new Prefix("#".repeat(this.level) + " ");
     r.pushPrefix(prefix);
     super.render(r);
     r.popPrefix(prefix);
@@ -94,9 +94,10 @@ export class I extends IrNode {
 /** List item */
 export class L extends IrNode {
   render(r: BlockRendering) {
-    r.pushPrefix("  - ", "    ");
+    const prefix = new Prefix("  - ", "    ");
+    r.pushPrefix(prefix);
     super.render(r);
-    r.popPrefix("  - ", "    ");
+    r.popPrefix(prefix);
   }
 }
 
@@ -112,8 +113,19 @@ export class C extends IrNode {
 /** Paragraph */
 export class P extends IrNode {
   render(r: BlockRendering) {
-    r.pushPrefix("");
+    const prefix = new Prefix("");
+    r.pushPrefix(prefix);
     super.render(r);
-    r.popPrefix("");
+    r.popPrefix(prefix);
+  }
+}
+
+/** Blockquote */
+export class Q extends IrNode {
+  render(r: BlockRendering) {
+    const prefix = new Prefix("> ");
+    r.pushPrefix(prefix);
+    super.render(r);
+    r.popPrefix(prefix);
   }
 }

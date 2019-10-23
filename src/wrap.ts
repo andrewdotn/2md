@@ -1,3 +1,5 @@
+import { Prefix } from "./render";
+
 function* wordPieces(s: string): Generator<RegExpExecArray> {
   const wordRegex = /\S+/g;
   let lastIndex = 0;
@@ -14,10 +16,9 @@ function* wordPieces(s: string): Generator<RegExpExecArray> {
 }
 
 class Wrap {
-  constructor(s: string, prefixFirst: string, prefixSubsequent: string) {
+  constructor(s: string, prefix: Prefix) {
     this.text = s;
-    this.prefixFirst = prefixFirst;
-    this.prefixSubsequent = prefixSubsequent;
+    this.prefix = prefix;
     this.result = "";
   }
 
@@ -58,9 +59,7 @@ class Wrap {
   }
 
   private renderPrefix() {
-    const prefix = !this.currentPrefixRendered
-      ? this.prefixFirst
-      : this.prefixSubsequent;
+    const prefix = this.prefix.get({ first: !this.currentPrefixRendered });
     this.result += prefix;
     this.col += prefix.length;
     this.currentPrefixRendered = true;
@@ -83,11 +82,10 @@ class Wrap {
   atStartOfLine = true;
   col = 0;
   currentPrefixRendered = false;
-  prefixFirst: string;
-  prefixSubsequent: string;
+  prefix: Prefix;
   result: string;
 }
 
-export function wrap(s: string, prefixFirst: string, prefixSubsequent: string) {
-  return new Wrap(s, prefixFirst, prefixSubsequent).wrap();
+export function wrap(s: string, prefix: Prefix) {
+  return new Wrap(s, prefix).wrap();
 }

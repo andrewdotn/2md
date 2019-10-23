@@ -39,7 +39,7 @@ async function readClipboard() {
 }
 
 async function main() {
-  const outputFormats = tuple("raw", "html", "ir", "ir2", "md");
+  const outputFormats = tuple("raw", "html", "ir", "blocks", "md");
   type OutputFormat = typeof outputFormats[number];
 
   const argv = yargs
@@ -51,6 +51,9 @@ async function main() {
 Converts formatted text to markdown. Defaults to reading the clipboard.`
     )
     .option("output-format", { choices: outputFormats, default: "md" })
+    // This magic option is handy for debugging round-trip issues, but isn’t
+    // enabled by default because we don’t want users to have to pull in
+    // markdown libraries too.
     .option("dev-mode-md-to-html-first", { type: "boolean", hidden: true })
     .argv;
 
@@ -88,7 +91,7 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
       output = inspect(intermediate, false, 10);
       break;
     }
-    case "ir2": {
+    case "blocks": {
       const intermediate = parse(input);
       const rendering = new BlockRendering();
       intermediate.render(rendering);

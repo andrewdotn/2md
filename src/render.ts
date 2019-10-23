@@ -1,30 +1,41 @@
-import { isEqual, last } from "lodash";
+import { last } from "lodash";
 import { wrap } from "./wrap";
 
-type Prefix = [string, string];
+export class Prefix {
+  constructor(first: string, subsequent?: string) {
+    this.first = first;
+    this.subsequent = subsequent !== undefined ? subsequent : first;
+  }
 
-/**
- * Convenience function to allow callers to specify only one part of the prefix
- * if both parts are the same.
- */
-function makePrefix(
-  firstLinePrefix: string,
-  subsequentLinePrefix?: string
-): Prefix {
-  const p: Prefix = [
-    firstLinePrefix,
-    subsequentLinePrefix === undefined ? firstLinePrefix : subsequentLinePrefix
-  ];
-  return p;
+  get({ first }: { first: boolean }) {
+    if (first) {
+      return this.first;
+    } else {
+      return this.subsequent;
+    }
+  }
+
+  equals(other: Prefix): boolean {
+    return this.first === other.first && this.subsequent === other.subsequent;
+  }
+
+  static join(prefixList: Prefix[]) {
+    return new Prefix(
+      prefixList.map(p => p.first).join(""),
+      prefixList.map(p => p.subsequent).join("")
+    );
+  }
+
+  readonly first: string;
+  readonly subsequent: string;
 }
 
 class OutputBlock {
   constructor(prefix?: Prefix) {
     if (prefix === undefined) {
-      prefix = makePrefix("");
+      prefix = new Prefix("");
     }
-    this._prefixFirst = prefix[0];
-    this._prefixSubsequent = prefix[1];
+    this.prefix = prefix;
   }
 
   append(s: string) {
@@ -44,11 +55,10 @@ class OutputBlock {
       return "";
     }
 
-    return wrap(this._contents, this._prefixFirst, this._prefixSubsequent);
+    return wrap(this._contents, this.prefix);
   }
 
-  private readonly _prefixFirst: string;
-  private readonly _prefixSubsequent: string;
+  readonly prefix: Prefix;
   private _contents: string | undefined;
 }
 
@@ -59,16 +69,17 @@ export class TextRendering {
 
   toText(): string {
     let ret = "";
-    for (let b of this._blocks) {
-      const rendered = b.render();
-      if (rendered) {
-        if (ret !== "") {
-          ret += "\n";
-        }
-        ret += rendered;
-        if (ret !== "" && !ret.endsWith("\n")) {
-          ret += "\n";
-        }
+    let separator: string | null = null;
+    for (let block of this._blocks) {
+      const rendered = block.render();
+      if (rendered !== "" && ret !== "" && separator != null) {
+        ret += separator + "\n";
+      }
+      if (rendered !== "") {
+        ret += rendered + "\n";
+        separator = null;
+      } else {
+        separator = block.prefix.first.trimRight();
       }
     }
     return ret;
@@ -82,26 +93,21 @@ export class BlockRendering {
     last(this.result)!.append(s);
   }
 
-  pushPrefix(firstLinePrefix: string, subsequentLinePrefix?: string) {
-    const prefix = makePrefix(firstLinePrefix, subsequentLinePrefix);
+  pushPrefix(prefix: Prefix) {
     this._prefixStack.push(prefix);
     this.result.push(new OutputBlock(this.prefix()));
   }
 
-  popPrefix(firstLinePrefix: string, subsequentLinePrefix?: string) {
-    const prefix = makePrefix(firstLinePrefix, subsequentLinePrefix);
+  popPrefix(prefix: Prefix) {
     const popped = this._prefixStack.pop();
-    if (!isEqual(popped, prefix)) {
+    if (popped === undefined || !popped.equals(prefix)) {
       throw new Error("pop does not match what was pushed");
     }
     this.result.push(new OutputBlock(this.prefix()));
   }
 
-  prefix(firstLine = true): Prefix {
-    return [
-      this._prefixStack.map(p => p[0]).join(""),
-      this._prefixStack.map(p => p[1]).join("")
-    ];
+  prefix(): Prefix {
+    return Prefix.join(this._prefixStack);
   }
 
   /** Used for collecting link info to add on later */

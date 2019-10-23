@@ -9,7 +9,7 @@ import { BlockRendering, Prefix } from "./render";
 export abstract class IrNode {
   constructor(children: (IrNode | string)[]) {
     this.children = children;
-    this.name = this.constructor.name;
+    this.name = <NodeName>this.constructor.name;
   }
 
   push(child: IrNode | string) {
@@ -27,8 +27,10 @@ export abstract class IrNode {
   }
 
   children: (IrNode | string)[];
-  readonly name: string;
+  readonly name: NodeName;
 }
+
+type NodeName = "H" | "A" | "P" | "O" | "B" | "I" | "F" | "C" | "L";
 
 export class Doc extends IrNode {}
 
@@ -99,6 +101,31 @@ export class L extends IrNode {
     super.render(r);
     r.popPrefix(prefix);
   }
+}
+
+/** Ordered list */
+export class O extends IrNode {
+  render(r: BlockRendering) {
+    throw new Error("this node should have been transformed away");
+  }
+}
+
+/** Numbered list item */
+export class N extends IrNode {
+  constructor(children: (IrNode | string)[], { index }: { index: number }) {
+    super(children);
+    this.index = index;
+  }
+
+  render(r: BlockRendering) {
+    const number = this.index.toFixed(0).padStart(2);
+    const prefix = new Prefix(`${number}. `, "    ");
+    r.pushPrefix(prefix);
+    super.render(r);
+    r.popPrefix(prefix);
+  }
+
+  index: number;
 }
 
 /** Code */

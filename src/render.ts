@@ -7,12 +7,12 @@ export class Prefix {
     this.subsequent = subsequent !== undefined ? subsequent : first;
   }
 
-  get({ first }: { first: boolean }) {
-    if (first) {
+  render() {
+    if (!this._rendered) {
+      this._rendered = true;
       return this.first;
-    } else {
-      return this.subsequent;
     }
+    return this.subsequent;
   }
 
   equals(other: Prefix): boolean {
@@ -28,6 +28,7 @@ export class Prefix {
 
   readonly first: string;
   readonly subsequent: string;
+  private _rendered = false;
 }
 
 class OutputBlock {
@@ -58,8 +59,19 @@ class OutputBlock {
     return wrap(this._contents, this.prefix);
   }
 
-  readonly prefix: Prefix;
+  // If subsequent output blocks have the same prefix, with no separator
+  // between them where the prefix was popped off, then we don’t actually to
+  // use the first-line prefix.
+  markAsContinuation() {
+    this.prefix = new Prefix(this.prefix.subsequent);
+  }
+
+  prefix: Prefix;
   private _contents: string | undefined;
+
+  isHeading() {
+    return this.prefix.first.trimRight().endsWith("#");
+  }
 }
 
 export class TextRendering {
@@ -70,16 +82,24 @@ export class TextRendering {
   toText(): string {
     let ret = "";
     let separator: string | null = null;
+    let lastNonEmptyBlock: OutputBlock | null = null;
     for (let block of this._blocks) {
       const rendered = block.render();
       if (rendered !== "" && ret !== "" && separator != null) {
-        ret += separator + "\n";
+        const betweenHeadings =
+          block.isHeading() &&
+          lastNonEmptyBlock !== null &&
+          lastNonEmptyBlock.isHeading();
+        if (!betweenHeadings) {
+          ret += separator + "\n";
+        }
       }
       if (rendered !== "") {
         ret += rendered + "\n";
         separator = null;
+        lastNonEmptyBlock = block;
       } else {
-        separator = block.prefix.first.trimRight();
+        separator = block.prefix.subsequent.trimRight();
       }
     }
     return ret;
@@ -118,7 +138,20 @@ export class BlockRendering {
     this.trailers.push(s);
   }
 
+  cleanup() {
+    for (let i = 0; i < this.outputBlocks.length - 1; i++) {
+      const b0 = this.outputBlocks[i];
+      const b1 = this.outputBlocks[i + 1];
+
+      if (b0.prefix.equals(b1.prefix)) {
+        b1.prefix = b0.prefix;
+      }
+    }
+  }
+
   finish(): string {
+    this.cleanup();
+
     let ret = new TextRendering(this.outputBlocks).toText();
 
     if (this.trailers.length !== 0) {

@@ -79,7 +79,7 @@ class Wrap {
   }
 
   private renderPrefix() {
-    const prefix = this.prefix.get({ first: !this.currentPrefixRendered });
+    const prefix = this.prefix.render();
     this.result += prefix;
     this.col += prefix.length;
     this.currentPrefixRendered = true;

@@ -1,10 +1,11 @@
-import { IrNode } from "./2md";
+import { IrNode, N } from "./2md";
 
-export function applyOptimizations(root: IrNode) {
+export function applyTreeTransforms(root: IrNode) {
   visitPre(root, concatenateStrings);
   visitPre(root, replaceEmDashes);
   visitPre(root, removeEmptyLinks);
   visitPre(root, collapseCodeInsidePre);
+  visitPre(root, numberLists);
 }
 
 /**
@@ -71,6 +72,27 @@ function collapseCodeInsidePre(node: IrNode) {
     const c = node.children[0];
     if (typeof c !== "string" && c.name === "C") {
       node.children = c.children;
+    }
+  }
+}
+
+/**
+ * <pre><code>foo</code></pre> -> <pre>foo</pre>
+ */
+function numberLists(node: IrNode) {
+  for (let i = 0; i < node.children.length; i++) {
+    let counter = 1;
+    const c = node.children[i];
+    if (typeof c !== "string" && c.name === "O") {
+      const newChildren = c.children.map(n => {
+        if (typeof n !== "string" && n.name === "L") {
+          return new N(n.children, { index: counter++ });
+        } else {
+          return n;
+        }
+      });
+
+      node.children.splice(i, 1, ...newChildren);
     }
   }
 }

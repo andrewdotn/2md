@@ -1,6 +1,6 @@
 import { JSDOM } from "jsdom";
-import { IrNode, HeadingLevel, Doc, A, I, L, B, H, C, P, Q, F } from "./2md";
-import { applyOptimizations } from "./tree-transforms";
+import { IrNode, HeadingLevel, Doc, A, I, L, B, H, C, P, Q, F, O } from "./2md";
+import { applyTreeTransforms } from "./tree-transforms";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
   if (!/^H[1-6]$/.test(nodeName)) throw new Error("Not a heading");
@@ -37,6 +37,9 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
       case "I":
       case "EM":
         receiver = new I([]);
+        break;
+      case "OL":
+        receiver = new O([]);
         break;
       case "LI":
         receiver = new L([]);
@@ -94,7 +97,7 @@ export function parse(html: string, options?: ParseOptions): IrNode {
     parse1(parseRoot, doc.childNodes[i]);
   }
 
-  applyOptimizations(root);
+  applyTreeTransforms(root);
 
   return root;
 }

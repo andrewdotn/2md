@@ -1,4 +1,4 @@
-import { Rendering } from "./render";
+import { BlockRendering } from "./render";
 
 /**
  * Intermediate representation of the document. We use vanilla computing science
@@ -16,7 +16,7 @@ export abstract class IrNode {
     this.children.push(child);
   }
 
-  render(r: Rendering) {
+  render(r: BlockRendering) {
     for (let c of this.children) {
       if (typeof c === "string") {
         r.append(c);
@@ -44,14 +44,11 @@ export class H extends IrNode {
     this.level = level;
   }
 
-  render(r: Rendering) {
+  render(r: BlockRendering) {
     const prefix = "#".repeat(this.level) + " ";
     r.pushPrefix(prefix);
-    r.ensureStartOfLine();
     super.render(r);
     r.popPrefix(prefix);
-    r.ensureStartOfLine();
-    r.newLine();
   }
 
   level: HeadingLevel;
@@ -64,7 +61,7 @@ export class A extends IrNode {
     this.href = href;
   }
 
-  render(r: Rendering) {
+  render(r: BlockRendering) {
     const num = r.linkCounter++;
     r.append("[");
     super.render(r);
@@ -78,7 +75,7 @@ export class A extends IrNode {
 
 /** Bold */
 export class B extends IrNode {
-  render(r: Rendering) {
+  render(r: BlockRendering) {
     r.append("**");
     super.render(r);
     r.append("**");
@@ -87,7 +84,7 @@ export class B extends IrNode {
 
 /** Italics */
 export class I extends IrNode {
-  render(r: Rendering) {
+  render(r: BlockRendering) {
     r.append("*");
     super.render(r);
     r.append("*");
@@ -96,19 +93,27 @@ export class I extends IrNode {
 
 /** List item */
 export class L extends IrNode {
-  render(r: Rendering) {
-    r.ensureStartOfLine();
-    r.newLine();
+  render(r: BlockRendering) {
     r.pushPrefix("  - ", "    ");
     super.render(r);
     r.popPrefix("  - ", "    ");
   }
 }
 
+/** Code */
 export class C extends IrNode {
-  render(r: Rendering) {
+  render(r: BlockRendering) {
     r.append("`");
     super.render(r);
     r.append("`");
+  }
+}
+
+/** Paragraph */
+export class P extends IrNode {
+  render(r: BlockRendering) {
+    r.pushPrefix("");
+    super.render(r);
+    r.popPrefix("");
   }
 }

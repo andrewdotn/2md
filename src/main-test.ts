@@ -4,7 +4,7 @@ import { readFile } from "fs-extra";
 import remark from "remark";
 import html from "remark-html";
 import { toMd } from "./main";
-import { A, B, Doc, H, L } from "./2md";
+import { A, B, Doc, H, L, P } from "./2md";
 import { parse } from "./parse";
 
 async function fixture(filename: string): Promise<string> {
@@ -20,7 +20,11 @@ describe("2md", function() {
       const expected = new Doc([
         new H(["The end of 32-bit apps (and other removals)"], { level: 2 }),
 
-        "Mac hardware and macOS made the jump from 32 bits to 64 bits a long time ago, but Catalina will be the very first version of macOS that is totally unable to run 32-bit software. For (what I hope will be) the last time, let's review the Mac's entire 64-bit timeline from start to finish:",
+        new P([
+          "Mac hardware and macOS made the jump from 32 bits to 64 bits a long" +
+            " time ago, but Catalina will be the very first version of macOS" +
+            " that is totally unable to run 32-bit software. For (what I hope will be) the last time, let's review the Mac's entire 64-bit timeline from start to finish:"
+        ]),
         new L([
           new B(["June 2003"]),
           ": The PowerPC G5 CPU is ",
@@ -60,7 +64,7 @@ describe("2md", function() {
           .use(html)
           .process(md);
         const backToMd = toMd(rendered.contents.toString());
-        expect(md).to.eql(backToMd);
+        expect(backToMd).to.eql(md);
       });
     }
 

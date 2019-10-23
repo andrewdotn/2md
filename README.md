@@ -22,7 +22,6 @@ Some pretty basic things aren’t implemented yet:
   - [ ] blockquotes
   - [ ] pre/code/tt blocks
   - [ ] numbered lists
-  - [ ] multiple paragraphs
   - [ ] br tags, such as in poetry
   - [ ] clipboard access on any OS besides macOS
 

@@ -1,7 +1,12 @@
-import { isEqual } from "lodash";
+import { isEqual, last } from "lodash";
+import { wrap } from "./wrap";
 
 type Prefix = [string, string];
 
+/**
+ * Convenience function to allow callers to specify only one part of the prefix
+ * if both parts are the same.
+ */
 function makePrefix(
   firstLinePrefix: string,
   subsequentLinePrefix?: string
@@ -13,95 +18,90 @@ function makePrefix(
   return p;
 }
 
-function* wordPieces(s: string): Generator<RegExpExecArray> {
-  const wordRegex = /\S+/g;
-  let lastIndex = 0;
-  for (let m = wordRegex.exec(s); m !== null; m = wordRegex.exec(s)) {
-    lastIndex = m.index + m[0].length;
-    yield m;
+class OutputBlock {
+  constructor(prefix?: Prefix) {
+    if (prefix === undefined) {
+      prefix = makePrefix("");
+    }
+    this._prefixFirst = prefix[0];
+    this._prefixSubsequent = prefix[1];
   }
-  if (lastIndex < s.length) {
-    yield Object.assign([s.substring(lastIndex)], {
-      index: lastIndex,
-      input: s
-    });
+
+  append(s: string) {
+    if (this._contents === undefined) this._contents = "";
+    this._contents += s;
   }
+
+  contents(): string | null {
+    if (this._contents === undefined) {
+      return null;
+    }
+    return this._contents;
+  }
+
+  render(): string {
+    if (this._contents === undefined) {
+      return "";
+    }
+
+    return wrap(this._contents, this._prefixFirst, this._prefixSubsequent);
+  }
+
+  private readonly _prefixFirst: string;
+  private readonly _prefixSubsequent: string;
+  private _contents: string | undefined;
 }
 
-export class Rendering {
-  append(s: string, newline = false) {
-    s = s.replace(/\n/g, " ");
+export class TextRendering {
+  constructor(blocks: OutputBlock[]) {
+    this._blocks = blocks;
+  }
 
-    if (newline) {
-      this.ensureStartOfLine();
-    }
-
-    if (this.atStartOfLine) {
-      this.renderPrefix();
-    }
-
-    /** Greedy word wrap */
-    let lastMatchEnd = 0;
-    for (let m of wordPieces(s)) {
-      const word = m[0];
-      const matchEnd = m.index + word.length;
-      const matchLen = matchEnd - lastMatchEnd;
-
-      if (
-        !this.atStartOfLine &&
-        this.col + (matchEnd - lastMatchEnd) > this.maxWidth
-      ) {
-        this.ensureStartOfLine();
-        this.renderPrefix();
+  toText(): string {
+    let ret = "";
+    for (let b of this._blocks) {
+      const rendered = b.render();
+      if (rendered) {
+        if (ret !== "") {
+          ret += "\n";
+        }
+        ret += rendered;
+        if (ret !== "" && !ret.endsWith("\n")) {
+          ret += "\n";
+        }
       }
-
-      const toAdd = this.atStartOfLine
-        ? m[0]
-        : s.substring(lastMatchEnd, matchEnd);
-      this.result += toAdd;
-      this.col += matchLen;
-      this.atStartOfLine = false;
-
-      lastMatchEnd = matchEnd;
     }
+    return ret;
   }
 
-  private renderPrefix() {
-    const prefix = this.prefix(!this.currentPrefixRendered);
-    this.result += prefix;
-    this.col += prefix.length;
-    this.currentPrefixRendered = true;
-  }
+  private _blocks: OutputBlock[];
+}
 
-  ensureStartOfLine() {
-    if (!this.atStartOfLine) {
-      this.newLine();
-    }
-  }
-
-  newLine() {
-    this.result += "\n";
-    this.col = 0;
-    this.atStartOfLine = true;
+export class BlockRendering {
+  append(s: string, newline = false) {
+    last(this.result)!.append(s);
   }
 
   pushPrefix(firstLinePrefix: string, subsequentLinePrefix?: string) {
-    this.prefixStack.push(makePrefix(firstLinePrefix, subsequentLinePrefix));
-    this.currentPrefixRendered = false;
-    this.ensureStartOfLine();
+    const prefix = makePrefix(firstLinePrefix, subsequentLinePrefix);
+    this._prefixStack.push(prefix);
+    this.result.push(new OutputBlock(this.prefix()));
   }
 
   popPrefix(firstLinePrefix: string, subsequentLinePrefix?: string) {
     const prefix = makePrefix(firstLinePrefix, subsequentLinePrefix);
-    const popped = this.prefixStack.pop();
+    const popped = this._prefixStack.pop();
     if (!isEqual(popped, prefix)) {
       throw new Error("pop does not match what was pushed");
     }
-    this.currentPrefixRendered = false;
+    this.result.push(new OutputBlock(this.prefix()));
   }
 
-  prefix(firstLine = true) {
-    return this.prefixStack.map(p => (firstLine ? p[0] : p[1])).join("");
+  prefix(firstLine = true): Prefix {
+    return [
+      this._prefixStack.map(p => p[0]).join(""),
+      this._prefixStack.map(p => p[1]).join("")
+    ];
   }
 
   /** Used for collecting link info to add on later */
@@ -109,22 +109,22 @@ export class Rendering {
     this.trailers.push(s);
   }
 
-  finish() {
-    this.ensureStartOfLine();
-    while (this.trailers.length > 0) {
-      this.result += `\n${this.trailers.shift()}`;
+  finish(): string {
+    let ret = new TextRendering(this.result).toText();
+
+    if (this.trailers.length !== 0) {
+      while (!ret.endsWith("\n\n")) {
+        ret += "\n";
+      }
+      while (this.trailers.length > 0) {
+        ret += `${this.trailers.shift()}\n`;
+      }
     }
-    if (!this.result.endsWith("\n")) {
-      this.newLine();
-    }
+    return ret;
   }
 
-  maxWidth = 80;
-  atStartOfLine = true;
-  col = 0;
-  private prefixStack: Prefix[] = [];
-  private currentPrefixRendered = false;
-  result = "";
+  private _prefixStack: Prefix[] = [];
+  result: OutputBlock[] = [];
   linkCounter = 1;
   trailers: string[] = [];
 }

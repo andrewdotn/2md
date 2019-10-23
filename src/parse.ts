@@ -1,5 +1,5 @@
 import { JSDOM } from "jsdom";
-import { IrNode, HeadingLevel, Doc, A, I, L, B, H, C } from "./2md";
+import { IrNode, HeadingLevel, Doc, A, I, L, B, H, C, P } from "./2md";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
   if (!/^H[1-6]$/.test(nodeName)) throw new Error("Not a heading");
@@ -43,6 +43,9 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
       case "A":
         receiver = new A([], { href: e.getAttribute("href") || "" });
         break;
+      case "P":
+        receiver = new P([]);
+        break;
       case "CODE":
         receiver = new C([]);
         break;
@@ -56,7 +59,7 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
   }
 }
 
-function parseHtml(html: string): Document {
+export function parseHtml(html: string): Document {
   const dom = new JSDOM(html);
   return dom.window.document;
 }

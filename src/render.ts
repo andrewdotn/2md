@@ -59,13 +59,6 @@ class OutputBlock {
     return wrap(this._contents, this.prefix);
   }
 
-  // If subsequent output blocks have the same prefix, with no separator
-  // between them where the prefix was popped off, then we don’t actually to
-  // use the first-line prefix.
-  markAsContinuation() {
-    this.prefix = new Prefix(this.prefix.subsequent);
-  }
-
   prefix: Prefix;
   private _contents: string | undefined;
 

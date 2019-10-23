@@ -4,7 +4,7 @@ import { readFile } from "fs-extra";
 import remark from "remark";
 import html from "remark-html";
 import { toMd } from "./main";
-import { A, B, Doc, H, L, P } from "./2md";
+import { A, B, Doc, F, H, L, P } from "./2md";
 import { parse } from "./parse";
 import { BlockRendering } from "./render";
 
@@ -16,6 +16,10 @@ async function fixture(filename: string): Promise<string> {
 
 describe("2md", function() {
   describe("parsing", function() {
+    it("handles text with no markup at all", function() {
+      expect(toMd("foo")).to.eql("foo\n");
+    });
+
     it("can parse the first sample", async function() {
       const html = await fixture("quote1.html");
       const expected = new Doc([
@@ -46,6 +50,11 @@ describe("2md", function() {
       const parsed = parse(html);
       expect(parsed).to.deep.equal(expected);
     });
+
+    it("turns <pre><code> into just a preformatted node", function() {
+      const parsed = parse(`<pre><code>foo</code></pre>`);
+      expect(parsed).to.deep.equal(new Doc([new F(["foo"])]));
+    });
   });
 
   describe("end-to-end", function() {
@@ -72,7 +81,8 @@ describe("2md", function() {
     for (let filename of [
       "blockquote1.md",
       "inline-code.md",
-      "round-trip1.md"
+      "round-trip1.md",
+      "round-trip2.md"
     ]) {
       roundTripTest(filename);
     }
@@ -82,6 +92,10 @@ describe("2md", function() {
     it("strips out empty anchor elements", async function() {
       const anchorsHtml = await fixture("anchors.html");
       expect(toMd(anchorsHtml)).to.eql("# Hello, world.\n");
+    });
+
+    it("handles tt elements", function() {
+      expect(toMd("<tt>foo</tt>")).to.eql("`foo`\n");
     });
   });
 

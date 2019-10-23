@@ -4,6 +4,7 @@ export function applyOptimizations(root: IrNode) {
   visitPre(root, concatenateStrings);
   visitPre(root, replaceEmDashes);
   visitPre(root, removeEmptyLinks);
+  visitPre(root, collapseCodeInsidePre);
 }
 
 /**
@@ -54,6 +55,22 @@ function removeEmptyLinks(node: IrNode) {
     const c = node.children[i];
     if (typeof c !== "string" && c.name === "A" && c.children.length === 0) {
       node.children.splice(i, 1);
+    }
+  }
+}
+
+/**
+ * <pre><code>foo</code></pre> -> <pre>foo</pre>
+ */
+function collapseCodeInsidePre(node: IrNode) {
+  if (node.name !== "F") {
+    return;
+  }
+
+  if (node.children.length === 1) {
+    const c = node.children[0];
+    if (typeof c !== "string" && c.name === "C") {
+      node.children = c.children;
     }
   }
 }

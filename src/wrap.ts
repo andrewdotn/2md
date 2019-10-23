@@ -1,7 +1,7 @@
 import { Prefix } from "./render";
 
 function* wordPieces(s: string): Generator<RegExpExecArray> {
-  const wordRegex = /\S+/g;
+  const wordRegex = /\S+|\n/g;
   let lastIndex = 0;
   for (let m = wordRegex.exec(s); m !== null; m = wordRegex.exec(s)) {
     lastIndex = m.index + m[0].length;
@@ -15,22 +15,36 @@ function* wordPieces(s: string): Generator<RegExpExecArray> {
   }
 }
 
+export function stripTrailingNewlines(text: string) {
+  const m = /\n+$/.exec(text);
+  if (m) {
+    return text.substring(0, m.index);
+  } else {
+    return text;
+  }
+}
+
 class Wrap {
-  constructor(s: string, prefix: Prefix) {
+  constructor(s: string, prefix: Prefix, preserveNewlines: boolean) {
     this.text = s;
     this.prefix = prefix;
     this.result = "";
+    this.preserveNewlines = preserveNewlines;
   }
 
   wrap() {
     this.result = "";
-    const text = this.text.replace(/\n/g, " ");
+    let text = this.preserveNewlines
+      ? stripTrailingNewlines(this.text)
+      : this.text.replace(/\n/g, " ");
 
     if (this.atStartOfLine) {
       this.renderPrefix();
     }
 
-    /** Greedy word wrap */
+    // Greedy word wrap. The non-greedy algorithm is much more important for
+    // good spacing in justified proportional-width text, where we’re wrapping
+    // monospace text at 80 cols.
     let lastMatchEnd = 0;
     for (let m of wordPieces(text)) {
       const word = m[0];
@@ -48,7 +62,13 @@ class Wrap {
       const toAdd = this.atStartOfLine
         ? m[0]
         : text.substring(lastMatchEnd, matchEnd);
+
       this.result += toAdd;
+      if (toAdd == "\n") {
+        this.col = 0;
+        this.atStartOfLine = true;
+        this.renderPrefix();
+      }
       this.col += matchLen;
       this.atStartOfLine = false;
 
@@ -83,9 +103,10 @@ class Wrap {
   col = 0;
   currentPrefixRendered = false;
   prefix: Prefix;
+  private preserveNewlines: boolean;
   result: string;
 }
 
-export function wrap(s: string, prefix: Prefix) {
-  return new Wrap(s, prefix).wrap();
+export function wrap(s: string, prefix: Prefix, preserveNewlines = true) {
+  return new Wrap(s, prefix, preserveNewlines).wrap();
 }

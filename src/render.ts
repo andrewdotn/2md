@@ -90,12 +90,15 @@ export class TextRendering {
 
 export class BlockRendering {
   append(s: string, newline = false) {
-    last(this.result)!.append(s);
+    if (this.outputBlocks.length === 0) {
+      this.pushPrefix(new Prefix(""));
+    }
+    last(this.outputBlocks)!.append(s);
   }
 
   pushPrefix(prefix: Prefix) {
     this._prefixStack.push(prefix);
-    this.result.push(new OutputBlock(this.prefix()));
+    this.outputBlocks.push(new OutputBlock(this.prefix()));
   }
 
   popPrefix(prefix: Prefix) {
@@ -103,7 +106,7 @@ export class BlockRendering {
     if (popped === undefined || !popped.equals(prefix)) {
       throw new Error("pop does not match what was pushed");
     }
-    this.result.push(new OutputBlock(this.prefix()));
+    this.outputBlocks.push(new OutputBlock(this.prefix()));
   }
 
   prefix(): Prefix {
@@ -116,7 +119,7 @@ export class BlockRendering {
   }
 
   finish(): string {
-    let ret = new TextRendering(this.result).toText();
+    let ret = new TextRendering(this.outputBlocks).toText();
 
     if (this.trailers.length !== 0) {
       while (!ret.endsWith("\n\n")) {
@@ -130,7 +133,7 @@ export class BlockRendering {
   }
 
   private _prefixStack: Prefix[] = [];
-  result: OutputBlock[] = [];
+  outputBlocks: OutputBlock[] = [];
   linkCounter = 1;
   trailers: string[] = [];
 }

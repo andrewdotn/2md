@@ -110,6 +110,16 @@ export class C extends IrNode {
   }
 }
 
+/** Preformatted */
+export class F extends IrNode {
+  render(r: BlockRendering) {
+    const prefix = new Prefix("    ");
+    r.pushPrefix(prefix);
+    super.render(r);
+    r.popPrefix(prefix);
+  }
+}
+
 /** Paragraph */
 export class P extends IrNode {
   render(r: BlockRendering) {

@@ -19,7 +19,6 @@ and hyperlinks are all preserved.
 
 Some pretty basic things aren’t implemented yet:
 
-  - [ ] pre/code/tt blocks
   - [ ] numbered lists
   - [ ] br tags, such as in poetry
   - [ ] clipboard access on any OS besides macOS

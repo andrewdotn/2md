@@ -78,6 +78,13 @@ describe("2md", function() {
     }
   });
 
+  describe("formatting", function() {
+    it("strips out empty anchor elements", async function() {
+      const anchorsHtml = await fixture("anchors.html");
+      expect(toMd(anchorsHtml)).to.eql("# Hello, world.\n");
+    });
+  });
+
   describe("--wrap-in-backquote", function() {
     it("works", function() {
       const intermediate = parse(`foo`, { wrapInBackquote: true });

@@ -20,7 +20,7 @@ and hyperlinks are all preserved.
 Some pretty basic things aren’t implemented yet:
 
   - [ ] numbered lists
-  - [ ] br tags, such as in poetry
+  - [ ] br tags, such as in poetry, or when two used in place of <p>
   - [ ] clipboard access on any OS besides macOS
 
 The package will be [published on npm][npm-2md] once most of those are

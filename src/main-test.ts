@@ -82,7 +82,9 @@ describe("2md", function() {
       "blockquote1.md",
       "inline-code.md",
       "round-trip1.md",
-      "round-trip2.md"
+      "round-trip2.md",
+      "round-trip3.md",
+      "round-trip4.md"
     ]) {
       roundTripTest(filename);
     }

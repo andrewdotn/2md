@@ -56,6 +56,10 @@ function removeEmptyLinks(node: IrNode) {
     const c = node.children[i];
     if (typeof c !== "string" && c.name === "A" && c.children.length === 0) {
       node.children.splice(i, 1);
+      // Since we just deleted the element at the current index, decrement
+      // the loop index, otherwise we’ll miss the next element which has
+      // shifted down into the current position.
+      i--;
     }
   }
 }

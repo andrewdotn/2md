@@ -97,7 +97,7 @@ describe("2md", function() {
   describe("formatting", function() {
     it("strips out empty anchor elements", async function() {
       const anchorsHtml = await fixture("anchors.html");
-      expect(toMd(anchorsHtml)).to.eql("# Hello, world.\n");
+      expect(toMd(anchorsHtml)).to.eql("# Hello, world.\n".repeat(2));
     });
 
     it("handles tt elements", function() {

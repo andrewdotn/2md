@@ -21,7 +21,7 @@ It’s already pretty functional!
 
 The things that aren’t implemented yet:
 
-  - br tags, such as in poetry, or when two are used in place of <p>
+  - br tags, such as in poetry, or when two are used in place of &lt;p>
   - images; including the link wouldn’t hurt
   - clipboard access on any OS besides macOS, though the cli will read
     html from a file if one is named on the command line

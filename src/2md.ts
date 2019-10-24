@@ -47,7 +47,7 @@ export class H extends IrNode {
   }
 
   render(r: BlockRendering) {
-    const prefix = new Prefix("#".repeat(this.level) + " ");
+    const prefix = new Prefix("#".repeat(this.level) + " ", "");
     r.pushPrefix(prefix);
     super.render(r);
     r.popPrefix(prefix);
@@ -96,6 +96,7 @@ export class I extends IrNode {
 /** List item */
 export class L extends IrNode {
   render(r: BlockRendering) {
+    // See comment on Prefix constructor
     const prefix = new Prefix("  - ", "    ");
     r.pushPrefix(prefix);
     super.render(r);

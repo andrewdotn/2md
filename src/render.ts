@@ -1,29 +1,35 @@
 import { last } from "lodash";
 import { wrap } from "./wrap";
 
+/**
+ * A string that gets prepended to each line of an output block in Markdown,
+ * e.g., `#` or `>`. The first line is often different from subsequent lines,
+ * for example with a bulleted list that is simply indented on subsequent lines.
+ *
+ * You should always make a new prefix instead of caching one, because it
+ * contains state to track whether the first line has been printed or not.
+ */
 export class Prefix {
   constructor(first: string, subsequent?: string) {
     this.first = first;
     this.subsequent = subsequent !== undefined ? subsequent : first;
   }
 
-  render() {
-    if (!this._rendered) {
-      this._rendered = true;
-      return this.first;
+  static render(prefixStack: Prefix[]): string {
+    let ret = "";
+    for (let p of prefixStack) {
+      if (!p._rendered) {
+        p._rendered = true;
+        ret += p.first;
+      } else {
+        ret += p.subsequent;
+      }
     }
-    return this.subsequent;
+    return ret;
   }
 
   equals(other: Prefix): boolean {
     return this.first === other.first && this.subsequent === other.subsequent;
-  }
-
-  static join(prefixList: Prefix[]) {
-    return new Prefix(
-      prefixList.map(p => p.first).join(""),
-      prefixList.map(p => p.subsequent).join("")
-    );
   }
 
   readonly first: string;
@@ -32,11 +38,8 @@ export class Prefix {
 }
 
 class OutputBlock {
-  constructor(prefix?: Prefix) {
-    if (prefix === undefined) {
-      prefix = new Prefix("");
-    }
-    this.prefix = prefix;
+  constructor(prefixStack: Prefix[]) {
+    this.prefixStack = prefixStack;
   }
 
   append(s: string) {
@@ -56,14 +59,18 @@ class OutputBlock {
       return "";
     }
 
-    return wrap(this._contents, this.prefix);
+    return wrap(this._contents, this.prefixStack);
   }
 
-  prefix: Prefix;
+  prefixStack: Prefix[];
   private _contents: string | undefined;
 
   isHeading() {
-    return this.prefix.first.trimRight().endsWith("#");
+    if (this.prefixStack.length === 0) return false;
+
+    return last(this.prefixStack)!
+      .first.trimRight()
+      .endsWith("#");
   }
 }
 
@@ -74,25 +81,21 @@ export class TextRendering {
 
   toText(): string {
     let ret = "";
-    let separator: string | null = null;
     let lastNonEmptyBlock: OutputBlock | null = null;
     for (let block of this._blocks) {
       const rendered = block.render();
-      if (rendered !== "" && ret !== "" && separator != null) {
+      if (rendered !== "" && ret !== "") {
         const betweenHeadings =
           block.isHeading() &&
           lastNonEmptyBlock !== null &&
           lastNonEmptyBlock.isHeading();
-        if (!betweenHeadings) {
-          ret += separator + "\n";
+        if (!betweenHeadings && lastNonEmptyBlock !== null) {
+          ret += Prefix.render(lastNonEmptyBlock.prefixStack).trim() + "\n";
         }
       }
       if (rendered !== "") {
         ret += rendered + "\n";
-        separator = null;
         lastNonEmptyBlock = block;
-      } else {
-        separator = block.prefix.subsequent.trimRight();
       }
     }
     return ret;
@@ -111,7 +114,7 @@ export class BlockRendering {
 
   pushPrefix(prefix: Prefix) {
     this._prefixStack.push(prefix);
-    this.outputBlocks.push(new OutputBlock(this.prefix()));
+    this.outputBlocks.push(new OutputBlock(this._prefixStack.slice()));
   }
 
   popPrefix(prefix: Prefix) {
@@ -119,11 +122,7 @@ export class BlockRendering {
     if (popped === undefined || !popped.equals(prefix)) {
       throw new Error("pop does not match what was pushed");
     }
-    this.outputBlocks.push(new OutputBlock(this.prefix()));
-  }
-
-  prefix(): Prefix {
-    return Prefix.join(this._prefixStack);
+    this.outputBlocks.push(new OutputBlock(this._prefixStack.slice()));
   }
 
   /** Used for collecting link info to add on later */
@@ -131,20 +130,7 @@ export class BlockRendering {
     this.trailers.push(s);
   }
 
-  cleanup() {
-    for (let i = 0; i < this.outputBlocks.length - 1; i++) {
-      const b0 = this.outputBlocks[i];
-      const b1 = this.outputBlocks[i + 1];
-
-      if (b0.prefix.equals(b1.prefix)) {
-        b1.prefix = b0.prefix;
-      }
-    }
-  }
-
   finish(): string {
-    this.cleanup();
-
     let ret = new TextRendering(this.outputBlocks).toText();
 
     if (this.trailers.length !== 0) {

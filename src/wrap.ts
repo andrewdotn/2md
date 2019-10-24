@@ -25,9 +25,9 @@ export function stripTrailingNewlines(text: string) {
 }
 
 class Wrap {
-  constructor(s: string, prefix: Prefix, preserveNewlines: boolean) {
+  constructor(s: string, prefixStack: Prefix[], preserveNewlines: boolean) {
     this.text = s;
-    this.prefix = prefix;
+    this.prefixStack = prefixStack;
     this.result = "";
     this.preserveNewlines = preserveNewlines;
   }
@@ -79,7 +79,7 @@ class Wrap {
   }
 
   private renderPrefix() {
-    const prefix = this.prefix.render();
+    const prefix = Prefix.render(this.prefixStack);
     this.result += prefix;
     this.col += prefix.length;
     this.currentPrefixRendered = true;
@@ -102,11 +102,15 @@ class Wrap {
   atStartOfLine = true;
   col = 0;
   currentPrefixRendered = false;
-  prefix: Prefix;
+  prefixStack: Prefix[];
   private preserveNewlines: boolean;
   result: string;
 }
 
-export function wrap(s: string, prefix: Prefix, preserveNewlines = true) {
-  return new Wrap(s, prefix, preserveNewlines).wrap();
+export function wrap(
+  s: string,
+  prefixStack: Prefix[],
+  preserveNewlines = true
+) {
+  return new Wrap(s, prefixStack, preserveNewlines).wrap();
 }

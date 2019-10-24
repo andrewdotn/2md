@@ -103,7 +103,6 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
       const intermediate = parse(input, parseOptions);
       const rendering = new BlockRendering();
       intermediate.render(rendering);
-      rendering.cleanup();
       output = inspect(rendering.outputBlocks, false, 10);
       break;
     }

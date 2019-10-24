@@ -1,19 +1,19 @@
 import { JSDOM } from "jsdom";
 import {
-  IrNode,
-  HeadingLevel,
-  Doc,
   A,
-  I,
-  ListItem,
-  Bold,
-  Heading,
-  Code,
-  P,
   Blockquote,
-  Preformatted,
+  Bold,
+  Br,
+  Code,
+  Doc,
+  Heading,
+  HeadingLevel,
+  I,
+  IrNode,
+  ListItem,
   OrderedList,
-  Br
+  P,
+  Preformatted
 } from "./2md";
 import { applyTreeTransforms } from "./tree-transforms";
 
@@ -22,17 +22,20 @@ function extractHeadingLevel(nodeName: string): HeadingLevel {
   return <HeadingLevel>(nodeName.charCodeAt(1) - "0".charCodeAt(0));
 }
 
-function parse1(ilNode: IrNode, htmlNode: Node) {
+function parse1(irNode: IrNode, htmlNode: Node) {
   if (
     htmlNode.nodeType == htmlNode.TEXT_NODE &&
     htmlNode.textContent !== null
   ) {
-    if (htmlNode.textContent != "\n") {
-      ilNode.push(htmlNode.textContent);
+    if (
+      htmlNode.textContent !== "\n" ||
+      irNode.isOrHasParentNamed("Preformatted")
+    ) {
+      irNode.push(htmlNode.textContent);
     }
   } else if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
     const e = <Element>htmlNode;
-    let receiver = ilNode;
+    let receiver = irNode;
     switch (htmlNode.nodeName) {
       case "STRONG":
         receiver = new Bold([]);
@@ -86,7 +89,7 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
         receiver = new Br([]);
         break;
     }
-    if (ilNode !== receiver) ilNode.push(receiver);
+    if (irNode !== receiver) irNode.push(receiver);
 
     for (let i = 0; i < htmlNode.childNodes.length; i++) {
       const c = htmlNode.childNodes[i];
@@ -105,6 +108,19 @@ const defaultParseOptions = {
 };
 
 export type ParseOptions = Partial<typeof defaultParseOptions>;
+
+// For debugging input HTML
+// @ts-ignore
+function stripStyles(htmlNode: Node) {
+  if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
+    const e = <Element>htmlNode;
+    e.removeAttribute("style");
+    e.removeAttribute("class");
+    for (let i = 0; i < e.childNodes.length; i++) {
+      stripStyles(e.childNodes[i]);
+    }
+  }
+}
 
 export function parse(html: string, options?: ParseOptions): IrNode {
   options = Object.assign(defaultParseOptions, options);

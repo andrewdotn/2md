@@ -14,7 +14,7 @@ export function applyTreeTransforms(root: IrNode) {
  */
 function visitPre(root: IrNode, fn: (node: IrNode) => void) {
   fn(root);
-  for (let c of root.children) {
+  for (let c of root.copyOfChildren()) {
     if (typeof c !== "string") {
       visitPre(c, fn);
     }
@@ -26,12 +26,13 @@ function visitPre(root: IrNode, fn: (node: IrNode) => void) {
  * should be quick, and is here entirely to make unit test input cleaner.
  */
 function concatenateStrings(node: IrNode) {
-  for (let i = 0; i < node.children.length - 1; i++) {
-    const c0 = node.children[i];
-    const c1 = node.children[i + 1];
+  for (let i = 0; i < node.childCount() - 1; i++) {
+    const c0 = node.child(i);
+    const c1 = node.child(i + 1);
     if (typeof c0 === "string" && typeof c1 === "string") {
-      node.children[i] += c1;
-      node.children.splice(i + 1, 1);
+      node.setChild(i, c0 + c1);
+      node.removeChild(i + 1);
+      i--;
     }
   }
 }
@@ -41,10 +42,10 @@ function concatenateStrings(node: IrNode) {
  * fixed-width fonts that we’re expecting this markdown to be viewed with.
  */
 function replaceEmDashes(node: IrNode) {
-  for (let i = 0; i < node.children.length; i++) {
-    const c = node.children[i];
+  for (let i = 0; i < node.childCount(); i++) {
+    const c = node.child(i);
     if (typeof c === "string" && c.indexOf("—") !== -1) {
-      node.children[i] = c.replace(/—/g, "--");
+      node.setChild(i, c.replace(/—/g, "--"));
     }
   }
 }
@@ -53,10 +54,10 @@ function replaceEmDashes(node: IrNode) {
  * Strip out empty links, such as <a name=...></a>
  */
 function removeEmptyLinks(node: IrNode) {
-  for (let i = 0; i < node.children.length; i++) {
-    const c = node.children[i];
-    if (typeof c !== "string" && c.name === "A" && c.children.length === 0) {
-      node.children.splice(i, 1);
+  for (let i = 0; i < node.childCount(); i++) {
+    const c = node.child(i);
+    if (typeof c !== "string" && c.name === "A" && !c.hasChildren()) {
+      node.removeChild(i);
       // Since we just deleted the element at the current index, decrement
       // the loop index, otherwise we’ll miss the next element which has
       // shifted down into the current position.
@@ -73,10 +74,17 @@ function collapseCodeInsidePre(node: IrNode) {
     return;
   }
 
-  if (node.children.length === 1) {
-    const c = node.children[0];
+  if (node.childCount() === 1) {
+    const c = node.child(0);
     if (typeof c !== "string" && c.name === "Code") {
-      node.children = c.children;
+      // Roundabout way of doing `node.children = c.children;`
+      const copy = c.copyOfChildren();
+      while (node.hasChildren()) {
+        node.removeChild(0);
+      }
+      for (let c1 of copy) {
+        node.push(c1);
+      }
     }
   }
 }
@@ -85,31 +93,36 @@ function collapseCodeInsidePre(node: IrNode) {
  * <pre><code>foo</code></pre> -> <pre>foo</pre>
  */
 function numberLists(node: IrNode) {
-  for (let i = 0; i < node.children.length; i++) {
+  for (let i = 0; i < node.childCount(); i++) {
     let counter = 1;
-    const c = node.children[i];
+    const c = node.child(i);
     if (typeof c !== "string" && c.name === "OrderedList") {
-      const newChildren = c.children.map(n => {
+      const newChildren = c.copyOfChildren().map(n => {
         if (typeof n !== "string" && n.name === "ListItem") {
-          return new NumberedListItem(n.children, { index: counter++ });
+          return new NumberedListItem(n.copyOfChildren(), { index: counter++ });
         } else {
           return n;
         }
       });
 
-      node.children.splice(i, 1, ...newChildren);
+      node.removeChild(i);
+      for (let j = 0; j < newChildren.length; j++) {
+        node.insertChild(i + j, newChildren[j]);
+      }
     }
   }
 }
 
 function twoBrsMakesOneSeparator(node: IrNode) {
-  for (let i = 0; i < node.children.length - 1; i++) {
-    const n0 = node.children[i];
-    const n1 = node.children[i + 1];
+  for (let i = 0; i < node.childCount() - 1; i++) {
+    const n0 = node.child(i);
+    const n1 = node.child(i + 1);
 
     if (typeof n0 !== "string" && n0.name === "Br") {
       if (typeof n1 !== "string" && n1.name === "Br") {
-        node.children.splice(i, 2, new Separator([]));
+        node.removeChild(i);
+        node.removeChild(i);
+        node.insertChild(i, new Separator([]));
       }
     }
   }

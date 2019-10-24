@@ -4,7 +4,7 @@ import { readFile } from "fs-extra";
 import remark from "remark";
 import html from "remark-html";
 import { toMd } from "./main";
-import { A, Bold, Doc, Preformatted, Heading, ListItem, P } from "./2md";
+import { A, Bold, Doc, Heading, ListItem, P, Preformatted } from "./2md";
 import { parse } from "./parse";
 import { BlockRendering } from "./render";
 
@@ -60,7 +60,7 @@ describe("2md", function() {
   });
 
   describe("end-to-end", function() {
-    for (let basename of ["quote1", "quote2", "single-br"]) {
+    for (let basename of ["quote1", "quote2", "quote3", "single-br"]) {
       it(`can process ${basename}.html to ${basename}.md`, async function() {
         const [html, md] = await Promise.all(
           ["html", "md"].map(ext => fixture(basename + "." + ext))

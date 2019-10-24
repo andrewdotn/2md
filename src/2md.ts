@@ -10,17 +10,70 @@ import { includes, last } from "lodash";
  */
 export abstract class IrNode {
   constructor(children: (IrNode | string)[]) {
-    this.children = children;
     if (!includes(nodeNames, this.constructor.name)) {
       throw new Error(
         `constructor ${this.constructor.name} is not in nodeNames`
       );
     }
     this.name = <NodeName>this.constructor.name;
+
+    for (let c of children) {
+      if (c instanceof IrNode) {
+        c.parent = this;
+      }
+    }
+    this.children = children;
   }
 
   push(child: IrNode | string) {
     this.children.push(child);
+    if (typeof child !== "string") {
+      child.parent = this;
+    }
+  }
+
+  isOrHasParentNamed(name: NodeName): boolean {
+    if (this.name === name) {
+      return true;
+    }
+    if (this.parent) {
+      return this.parent.isOrHasParentNamed(name);
+    }
+    return false;
+  }
+
+  copyOfChildren() {
+    return this.children.slice();
+  }
+
+  childCount() {
+    return this.children.length;
+  }
+
+  hasChildren() {
+    return this.children.length !== 0;
+  }
+
+  child(i: number) {
+    return this.children[i];
+  }
+
+  setChild(i: number, value: IrNode | string) {
+    if (value instanceof IrNode) {
+      value.parent = this;
+    }
+    this.children[i] = value;
+  }
+
+  removeChild(i: number) {
+    this.children.splice(i, 1);
+  }
+
+  insertChild(i: number, value: IrNode | string) {
+    if (value instanceof IrNode) {
+      value.parent = this;
+    }
+    this.children.splice(i, 0, value);
   }
 
   render(r: BlockRendering) {
@@ -33,7 +86,10 @@ export abstract class IrNode {
     }
   }
 
-  children: (IrNode | string)[];
+  // Life was easier when other classes had direct access to the `children`
+  // array, but we need to track parents for `isOrHasParentNamed().`
+  private children: (IrNode | string)[];
+  parent?: IrNode;
   readonly name: NodeName;
 }
 

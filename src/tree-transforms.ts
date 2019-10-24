@@ -1,4 +1,4 @@
-import { IrNode, N } from "./2md";
+import { IrNode, N, Separator } from "./2md";
 
 export function applyTreeTransforms(root: IrNode) {
   visitPre(root, concatenateStrings);
@@ -6,6 +6,7 @@ export function applyTreeTransforms(root: IrNode) {
   visitPre(root, removeEmptyLinks);
   visitPre(root, collapseCodeInsidePre);
   visitPre(root, numberLists);
+  visitPre(root, twoBrsMakesOneSeparator);
 }
 
 /**
@@ -97,6 +98,22 @@ function numberLists(node: IrNode) {
       });
 
       node.children.splice(i, 1, ...newChildren);
+    }
+  }
+}
+
+function twoBrsMakesOneSeparator(node: IrNode) {
+  for (let i = 0; i < node.children.length - 1; i++) {
+    const n0 = node.children[i];
+    const n1 = node.children[i + 1];
+
+    if (typeof n0 !== "string" && n0.name === "Br") {
+      if (typeof n1 !== "string" && n1.name === "Br") {
+        node.children.splice(i, 1, new Separator([]));
+      } else {
+        node.children.splice(i, 1);
+        i--;
+      }
     }
   }
 }

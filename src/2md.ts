@@ -1,4 +1,6 @@
 import { BlockRendering, Prefix } from "./render";
+import { tuple } from "./tuple";
+import { includes } from "lodash";
 
 /**
  * Intermediate representation of the document. We use vanilla computing science
@@ -9,6 +11,11 @@ import { BlockRendering, Prefix } from "./render";
 export abstract class IrNode {
   constructor(children: (IrNode | string)[]) {
     this.children = children;
+    if (!includes(nodeNames, this.constructor.name)) {
+      throw new Error(
+        `constructor ${this.constructor.name} is not in nodeNames`
+      );
+    }
     this.name = <NodeName>this.constructor.name;
   }
 
@@ -30,13 +37,28 @@ export abstract class IrNode {
   readonly name: NodeName;
 }
 
-type NodeName = "H" | "A" | "P" | "O" | "B" | "I" | "F" | "C" | "L";
+const nodeNames = tuple(
+  "A",
+  "B",
+  "Br",
+  "Separator",
+  "C",
+  "Doc",
+  "F",
+  "H",
+  "I",
+  "L",
+  "N",
+  "O",
+  "P",
+  "Q"
+);
+type NodeName = typeof nodeNames[number];
 
 export class Doc extends IrNode {}
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-/** Heading */
 export class H extends IrNode {
   constructor(
     children: (IrNode | string)[],
@@ -165,6 +187,25 @@ export class Q extends IrNode {
     const prefix = new Prefix("> ");
     r.pushPrefix(prefix);
     super.render(r);
+    r.popPrefix(prefix);
+  }
+}
+
+// For <br> tags: two subsequent ones are turned into a Separator nodes. A
+// single <br> tag is ignored for now.
+export class Br extends IrNode {
+  render(r: BlockRendering) {
+    throw new Error("this node should have been transformed away");
+  }
+}
+
+export class Separator extends IrNode {
+  render(r: BlockRendering) {
+    if (this.children.length !== 0) {
+      throw new Error("a separator should not have children");
+    }
+    const prefix = new Prefix("");
+    r.pushPrefix(prefix);
     r.popPrefix(prefix);
   }
 }

@@ -1,5 +1,20 @@
 import { JSDOM } from "jsdom";
-import { IrNode, HeadingLevel, Doc, A, I, L, B, H, C, P, Q, F, O } from "./2md";
+import {
+  IrNode,
+  HeadingLevel,
+  Doc,
+  A,
+  I,
+  L,
+  B,
+  H,
+  C,
+  P,
+  Q,
+  F,
+  O,
+  Br
+} from "./2md";
 import { applyTreeTransforms } from "./tree-transforms";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
@@ -59,6 +74,9 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
       case "TT":
       case "CODE":
         receiver = new C([]);
+        break;
+      case "BR":
+        receiver = new Br([]);
         break;
     }
     if (ilNode !== receiver) ilNode.push(receiver);

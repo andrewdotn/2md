@@ -2,6 +2,7 @@ import yargs from "yargs";
 import { run } from "./run";
 import { parse, parseHtml, ParseOptions } from "./parse";
 import { BlockRendering } from "./render";
+import { tuple } from "./tuple";
 import { readFile } from "fs-extra";
 import { inspect } from "util";
 
@@ -11,11 +12,6 @@ export function toMd(html: string, options?: ParseOptions): string {
   const rendered = new BlockRendering();
   intermediate.render(rendered);
   return rendered.finish();
-}
-
-// https://stackoverflow.com/a/54071129/14558
-function tuple<T extends string[]>(...o: T) {
-  return o;
 }
 
 // Getting the clipboard as HTML is relatively easy in swift:

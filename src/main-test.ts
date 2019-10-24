@@ -107,6 +107,10 @@ describe("2md", function() {
     it("wraps normal text", function() {
       expect(toMd("foo\nbar\nbaz\n")).to.eql("foo bar baz\n");
     });
+
+    it("turns two brs into a newline", async function() {
+      expect(toMd(await fixture("two-br.html"))).to.eql("foo\n\nbar\n\nbaz\n");
+    });
   });
 
   describe("--wrap-in-backquote", function() {

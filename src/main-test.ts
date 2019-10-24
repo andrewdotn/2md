@@ -60,7 +60,13 @@ describe("2md", function() {
   });
 
   describe("end-to-end", function() {
-    for (let basename of ["quote1", "quote2", "quote3", "single-br"]) {
+    for (let basename of [
+      "bold-and-italic",
+      "quote1",
+      "quote2",
+      "quote3",
+      "single-br"
+    ]) {
       it(`can process ${basename}.html to ${basename}.md`, async function() {
         const [html, md] = await Promise.all(
           ["html", "md"].map(ext => fixture(basename + "." + ext))

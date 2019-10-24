@@ -37,9 +37,6 @@ function parse1(irNode: IrNode, htmlNode: Node) {
     const e = <Element>htmlNode;
     let receiver = irNode;
     switch (htmlNode.nodeName) {
-      case "STRONG":
-        receiver = new Bold([]);
-        break;
       case "H1":
       case "H2":
       case "H3":
@@ -50,7 +47,7 @@ function parse1(irNode: IrNode, htmlNode: Node) {
           level: extractHeadingLevel(htmlNode.nodeName)
         });
         break;
-      case "Bold":
+      case "B":
       case "STRONG":
         receiver = new Bold([]);
         break;

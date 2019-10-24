@@ -1,11 +1,25 @@
 {
   "name": "2md",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "Apache-2.0",
+  "description": "convert formatted text to markdown",
+  "homepage": "https://github.com/andrewdotn/2md",
+  "keywords": [
+    "markdown",
+    "clipboard"
+  ],
+  "files": [
+    "lib/**/*.js"
+  ],
+  "main": "lib/public/api.js",
+  "bin": {
+    "2md": "lib/main.js"
+  },
   "scripts": {
     "test": "tsc && yarn run pretty:check && mocha -r ./babel-register --exclude 'node_modules/**' 'src/**/*-test.ts'",
     "pretty": "prettier --write '*.js' '*.json' 'src/**/*.ts'",
-    "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts'"
+    "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts'",
+    "package": "tsc && rm -rf lib && babel --extensions=.ts --source-maps=false -d lib src && find lib -name '*-test.js' -o -name '*.d.js' -print0 | xargs -0 rm && yarn pack"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",

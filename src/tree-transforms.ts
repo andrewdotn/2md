@@ -1,4 +1,4 @@
-import { IrNode, N, Separator } from "./2md";
+import { IrNode, NumberedListItem, Separator } from "./2md";
 
 export function applyTreeTransforms(root: IrNode) {
   visitPre(root, concatenateStrings);
@@ -69,13 +69,13 @@ function removeEmptyLinks(node: IrNode) {
  * <pre><code>foo</code></pre> -> <pre>foo</pre>
  */
 function collapseCodeInsidePre(node: IrNode) {
-  if (node.name !== "F") {
+  if (node.name !== "Preformatted") {
     return;
   }
 
   if (node.children.length === 1) {
     const c = node.children[0];
-    if (typeof c !== "string" && c.name === "C") {
+    if (typeof c !== "string" && c.name === "Code") {
       node.children = c.children;
     }
   }
@@ -88,10 +88,10 @@ function numberLists(node: IrNode) {
   for (let i = 0; i < node.children.length; i++) {
     let counter = 1;
     const c = node.children[i];
-    if (typeof c !== "string" && c.name === "O") {
+    if (typeof c !== "string" && c.name === "OrderedList") {
       const newChildren = c.children.map(n => {
-        if (typeof n !== "string" && n.name === "L") {
-          return new N(n.children, { index: counter++ });
+        if (typeof n !== "string" && n.name === "ListItem") {
+          return new NumberedListItem(n.children, { index: counter++ });
         } else {
           return n;
         }

@@ -5,14 +5,14 @@ import {
   Doc,
   A,
   I,
-  L,
-  B,
-  H,
-  C,
+  ListItem,
+  Bold,
+  Heading,
+  Code,
   P,
-  Q,
-  F,
-  O,
+  Blockquote,
+  Preformatted,
+  OrderedList,
   Br
 } from "./2md";
 import { applyTreeTransforms } from "./tree-transforms";
@@ -35,7 +35,7 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
     let receiver = ilNode;
     switch (htmlNode.nodeName) {
       case "STRONG":
-        receiver = new B([]);
+        receiver = new Bold([]);
         break;
       case "H1":
       case "H2":
@@ -43,37 +43,39 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
       case "H4":
       case "H5":
       case "H6":
-        receiver = new H([], { level: extractHeadingLevel(htmlNode.nodeName) });
+        receiver = new Heading([], {
+          level: extractHeadingLevel(htmlNode.nodeName)
+        });
         break;
-      case "B":
+      case "Bold":
       case "STRONG":
-        receiver = new B([]);
+        receiver = new Bold([]);
         break;
       case "I":
       case "EM":
         receiver = new I([]);
         break;
       case "OL":
-        receiver = new O([]);
+        receiver = new OrderedList([]);
         break;
       case "LI":
-        receiver = new L([]);
+        receiver = new ListItem([]);
         break;
       case "A":
         receiver = new A([], { href: e.getAttribute("href") || "" });
         break;
       case "PRE":
-        receiver = new F([]);
+        receiver = new Preformatted([]);
         break;
       case "P":
         receiver = new P([]);
         break;
       case "BLOCKQUOTE":
-        receiver = new Q([]);
+        receiver = new Blockquote([]);
         break;
       case "TT":
       case "CODE":
-        receiver = new C([]);
+        receiver = new Code([]);
         break;
       case "BR":
         receiver = new Br([]);
@@ -107,7 +109,7 @@ export function parse(html: string, options?: ParseOptions): IrNode {
   let parseRoot = root;
 
   if (options.wrapInBackquote) {
-    parseRoot = new Q([]);
+    parseRoot = new Blockquote([]);
     root.push(parseRoot);
   }
 

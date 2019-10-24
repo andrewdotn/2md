@@ -4,7 +4,7 @@ import { readFile } from "fs-extra";
 import remark from "remark";
 import html from "remark-html";
 import { toMd } from "./main";
-import { A, B, Doc, F, H, L, P } from "./2md";
+import { A, Bold, Doc, Preformatted, Heading, ListItem, P } from "./2md";
 import { parse } from "./parse";
 import { BlockRendering } from "./render";
 
@@ -23,23 +23,25 @@ describe("2md", function() {
     it("can parse the first sample", async function() {
       const html = await fixture("quote1.html");
       const expected = new Doc([
-        new H(["The end of 32-bit apps (and other removals)"], { level: 2 }),
+        new Heading(["The end of 32-bit apps (and other removals)"], {
+          level: 2
+        }),
 
         new P([
           "Mac hardware and macOS made the jump from 32 bits to 64 bits a long" +
             " time ago, but Catalina will be the very first version of macOS" +
             " that is totally unable to run 32-bit software. For (what I hope will be) the last time, let's review the Mac's entire 64-bit timeline from start to finish:"
         ]),
-        new L([
-          new B(["June 2003"]),
+        new ListItem([
+          new Bold(["June 2003"]),
           ": The PowerPC G5 CPU is ",
           new A(["the first 64-bit-capable chip to show up in a Mac"], {
             href: "https://www.macworld.com/article/1025078/future.html"
           }),
           ", and with Mac OS X 10.3 Panther, it can theoretically address up to 8GB of RAM."
         ]),
-        new L([
-          new B(["April 2005"]),
+        new ListItem([
+          new Bold(["April 2005"]),
           ": Mac OS X 10.4 Tiger ",
           new A(["allows for 64-bit processes under the hood"], {
             href: "https://arstechnica.com/gadgets/2005/04/macosx-10-4/4/"
@@ -53,7 +55,7 @@ describe("2md", function() {
 
     it("turns <pre><code> into just a preformatted node", function() {
       const parsed = parse(`<pre><code>foo</code></pre>`);
-      expect(parsed).to.deep.equal(new Doc([new F(["foo"])]));
+      expect(parsed).to.deep.equal(new Doc([new Preformatted(["foo"])]));
     });
   });
 

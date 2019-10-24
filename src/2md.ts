@@ -39,19 +39,19 @@ export abstract class IrNode {
 
 const nodeNames = tuple(
   "A",
-  "B",
+  "Bold",
   "Br",
   "Separator",
-  "C",
+  "Code",
   "Doc",
-  "F",
-  "H",
+  "Preformatted",
+  "Heading",
   "I",
-  "L",
-  "N",
-  "O",
+  "ListItem",
+  "NumberedListItem",
+  "OrderedList",
   "P",
-  "Q"
+  "Blockquote"
 );
 type NodeName = typeof nodeNames[number];
 
@@ -59,7 +59,7 @@ export class Doc extends IrNode {}
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
-export class H extends IrNode {
+export class Heading extends IrNode {
   constructor(
     children: (IrNode | string)[],
     { level }: { level: HeadingLevel }
@@ -79,7 +79,6 @@ export class H extends IrNode {
   level: HeadingLevel;
 }
 
-/** Link */
 export class A extends IrNode {
   constructor(children: (IrNode | string)[], { href }: { href: string }) {
     super(children);
@@ -99,7 +98,7 @@ export class A extends IrNode {
 }
 
 /** Bold */
-export class B extends IrNode {
+export class Bold extends IrNode {
   render(r: BlockRendering) {
     r.append("**");
     super.render(r);
@@ -116,8 +115,7 @@ export class I extends IrNode {
   }
 }
 
-/** List item */
-export class L extends IrNode {
+export class ListItem extends IrNode {
   render(r: BlockRendering) {
     // See comment on Prefix constructor
     const prefix = new Prefix("  - ", "    ");
@@ -127,15 +125,13 @@ export class L extends IrNode {
   }
 }
 
-/** Ordered list */
-export class O extends IrNode {
+export class OrderedList extends IrNode {
   render(r: BlockRendering) {
     throw new Error("this node should have been transformed away");
   }
 }
 
-/** Numbered list item */
-export class N extends IrNode {
+export class NumberedListItem extends IrNode {
   constructor(children: (IrNode | string)[], { index }: { index: number }) {
     super(children);
     this.index = index;
@@ -152,8 +148,7 @@ export class N extends IrNode {
   index: number;
 }
 
-/** Code */
-export class C extends IrNode {
+export class Code extends IrNode {
   render(r: BlockRendering) {
     r.append("`");
     super.render(r);
@@ -161,8 +156,7 @@ export class C extends IrNode {
   }
 }
 
-/** Preformatted */
-export class F extends IrNode {
+export class Preformatted extends IrNode {
   render(r: BlockRendering) {
     const prefix = new Prefix("    ");
     r.pushPrefix(prefix, { maxWidth: 0, preserveNewlines: true });
@@ -171,7 +165,6 @@ export class F extends IrNode {
   }
 }
 
-/** Paragraph */
 export class P extends IrNode {
   render(r: BlockRendering) {
     const prefix = new Prefix("");
@@ -181,8 +174,7 @@ export class P extends IrNode {
   }
 }
 
-/** Blockquote */
-export class Q extends IrNode {
+export class Blockquote extends IrNode {
   render(r: BlockRendering) {
     const prefix = new Prefix("> ");
     r.pushPrefix(prefix);

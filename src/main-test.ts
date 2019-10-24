@@ -60,12 +60,14 @@ describe("2md", function() {
   });
 
   describe("end-to-end", function() {
-    it("can process the first sample", async function() {
-      const [html, md] = await Promise.all(
-        ["html", "md"].map(ext => fixture(`quote1.${ext}`))
-      );
-      expect(toMd(html)).to.eql(md);
-    });
+    for (let basename of ["quote1", "quote2"]) {
+      it(`can process ${basename}.html to ${basename}.md`, async function() {
+        const [html, md] = await Promise.all(
+          ["html", "md"].map(ext => fixture(basename + "." + ext))
+        );
+        expect(toMd(html)).to.eql(md);
+      });
+    }
   });
 
   describe("round-trip", function() {

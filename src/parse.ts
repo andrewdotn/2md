@@ -68,6 +68,11 @@ function parse1(ilNode: IrNode, htmlNode: Node) {
         receiver = new Preformatted([]);
         break;
       case "P":
+      // There’s no standard markdown representation for these, but putting them
+      // on separate lines is better than jamming them together in a single
+      // paragraph.
+      case "DL":
+      case "DT":
         receiver = new P([]);
         break;
       case "BLOCKQUOTE":

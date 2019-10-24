@@ -177,10 +177,12 @@ export class P extends IrNode {
 export class Blockquote extends IrNode {
   render(r: BlockRendering) {
     const prefix = new Prefix("> ");
-    r.pushPrefix(prefix);
+    r.pushPrefix(prefix, { acceptsTrailers: this.acceptsTrailers });
     super.render(r);
     r.popPrefix(prefix);
   }
+
+  acceptsTrailers = false;
 }
 
 // For <br> tags: two subsequent ones are turned into a Separator nodes. A

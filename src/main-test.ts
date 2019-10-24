@@ -124,5 +124,12 @@ describe("2md", function() {
       intermediate.render(rendering);
       expect(rendering.finish()).to.eql(`> foo\n`);
     });
+
+    it("includes trailers within the backquote", function() {
+      const intermediate = parse("<a href=#top>Top</a>", { quote: true });
+      const rendering = new BlockRendering();
+      intermediate.render(rendering);
+      expect(rendering.finish()).to.eql("> [Top][1]\n>\n> [1]: #top\n");
+    });
   });
 });

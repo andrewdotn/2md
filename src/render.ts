@@ -73,7 +73,7 @@ class OutputBlock {
 
   prefixStack: Prefix[];
   private _contents: string | undefined;
-  private wrapOptions?: WrapOptions;
+  readonly wrapOptions?: WrapOptions;
 }
 
 export class TextRendering {
@@ -137,12 +137,23 @@ export class BlockRendering {
   finish(): string {
     let ret = new TextRendering(this.outputBlocks).toText();
 
+    let prefix = "";
+
+    // If there’s a block that accepts trailers, use its prefix.
+    for (let i = this.outputBlocks.length - 1; i >= 0; i--) {
+      const block = this.outputBlocks[i];
+      if (block.wrapOptions && block.wrapOptions.acceptsTrailers) {
+        prefix = Prefix.render(block.prefixStack);
+        break;
+      }
+    }
+
     if (this.trailers.length !== 0) {
-      while (!ret.endsWith("\n\n")) {
-        ret += "\n";
+      while (!ret.endsWith(`\n${prefix.trimRight()}\n`)) {
+        ret += prefix.trimRight() + "\n";
       }
       while (this.trailers.length > 0) {
-        ret += `${this.trailers.shift()}\n`;
+        ret += `${prefix}${this.trailers.shift()}\n`;
       }
     }
     return ret;

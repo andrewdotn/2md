@@ -114,7 +114,9 @@ export function parse(html: string, options?: ParseOptions): IrNode {
   let parseRoot = root;
 
   if (options.quote) {
-    parseRoot = new Blockquote([]);
+    const blockquote = new Blockquote([]);
+    blockquote.acceptsTrailers = true;
+    parseRoot = blockquote;
     root.push(parseRoot);
   }
 

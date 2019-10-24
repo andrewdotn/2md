@@ -25,8 +25,9 @@ export function stripTrailingNewlines(text: string) {
 }
 
 const defaultWrapOptions = {
-  preserveNewlines: false,
-  maxWidth: 80
+  acceptsTrailers: false,
+  maxWidth: 80,
+  preserveNewlines: false
 };
 
 export type WrapOptions = Partial<typeof defaultWrapOptions>;

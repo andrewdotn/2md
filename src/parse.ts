@@ -96,7 +96,7 @@ export function parseHtml(html: string): Document {
 }
 
 const defaultParseOptions = {
-  wrapInBackquote: false
+  quote: false
 };
 
 export type ParseOptions = Partial<typeof defaultParseOptions>;
@@ -108,7 +108,7 @@ export function parse(html: string, options?: ParseOptions): IrNode {
   const root = new Doc([]);
   let parseRoot = root;
 
-  if (options.wrapInBackquote) {
+  if (options.quote) {
     parseRoot = new Blockquote([]);
     root.push(parseRoot);
   }

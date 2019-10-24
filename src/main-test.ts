@@ -117,7 +117,7 @@ describe("2md", function() {
 
   describe("--wrap-in-backquote", function() {
     it("works", function() {
-      const intermediate = parse(`foo`, { wrapInBackquote: true });
+      const intermediate = parse(`foo`, { quote: true });
       const rendering = new BlockRendering();
       intermediate.render(rendering);
       expect(rendering.finish()).to.eql(`> foo\n`);

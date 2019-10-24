@@ -51,7 +51,11 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
     // enabled by default because we don’t want users to have to pull in
     // markdown libraries too.
     .option("dev-mode-md-to-html-first", { type: "boolean", hidden: true })
-    .option("wrap-in-backquote", { type: "boolean", default: true }).argv;
+    .option("quote", {
+      type: "boolean",
+      default: true,
+      description: "Wrap the output in a quote"
+    }).argv;
 
   let input: string;
   if (argv._.length == 1) {
@@ -71,7 +75,7 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
 
   const outputFormat: OutputFormat = <OutputFormat>argv.outputFormat;
   const parseOptions: ParseOptions = {
-    wrapInBackquote: <boolean>argv.wrapInBackquote
+    quote: <boolean>argv.quote
   };
 
   let output: string;

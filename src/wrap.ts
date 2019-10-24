@@ -24,19 +24,33 @@ export function stripTrailingNewlines(text: string) {
   }
 }
 
+const defaultWrapOptions = {
+  preserveNewlines: false,
+  maxWidth: 80
+};
+
+export type WrapOptions = Partial<typeof defaultWrapOptions>;
+
 class Wrap {
-  constructor(s: string, prefixStack: Prefix[], preserveNewlines: boolean) {
+  constructor(s: string, prefixStack: Prefix[], options: WrapOptions) {
+    const { maxWidth, preserveNewlines } = {
+      ...defaultWrapOptions,
+      ...options
+    };
     this.text = s;
     this.prefixStack = prefixStack;
     this.result = "";
+    this.maxWidth = maxWidth;
     this.preserveNewlines = preserveNewlines;
   }
 
   wrap() {
     this.result = "";
-    let text = this.preserveNewlines
-      ? stripTrailingNewlines(this.text)
-      : this.text.replace(/\n/g, " ");
+    let text = stripTrailingNewlines(this.text);
+    if (!this.preserveNewlines) {
+      text = this.text.replace(/\n/g, " ");
+      text = text.trimRight();
+    }
 
     if (this.atStartOfLine) {
       this.renderPrefix();
@@ -53,6 +67,7 @@ class Wrap {
 
       if (
         !this.atStartOfLine &&
+        this.maxWidth > 0 &&
         this.col + (matchEnd - lastMatchEnd) > this.maxWidth
       ) {
         this.ensureStartOfLine();
@@ -98,7 +113,7 @@ class Wrap {
   }
 
   text: string;
-  maxWidth = 80;
+  maxWidth: number;
   atStartOfLine = true;
   col = 0;
   currentPrefixRendered = false;
@@ -110,7 +125,7 @@ class Wrap {
 export function wrap(
   s: string,
   prefixStack: Prefix[],
-  preserveNewlines = true
+  options: WrapOptions = {}
 ) {
-  return new Wrap(s, prefixStack, preserveNewlines).wrap();
+  return new Wrap(s, prefixStack, options).wrap();
 }

@@ -17,13 +17,16 @@ and hyperlinks are all preserved.
 
 ## Current status
 
-Some pretty basic things aren’t implemented yet:
+It’s already pretty functional!
 
-  - [ ] numbered lists
-  - [ ] br tags, such as in poetry, or when two used in place of <p>
-  - [ ] clipboard access on any OS besides macOS
+The things that aren’t implemented yet:
 
-The package will be [published on npm][npm-2md] once most of those are
-taken care of. For now, you can check out the code and run `bin/2md`.
+  - br tags, such as in poetry, or when two are used in place of <p>
+  - images; including the link wouldn’t hurt
+  - clipboard access on any OS besides macOS, though the cli will read
+    html from a file if one is named on the command line
+
+The package will eventually be [published on npm][npm-2md]. For now, you
+can check out the code and run `bin/2md`.
 
 [npm-2md]: https://www.npmjs.com/package/2md

@@ -79,12 +79,16 @@ describe("2md", function() {
     }
 
     for (let filename of [
+      "README.md",
       "blockquote1.md",
+      "headings-cant-wrap.md",
       "inline-code.md",
+      "nested-lists.md",
       "round-trip1.md",
       "round-trip2.md",
       "round-trip3.md",
-      "round-trip4.md"
+      "round-trip4.md",
+      "too-long-code.md"
     ]) {
       roundTripTest(filename);
     }
@@ -98,6 +102,10 @@ describe("2md", function() {
 
     it("handles tt elements", function() {
       expect(toMd("<tt>foo</tt>")).to.eql("`foo`\n");
+    });
+
+    it("wraps normal text", function() {
+      expect(toMd("foo\nbar\nbaz\n")).to.eql("foo bar baz\n");
     });
   });
 

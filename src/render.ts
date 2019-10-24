@@ -1,5 +1,5 @@
 import { last } from "lodash";
-import { wrap } from "./wrap";
+import { wrap, WrapOptions } from "./wrap";
 
 /**
  * A string that gets prepended to each line of an output block in Markdown,
@@ -38,8 +38,9 @@ export class Prefix {
 }
 
 class OutputBlock {
-  constructor(prefixStack: Prefix[]) {
+  constructor(prefixStack: Prefix[], wrapOptions?: WrapOptions) {
     this.prefixStack = prefixStack;
+    this.wrapOptions = wrapOptions;
   }
 
   append(s: string) {
@@ -59,11 +60,8 @@ class OutputBlock {
       return "";
     }
 
-    return wrap(this._contents, this.prefixStack);
+    return wrap(this._contents, this.prefixStack, this.wrapOptions);
   }
-
-  prefixStack: Prefix[];
-  private _contents: string | undefined;
 
   isHeading() {
     if (this.prefixStack.length === 0) return false;
@@ -72,6 +70,10 @@ class OutputBlock {
       .first.trimRight()
       .endsWith("#");
   }
+
+  prefixStack: Prefix[];
+  private _contents: string | undefined;
+  private wrapOptions?: WrapOptions;
 }
 
 export class TextRendering {
@@ -112,9 +114,11 @@ export class BlockRendering {
     last(this.outputBlocks)!.append(s);
   }
 
-  pushPrefix(prefix: Prefix) {
+  pushPrefix(prefix: Prefix, wrapOptions?: WrapOptions) {
     this._prefixStack.push(prefix);
-    this.outputBlocks.push(new OutputBlock(this._prefixStack.slice()));
+    this.outputBlocks.push(
+      new OutputBlock(this._prefixStack.slice(), wrapOptions)
+    );
   }
 
   popPrefix(prefix: Prefix) {

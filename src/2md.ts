@@ -48,7 +48,8 @@ export class H extends IrNode {
 
   render(r: BlockRendering) {
     const prefix = new Prefix("#".repeat(this.level) + " ", "");
-    r.pushPrefix(prefix);
+    // Headings shouldn’t be wrapped as they turn into multiple heading blocks
+    r.pushPrefix(prefix, { maxWidth: 0 });
     super.render(r);
     r.popPrefix(prefix);
   }
@@ -142,7 +143,7 @@ export class C extends IrNode {
 export class F extends IrNode {
   render(r: BlockRendering) {
     const prefix = new Prefix("    ");
-    r.pushPrefix(prefix);
+    r.pushPrefix(prefix, { maxWidth: 0, preserveNewlines: true });
     super.render(r);
     r.popPrefix(prefix);
   }

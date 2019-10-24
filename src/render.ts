@@ -87,10 +87,6 @@ export class TextRendering {
     for (let block of this._blocks) {
       let rendered = block.render();
 
-      if (block.wrapOptions.endsWithHardBreak) {
-        rendered += "  ";
-      }
-
       if (rendered !== "" && ret !== "") {
         const betweenHeadings =
           block.isHeading() &&
@@ -105,7 +101,11 @@ export class TextRendering {
         }
       }
       if (rendered !== "") {
-        ret += rendered + "\n";
+        ret += rendered;
+        if (block.wrapOptions.endsWithHardBreak) {
+          ret += "  ";
+        }
+        ret += "\n";
         lastNonEmptyBlock = block;
       }
     }

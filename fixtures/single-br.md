@@ -1,3 +1,5 @@
 foo  
 bar  
-baz
+baz a
+
+foo

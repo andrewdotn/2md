@@ -1,5 +1,5 @@
 import { last } from "lodash";
-import { wrap, WrapOptions } from "./wrap";
+import { wrap, BlockOptions } from "./wrap";
 
 /**
  * A string that gets prepended to each line of an output block in Markdown,
@@ -38,9 +38,9 @@ export class Prefix {
 }
 
 class OutputBlock {
-  constructor(prefixStack: Prefix[], wrapOptions?: WrapOptions) {
+  constructor(prefixStack: Prefix[], wrapOptions?: BlockOptions) {
     this.prefixStack = prefixStack;
-    this.wrapOptions = wrapOptions;
+    this.wrapOptions = { ...wrapOptions };
   }
 
   append(s: string) {
@@ -73,7 +73,7 @@ class OutputBlock {
 
   prefixStack: Prefix[];
   private _contents: string | undefined;
-  readonly wrapOptions?: WrapOptions;
+  readonly wrapOptions: BlockOptions;
 }
 
 export class TextRendering {
@@ -85,13 +85,22 @@ export class TextRendering {
     let ret = "";
     let lastNonEmptyBlock: OutputBlock | null = null;
     for (let block of this._blocks) {
-      const rendered = block.render();
+      let rendered = block.render();
+
+      if (block.wrapOptions.endsWithHardBreak) {
+        rendered += "  ";
+      }
+
       if (rendered !== "" && ret !== "") {
         const betweenHeadings =
           block.isHeading() &&
           lastNonEmptyBlock !== null &&
           lastNonEmptyBlock.isHeading();
-        if (!betweenHeadings && lastNonEmptyBlock !== null) {
+        if (
+          !betweenHeadings &&
+          lastNonEmptyBlock !== null &&
+          !lastNonEmptyBlock.wrapOptions.endsWithHardBreak
+        ) {
           ret += Prefix.render(lastNonEmptyBlock.prefixStack).trim() + "\n";
         }
       }
@@ -114,7 +123,7 @@ export class BlockRendering {
     last(this.outputBlocks)!.append(s);
   }
 
-  pushPrefix(prefix: Prefix, wrapOptions?: WrapOptions) {
+  pushPrefix(prefix: Prefix, wrapOptions?: BlockOptions) {
     this._prefixStack.push(prefix);
     this.outputBlocks.push(
       new OutputBlock(this._prefixStack.slice(), wrapOptions)
@@ -142,7 +151,7 @@ export class BlockRendering {
     // If there’s a block that accepts trailers, use its prefix.
     for (let i = this.outputBlocks.length - 1; i >= 0; i--) {
       const block = this.outputBlocks[i];
-      if (block.wrapOptions && block.wrapOptions.acceptsTrailers) {
+      if (block.wrapOptions.acceptsTrailers) {
         prefix = Prefix.render(block.prefixStack);
         break;
       }

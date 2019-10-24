@@ -109,10 +109,7 @@ function twoBrsMakesOneSeparator(node: IrNode) {
 
     if (typeof n0 !== "string" && n0.name === "Br") {
       if (typeof n1 !== "string" && n1.name === "Br") {
-        node.children.splice(i, 1, new Separator([]));
-      } else {
-        node.children.splice(i, 1);
-        i--;
+        node.children.splice(i, 2, new Separator([]));
       }
     }
   }

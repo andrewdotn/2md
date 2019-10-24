@@ -24,18 +24,19 @@ export function stripTrailingNewlines(text: string) {
   }
 }
 
-const defaultWrapOptions = {
+const defaultBlockOptions = {
   acceptsTrailers: false,
   maxWidth: 80,
-  preserveNewlines: false
+  preserveNewlines: false,
+  endsWithHardBreak: false
 };
 
-export type WrapOptions = Partial<typeof defaultWrapOptions>;
+export type BlockOptions = Partial<typeof defaultBlockOptions>;
 
 class Wrap {
-  constructor(s: string, prefixStack: Prefix[], options: WrapOptions) {
+  constructor(s: string, prefixStack: Prefix[], options: BlockOptions) {
     const { maxWidth, preserveNewlines } = {
-      ...defaultWrapOptions,
+      ...defaultBlockOptions,
       ...options
     };
     this.text = s;
@@ -126,7 +127,7 @@ class Wrap {
 export function wrap(
   s: string,
   prefixStack: Prefix[],
-  options: WrapOptions = {}
+  options: BlockOptions = {}
 ) {
   return new Wrap(s, prefixStack, options).wrap();
 }

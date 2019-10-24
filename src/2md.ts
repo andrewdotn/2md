@@ -1,6 +1,6 @@
 import { BlockRendering, Prefix } from "./render";
 import { tuple } from "./tuple";
-import { includes } from "lodash";
+import { includes, last } from "lodash";
 
 /**
  * Intermediate representation of the document. We use vanilla computing science
@@ -189,15 +189,15 @@ export class Blockquote extends IrNode {
 // single <br> tag is ignored for now.
 export class Br extends IrNode {
   render(r: BlockRendering) {
-    throw new Error("this node should have been transformed away");
+    const prefix = new Prefix("");
+    last(r.outputBlocks)!.wrapOptions.endsWithHardBreak = true;
+    r.pushPrefix(prefix);
+    r.popPrefix(prefix);
   }
 }
 
 export class Separator extends IrNode {
   render(r: BlockRendering) {
-    if (this.children.length !== 0) {
-      throw new Error("a separator should not have children");
-    }
     const prefix = new Prefix("");
     r.pushPrefix(prefix);
     r.popPrefix(prefix);

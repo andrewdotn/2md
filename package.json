@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "fs-extra": "^8.1.0",
+    "grapheme-splitter": "^1.0.4",
     "jsdom": "^15.1.1",
     "lodash": "^4.17.15",
     "yargs": "^14.2.0"

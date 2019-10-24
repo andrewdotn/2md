@@ -1,4 +1,5 @@
 import { Prefix } from "./render";
+import GraphemeSplitter from "grapheme-splitter";
 
 function* wordPieces(s: string): Generator<RegExpExecArray> {
   const wordRegex = /\S+|\n/g;
@@ -47,6 +48,8 @@ class Wrap {
   }
 
   wrap() {
+    const splitter = new GraphemeSplitter();
+
     this.result = "";
     let text = stripTrailingNewlines(this.text);
     if (!this.preserveNewlines) {
@@ -65,12 +68,14 @@ class Wrap {
     for (let m of wordPieces(text)) {
       const word = m[0];
       const matchEnd = m.index + word.length;
-      const matchLen = matchEnd - lastMatchEnd;
+      const matchLength = splitter.countGraphemes(
+        text.substring(lastMatchEnd, matchEnd)
+      );
 
       if (
         !this.atStartOfLine &&
         this.maxWidth > 0 &&
-        this.col + (matchEnd - lastMatchEnd) > this.maxWidth
+        this.col + matchLength > this.maxWidth
       ) {
         this.ensureStartOfLine();
         this.renderPrefix();
@@ -86,7 +91,7 @@ class Wrap {
         this.atStartOfLine = true;
         this.renderPrefix();
       }
-      this.col += matchLen;
+      this.col += matchLength;
       this.atStartOfLine = false;
 
       lastMatchEnd = matchEnd;

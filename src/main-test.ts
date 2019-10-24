@@ -88,6 +88,7 @@ describe("2md", function() {
       "headings-cant-wrap.md",
       "inline-code.md",
       "nested-lists.md",
+      "round-trip-emoji.md",
       "round-trip1.md",
       "round-trip2.md",
       "round-trip3.md",

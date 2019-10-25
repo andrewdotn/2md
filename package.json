@@ -21,6 +21,9 @@
     "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts'",
     "package": "tsc && rm -rf lib && babel --extensions=.ts --source-maps=false -d lib src && find lib -name '*-test.js' -o -name '*.d.js' -print0 | xargs -0 rm && yarn pack"
   },
+  "engines": {
+    "node": ">=12.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.6.4",
     "@babel/core": "^7.6.4",

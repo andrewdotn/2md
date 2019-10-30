@@ -89,9 +89,6 @@ function collapseCodeInsidePre(node: IrNode) {
   }
 }
 
-/**
- * <pre><code>foo</code></pre> -> <pre>foo</pre>
- */
 function numberLists(node: IrNode) {
   for (let i = 0; i < node.childCount(); i++) {
     let counter = 1;

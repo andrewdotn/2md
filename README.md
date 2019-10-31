@@ -80,3 +80,31 @@ A quick sketch of how this works:
 You can see the results of individual steps with the `--output-format`
 option to the cli. These are subject to change without notice, and not
 exposed through the public api.
+
+## Releasing
+
+The current release process, to be automated later, is:
+
+ 1. Remove the `-pre` tag from the package.json version field
+
+ 2. Update `CHANGELOG.md`
+
+ 3. Commit to git, and `git tag vA.B.C`
+
+ 4. `git push --tags master`.
+
+    Optional: figure out automation to put `CHANGELOG.md` excerpt into
+    auto-created [GitHub releases][gh-release].
+
+[gh-release]: https://github.com/andrewdotn/2md/releases
+
+ 5. `yarn run pack` and inspect tarball
+
+ 6. `npm publish 2md-vA.B.C.tgz`.
+
+     If publishing a pre-release, add `npm publish --tag next` to [set the
+     correct npm tag][npm-next].
+
+[npm-next]: https://medium.com/@mbostock/prereleases-and-npm-e778fc5e2420
+
+ 7. Bump version and add `-pre` version suffix in `package.json`

@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import yargs from "yargs";
 import { run } from "./run";
 import { parse, parseHtml, ParseOptions } from "./parse";
@@ -120,9 +118,7 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
   console.log(output);
 }
 
-if (require.main === module) {
-  main().catch(e => {
-    console.error(e);
-    process.exit(1);
-  });
-}
+main().catch(e => {
+console.error(e);
+process.exit(1);
+});

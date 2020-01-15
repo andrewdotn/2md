@@ -38,9 +38,11 @@
     "@types/yargs": "^13.0.3",
     "chai": "^4.2.0",
     "mocha": "^6.2.1",
+    "parcel": "^1.12.4",
     "prettier": "^1.18.2",
     "remark": "^11.0.1",
     "remark-html": "^10.0.0",
+    "tslib": "^1.10.0",
     "typescript": "^3.6.4"
   },
   "dependencies": {

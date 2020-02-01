@@ -9,13 +9,16 @@ import { includes, last } from "lodash";
  * markdown elements, which then gets rendered to text.
  */
 export abstract class IrNode {
+  // An earlier version used the class name directly, but that does not
+  // survive minification.
+  static irName: NodeName;
+
   constructor(children: (IrNode | string)[]) {
-    if (!includes(nodeNames, this.constructor.irName)) {
-      throw new Error(
-        `constructor ${this.constructor.name} is not in nodeNames`
-      );
+    const constructor = this.constructor as typeof IrNode;
+    if (!includes(nodeNames, constructor.irName)) {
+      throw new Error(`constructor ${constructor.irName} is not in nodeNames`);
     }
-    this.name = <NodeName>this.constructor.irName;
+    this.name = constructor.irName;
 
     for (let c of children) {
       if (c instanceof IrNode) {
@@ -112,13 +115,14 @@ const nodeNames = tuple(
 type NodeName = typeof nodeNames[number];
 
 export class Doc extends IrNode {
-    static irName = 'Doc';
+  static irName: NodeName = "Doc";
 }
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 export class Heading extends IrNode {
-    static irName = 'Heading';
+  static irName: NodeName = "Heading";
+
   constructor(
     children: (IrNode | string)[],
     { level }: { level: HeadingLevel }
@@ -139,7 +143,8 @@ export class Heading extends IrNode {
 }
 
 export class A extends IrNode {
-    static irName = 'A';
+  static irName: NodeName = "A";
+
   constructor(children: (IrNode | string)[], { href }: { href: string }) {
     super(children);
     this.href = href;
@@ -159,7 +164,8 @@ export class A extends IrNode {
 
 /** Bold */
 export class Bold extends IrNode {
-    static irName = 'Bold';
+  static irName: NodeName = "Bold";
+
   render(r: BlockRendering) {
     r.append("**");
     super.render(r);
@@ -169,7 +175,8 @@ export class Bold extends IrNode {
 
 /** Italics */
 export class I extends IrNode {
-    static irName = 'I';
+  static irName: NodeName = "I";
+
   render(r: BlockRendering) {
     r.append("*");
     super.render(r);
@@ -178,7 +185,8 @@ export class I extends IrNode {
 }
 
 export class ListItem extends IrNode {
-    static irName = 'ListItem';
+  static irName: NodeName = "ListItem";
+
   render(r: BlockRendering) {
     // See comment on Prefix constructor
     const prefix = new Prefix("  - ", "    ");
@@ -189,14 +197,16 @@ export class ListItem extends IrNode {
 }
 
 export class OrderedList extends IrNode {
-    static irName = 'OrderedList';
+  static irName: NodeName = "OrderedList";
+
   render(r: BlockRendering) {
     throw new Error("this node should have been transformed away");
   }
 }
 
 export class NumberedListItem extends IrNode {
-    static irName = 'NumberedListItem';
+  static irName: NodeName = "NumberedListItem";
+
   constructor(children: (IrNode | string)[], { index }: { index: number }) {
     super(children);
     this.index = index;
@@ -214,7 +224,8 @@ export class NumberedListItem extends IrNode {
 }
 
 export class Code extends IrNode {
-    static irName = 'Code';
+  static irName: NodeName = "Code";
+
   render(r: BlockRendering) {
     r.append("`");
     super.render(r);
@@ -223,7 +234,8 @@ export class Code extends IrNode {
 }
 
 export class Preformatted extends IrNode {
-    static irName = 'Preformatted';
+  static irName: NodeName = "Preformatted";
+
   render(r: BlockRendering) {
     const prefix = new Prefix("    ");
     r.pushPrefix(prefix, { maxWidth: 0, preserveNewlines: true });
@@ -233,7 +245,8 @@ export class Preformatted extends IrNode {
 }
 
 export class P extends IrNode {
-    static irName = 'P';
+  static irName: NodeName = "P";
+
   render(r: BlockRendering) {
     const prefix = new Prefix("");
     r.pushPrefix(prefix);
@@ -243,7 +256,8 @@ export class P extends IrNode {
 }
 
 export class Blockquote extends IrNode {
-    static irName = 'Blockquote';
+  static irName: NodeName = "Blockquote";
+
   render(r: BlockRendering) {
     const prefix = new Prefix("> ");
     r.pushPrefix(prefix, { acceptsTrailers: this.acceptsTrailers });
@@ -257,7 +271,8 @@ export class Blockquote extends IrNode {
 // For <br> tags: two subsequent ones are turned into a Separator nodes. A
 // single <br> tag is ignored for now.
 export class Br extends IrNode {
-    static irName = 'Br';
+  static irName: NodeName = "Br";
+
   render(r: BlockRendering) {
     const prefix = new Prefix("");
     last(r.outputBlocks)!.wrapOptions.endsWithHardBreak = true;
@@ -267,7 +282,8 @@ export class Br extends IrNode {
 }
 
 export class Separator extends IrNode {
-    static irName = 'Separator';
+  static irName: NodeName = "Separator";
+
   render(r: BlockRendering) {
     const prefix = new Prefix("");
     r.pushPrefix(prefix);

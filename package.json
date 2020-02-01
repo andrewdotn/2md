@@ -1,6 +1,6 @@
 {
   "name": "2md",
-  "version": "0.0.3",
+  "version": "0.0.3-pre",
   "license": "Apache-2.0",
   "description": "convert formatted text to markdown",
   "homepage": "https://github.com/andrewdotn/2md",
@@ -19,14 +19,15 @@
     "test": "tsc && yarn run pretty:check && mocha -r ./babel-register --exclude 'node_modules/**' 'src/**/*-test.ts'",
     "pretty": "prettier --write '*.js' '*.json' 'src/**/*.ts'",
     "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts'",
-    "package": "tsc && rm -rf lib && babel --extensions=.ts --source-maps=false -d lib src && find lib -name '*-test.js' -o -name '*.d.js' -print0 | xargs -0 rm && yarn pack"
+    "package": "tsc && rm -rf lib && babel --extensions=.ts --source-maps=false -d lib src && find lib -name '*-test.js' -o -name '*.d.js' -print0 | xargs -0 rm && yarn pack",
+    "dist": "parcel build --bundle-node-modules --target=node -o 2md.js src/parcel-main.ts"
   },
   "engines": {
     "node": ">=12.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",
-    "@babel/core": "^7.6.4",
+    "@babel/core": "^7.0.0-0",
     "@babel/plugin-transform-modules-commonjs": "^7.6.0",
     "@babel/preset-typescript": "^7.6.0",
     "@babel/register": "^7.6.2",
@@ -51,5 +52,9 @@
     "jsdom": "^15.1.1",
     "lodash": "^4.17.15",
     "yargs": "^14.2.0"
-  }
+  },
+  "alias": {
+    "canvas": "./src/canvas-shim.js"
+  },
+  "browserslist": "current node"
 }

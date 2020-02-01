@@ -34,7 +34,7 @@ async function readClipboard() {
   return Buffer.from(match[1], "hex").toString();
 }
 
-async function main() {
+export async function main() {
   const outputFormats = tuple("raw", "html", "ir", "blocks", "md");
   type OutputFormat = typeof outputFormats[number];
 
@@ -118,7 +118,9 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
   console.log(output);
 }
 
-main().catch(e => {
-console.error(e);
-process.exit(1);
-});
+if (require.main === module) {
+  main().catch(e => {
+    console.error(e);
+    process.exit(1);
+  });
+}

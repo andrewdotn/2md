@@ -56,5 +56,10 @@
   "alias": {
     "canvas": "./src/canvas-shim.js"
   },
-  "browserslist": "current node"
+  "targets": {
+    "main": {
+      "browserslist": "current node"
+    }
+  },
+  "browserslist": "> 2% and not dead"
 }

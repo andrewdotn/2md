@@ -13,13 +13,16 @@ function render(input: string) {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  const inputField = document.getElementById("input") as
+  const input = document.getElementById("input");
+  input.contentEditable = true;
+
+  const htmlField = document.getElementById("html") as
     | HTMLInputElement
     | undefined;
-  if (!inputField) {
+  if (!htmlField) {
     throw Error("couldn’t find input field");
   }
-  inputField.value = "<b>blah blah</b>";
+  htmlField.value = "<b>blah blah</b>";
 
   const output = document.getElementById("output");
   if (!output) {
@@ -27,9 +30,13 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   const update = () => {
-    output.innerText = render(inputField.value);
+    output.innerText = render(htmlField.value);
   };
 
   update();
-  inputField.addEventListener("input", update);
+  htmlField.addEventListener("input", update);
+  input.addEventListener("input", () => {
+    htmlField.value = input.innerHTML;
+    update();
+  });
 });

@@ -1,5 +1,33 @@
-#output {
-  min-width: 400px;
-  min-height: 200px;
-  border: 1px solid black;
+@import './error-boundary.css';
+@import './dom-view.css';
+
+/* The class name is ‘toMd’ instead of ‘2md’ because css class names can’t begin
+ * with digits. */
+.toMd-demo {
+  font-family: sans-serif;
+}
+.toMd-demo__wrapper {
+  display: grid;
+  grid-template-columns: repeat(6, min(20em, 40%));
+  grid-gap: 10px
+}
+.toMd-demo__column {
+  padding: 8px;
+  background-color: #FCFDDF;
+}
+.toMd-demo__column__flex {
+  display: flex;
+  flex-direction: column;
+}
+.toMd-demo__input-area {
+  background-color: white;
+  border: 1px solid blue;
+  padding: 3px;
+}
+.toMd-demo__input-textarea {
+  width: 100%;
+  flex: 1 auto;
+}
+.toMd-demo__output {
+  overflow-x: scroll;
 }

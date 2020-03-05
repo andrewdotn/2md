@@ -68,7 +68,18 @@ export class Demo extends Component<AppProps, AppState> {
 
     return (
       <div className="toMd-demo">
-        <h1>2md demo</h1>
+        <div className="toMd-demo__heading">
+          <h1 className="toMd-demo__heading-piece">
+            <a href="https://github.com/andrewdotn/2md">2md</a> demo{" "}
+          </h1>
+          <span className="toMd-demo__heading-piece">
+            <a href="/">friendly version</a>
+          </span>
+          <span className="toMd-demo__heading-piece">
+            this page shows some of the internals of 2md, I intend to use this
+            in a talk explaining how 2md works
+          </span>
+        </div>
         <div className="toMd-demo__wrapper">
           <div className="toMd-demo__column">
             <h2>Input</h2>

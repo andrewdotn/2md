@@ -3,7 +3,7 @@ import React, { Component } from "react";
 interface ContentEditableProps {
   value?: string;
   className?: string;
-  onInput?: (newValue: string, domNode?: Node) => void;
+  onInput?: (newValue: string, domElement?: Element) => void;
 }
 
 interface ContentEditableState {

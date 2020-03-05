@@ -3,8 +3,9 @@ import { run } from "./run";
 import { parse, parseHtml, ParseOptions } from "./parse";
 import { BlockRendering } from "./render";
 import { tuple } from "./tuple";
-import { readFile } from "fs-extra";
+import { appendFile, pathExists, readFile } from "fs-extra";
 import { inspect } from "util";
+import { join as pathJoin } from "path";
 
 export function toMd(html: string, options?: ParseOptions): string {
   const intermediate = parse(html, options);
@@ -32,6 +33,27 @@ async function readClipboard() {
     throw new Error("Could not parse osascript output");
   }
   return Buffer.from(match[1], "hex").toString();
+}
+
+/**
+ * Opt-in local telemetry. If `~/.config/2md/local-telemetry-opt-in` exists, the
+ * current time will be appended to it on evey run of 2md.
+ */
+async function saveTelemetryMaybe() {
+  const homeDir = process.env.HOME;
+  if (!homeDir) {
+    return;
+  }
+  const telemetryFile = pathJoin(
+    homeDir,
+    ".config",
+    "2md",
+    "local-telemetry-opt-in"
+  );
+  if (await pathExists(telemetryFile)) {
+    const time = new Date().getTime().toString();
+    appendFile(telemetryFile, time + "\n");
+  }
 }
 
 export async function main() {
@@ -72,6 +94,8 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
   } else {
     input = await readClipboard();
   }
+
+  saveTelemetryMaybe();
 
   const outputFormat: OutputFormat = <OutputFormat>argv.outputFormat;
   const parseOptions: ParseOptions = {

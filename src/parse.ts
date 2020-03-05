@@ -1,4 +1,3 @@
-import { JSDOM } from "jsdom";
 import {
   A,
   Blockquote,
@@ -16,6 +15,7 @@ import {
   Preformatted
 } from "./2md";
 import { applyTreeTransforms } from "./tree-transforms";
+import { parseHtml } from "./parse-with-jsdom";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
   if (!/^H[1-6]$/.test(nodeName)) throw new Error("Not a heading");
@@ -95,11 +95,6 @@ function parse1(irNode: IrNode, htmlNode: Node) {
   }
 }
 
-export function parseHtml(html: string): Document {
-  const dom = new JSDOM(html);
-  return dom.window.document;
-}
-
 const defaultParseOptions = {
   quote: false
 };
@@ -119,10 +114,7 @@ function stripStyles(htmlNode: Node) {
   }
 }
 
-export function parse(html: string, options?: ParseOptions): IrNode {
-  options = Object.assign(defaultParseOptions, options);
-
-  const doc = parseHtml(html);
+export function parseToIr(doc: Node, options: ParseOptions): IrNode {
   const root = new Doc([]);
   let parseRoot = root;
 
@@ -140,4 +132,11 @@ export function parse(html: string, options?: ParseOptions): IrNode {
   applyTreeTransforms(root);
 
   return root;
+}
+
+export function parse(html: string, options?: ParseOptions): IrNode {
+  options = Object.assign(defaultParseOptions, options);
+
+  const doc = parseHtml(html);
+  return parseToIr(doc, options);
 }

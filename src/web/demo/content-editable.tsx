@@ -3,7 +3,7 @@ import React, { Component } from "react";
 interface ContentEditableProps {
   value?: string;
   className?: string;
-  onInput?: (newValue: string) => void;
+  onInput?: (newValue: string, domNode?: Node) => void;
 }
 
 interface ContentEditableState {
@@ -20,7 +20,7 @@ export class ContentEditable extends Component<
 
   handleInput = () => {
     const newValue = this.div?.innerHTML ?? "";
-    this.props.onInput?.(newValue);
+    this.props.onInput?.(newValue, this.div ?? undefined);
     this.setState({ lastNewValue: newValue });
   };
 

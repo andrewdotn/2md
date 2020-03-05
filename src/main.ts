@@ -1,10 +1,11 @@
 import yargs from "yargs";
 import { run } from "./run";
-import { parse, parseHtml, ParseOptions } from "./parse";
+import { parse, ParseOptions } from "./parse";
 import { BlockRendering } from "./render";
 import { tuple } from "./tuple";
 import { readFile } from "fs-extra";
 import { inspect } from "util";
+import { parseHtml } from "./parse-with-jsdom";
 
 export function toMd(html: string, options?: ParseOptions): string {
   const intermediate = parse(html, options);

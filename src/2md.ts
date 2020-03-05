@@ -275,7 +275,10 @@ export class Br extends IrNode {
 
   render(r: BlockRendering) {
     const prefix = new Prefix("");
-    last(r.outputBlocks)!.wrapOptions.endsWithHardBreak = true;
+    const lastBlock = last(r.outputBlocks);
+    if (lastBlock) {
+      lastBlock.wrapOptions.endsWithHardBreak = true;
+    }
     r.pushPrefix(prefix);
     r.popPrefix(prefix);
   }

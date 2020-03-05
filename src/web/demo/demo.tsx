@@ -2,8 +2,8 @@ import endent from "endent";
 import React, { Component } from "react";
 import { ContentEditable } from "./content-editable";
 import { FixtureDictionary, FixtureSelector } from "./fixture-selector";
-import { parse, parseHtml } from "../parse";
-import { BlockRendering } from "../render";
+import { parseToIr } from "../../parse";
+import { BlockRendering } from "../../render";
 import { format } from "prettier/standalone";
 import prettierHtmlPlugin from "prettier/parser-html";
 import { DomView } from "./dom-view";
@@ -38,7 +38,7 @@ interface AppState {
   rawHtml: string;
 }
 
-export class App extends Component<AppProps, AppState> {
+export class Demo extends Component<AppProps, AppState> {
   state = {
     rawHtml: helloWorldHtml
   };
@@ -54,9 +54,14 @@ export class App extends Component<AppProps, AppState> {
   render() {
     const html = this.state.rawHtml ?? "";
 
-    const dom = parseHtml(html);
+    const doc = document.implementation.createHTMLDocument();
+    const div = doc.createElement("div");
+    doc.body.appendChild(div);
+    div.innerHTML = html;
 
-    const intermediate = parse(html);
+    const dom = doc;
+
+    const intermediate = parseToIr(doc, {});
     const rendered = new BlockRendering();
     intermediate.render(rendered);
     const markdown = rendered.finish();

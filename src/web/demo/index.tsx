@@ -2,17 +2,17 @@ import "./style.css";
 
 import React from "react";
 import { render } from "react-dom";
-import { App, helloWorldHtml } from "./app";
+import { Demo, helloWorldHtml } from "./demo";
 import { ErrorBoundary } from "./error-boundary";
 
 async function loadFixtures() {
   // parcel gets these using fetch; would prefer static inclusion, but not
   // enough to spend any time making it happen.
   const fixturePromises = {
-    "Ars Technica": import("../../fixtures/quote1.html"),
-    MDN: import("../../fixtures/quote2.html"),
-    "Node JS": import("../../fixtures/nodejs.html"),
-    "Stack Overflow": import("../../fixtures/quote3.html")
+    "Ars Technica": import("../../../fixtures/quote1.html"),
+    MDN: import("../../../fixtures/quote2.html"),
+    "Node JS": import("../../../fixtures/nodejs.html"),
+    "Stack Overflow": import("../../../fixtures/quote3.html")
   };
   await Promise.all(Object.keys(fixturePromises));
   const ret = new Map<string, string>();
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", async function() {
   render(
     <React.StrictMode>
       <ErrorBoundary>
-        <App fixtures={fixtures} />
+        <Demo fixtures={fixtures} />
       </ErrorBoundary>
     </React.StrictMode>,
     appDiv

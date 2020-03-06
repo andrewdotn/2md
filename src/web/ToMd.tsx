@@ -74,7 +74,7 @@ export class ToMd extends Component<{}, ToMdState> {
               onInput={this.setHtml}
               value={this.state.doc?.innerHTML}
             />
-            <div className="d-flex">
+            <div className="d-flex flex-wrap">
               <h3 className="d-inline mb-0">Markdown</h3>
               <div className="flex-fill" />
               <div className="mb-0 align-self-baseline form-group form-check">
@@ -92,7 +92,7 @@ export class ToMd extends Component<{}, ToMdState> {
                 Developer demo
               </a>
               <button
-                className="align-self-baseline btn btn-primary btn-sm"
+                className="align-self-baseline btn btn-primary btn-sm mb-2"
                 onClick={this.copyToClipboard(markdown)}
               >
                 Copy to clipboard

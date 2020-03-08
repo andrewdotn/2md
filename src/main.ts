@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime";
 import yargs from "yargs";
 import { run } from "./run";
 import { parse, parseHtml, ParseOptions } from "./parse";
@@ -21,7 +22,7 @@ export function toMd(html: string, options?: ParseOptions): string {
 //
 // https://github.com/sindresorhus/clipboardy shells out to pbpaste
 // and electron calls into Chromium’s native clipboard access code
-async function readClipboard() {
+async function readClipboardMac() {
   const osaOutput = await run([
     "osascript",
     "-e",
@@ -33,6 +34,38 @@ async function readClipboard() {
     throw new Error("Could not parse osascript output");
   }
   return Buffer.from(match[1], "hex").toString();
+}
+
+async function readClipboardUnix() {
+  const output = await run([
+    "xclip",
+    "-o",
+    "-selection",
+    "clipboard",
+    "-t",
+    "text/html"
+  ]);
+  if ((output.stderr ?? "") !== "") {
+    throw new Error(`xclip printed an error: ${output.stderr}`);
+  }
+  return output.stdout;
+}
+
+async function readClipboard() {
+  for (const c of [readClipboardMac, readClipboardUnix]) {
+    try {
+      return await c();
+    } catch (e) {
+      if (e.code === "ENOENT") {
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw new Error(
+    "Unable to find a clipboard-reading program, please try" +
+      " file input instead"
+  );
 }
 
 /**

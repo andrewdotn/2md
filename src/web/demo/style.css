@@ -24,6 +24,7 @@ a {
   flex-direction: column;
 }
 .toMd-demo__input-area {
+  overflow: scroll;
   background-color: white;
   border: 1px solid blue;
   padding: 3px;

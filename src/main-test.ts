@@ -8,10 +8,14 @@ import { A, Bold, Doc, Heading, ListItem, P, Preformatted } from "./2md";
 import { parse } from "./parse";
 import { BlockRendering } from "./render";
 
-async function fixture(filename: string): Promise<string> {
+export async function fixtureBuffer(filename: string): Promise<Buffer> {
   const path = resolve(__dirname, "../fixtures", filename);
   const contents = await readFile(path);
-  return contents.toString();
+  return contents;
+}
+
+export async function fixture(filename: string): Promise<string> {
+  return (await fixtureBuffer(filename)).toString();
 }
 
 describe("2md", function() {

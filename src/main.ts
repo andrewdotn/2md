@@ -7,6 +7,7 @@ import { tuple } from "./tuple";
 import { appendFile, pathExists, readFile } from "fs-extra";
 import { inspect } from "util";
 import { join as pathJoin } from "path";
+import { readClipboard } from "./clipboard";
 
 export function toMd(html: string, options?: ParseOptions): string {
   const intermediate = parse(html, options);
@@ -14,58 +15,6 @@ export function toMd(html: string, options?: ParseOptions): string {
   const rendered = new BlockRendering();
   intermediate.render(rendered);
   return rendered.finish();
-}
-
-// Getting the clipboard as HTML is relatively easy in swift:
-// https://stackoverflow.com/a/36109230/14558 but it’s not obvious how to call
-// that API from nodejs, though I’m sure a native extension could be written.
-//
-// https://github.com/sindresorhus/clipboardy shells out to pbpaste
-// and electron calls into Chromium’s native clipboard access code
-async function readClipboardMac() {
-  const osaOutput = await run([
-    "osascript",
-    "-e",
-    "the clipboard as «class HTML»"
-  ]);
-  const hexEncodedHtml = osaOutput.stdout;
-  const match = /^«data HTML((?:[0-9A-F]{2})+)»$\n/m.exec(hexEncodedHtml);
-  if (!match) {
-    throw new Error("Could not parse osascript output");
-  }
-  return Buffer.from(match[1], "hex").toString();
-}
-
-async function readClipboardUnix() {
-  const output = await run([
-    "xclip",
-    "-o",
-    "-selection",
-    "clipboard",
-    "-t",
-    "text/html"
-  ]);
-  if ((output.stderr ?? "") !== "") {
-    throw new Error(`xclip printed an error: ${output.stderr}`);
-  }
-  return output.stdout;
-}
-
-async function readClipboard() {
-  for (const c of [readClipboardMac, readClipboardUnix]) {
-    try {
-      return await c();
-    } catch (e) {
-      if (e.code === "ENOENT") {
-        continue;
-      }
-      throw e;
-    }
-  }
-  throw new Error(
-    "Unable to find a clipboard-reading program, please try" +
-      " file input instead"
-  );
 }
 
 /**

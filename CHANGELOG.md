@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.0.4
+
+  - Make main script executable, including from npx
+
 ## Version 0.0.3
 
   - Unix and windows clipboard support

@@ -1,4 +1,5 @@
-import "regenerator-runtime/runtime";
+#!/usr/bin/env node
+
 import yargs from "yargs";
 import { parse, parseHtml, ParseOptions } from "./parse";
 import { BlockRendering } from "./render";

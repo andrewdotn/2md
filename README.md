@@ -12,18 +12,32 @@ are all preserved.
 
 ![](doc/demo.gif)
 
-## Installation and usage
+## Installation
+
+The easiest way to try `2md` is with [`npx`][] a tool to automatically
+download, cache, and run programs, that’s been included with Node.js
+[since 2017][]:
+
+[`npx`]: https://www.npmjs.com/package/npx
+[since 2017]: https://medium.com/@maybekatz/introducing-npx-an-npm-package-runner-55f7d4bd282b
+
+    npx 2md [--no-quote] [FILE]
+
+You can also install to install the `2md` command with `yarn`:
 
     yarn [global] add 2md
 
-installs the `2md` command.
+## Usage
 
-Then run
+Run
 
-    2md [--no-quote] [FILE]
+    npx 2md [--no-quote] [FILE]
 
-to get markdown. By default it reads from the clipboard, using `osascript`,
-[`xclip`][], or `powershell`. Otherwise, pass it an html file.
+to get markdown.
+
+By default, 2md reads from the clipboard, using `osascript`, [`xclip`][],
+or `powershell`. Otherwise, pass it the name of html file as a command-line
+argument.
 
 [`xclip`]: https://github.com/astrand/xclip
 

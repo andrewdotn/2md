@@ -22,8 +22,10 @@ Then run
 
     2md [--no-quote] [FILE]
 
-to get markdown. By default it reads from the clipboard, but that’s only
-implemented on macOS. Otherwise, pass it an html file.
+to get markdown. By default it reads from the clipboard, using `osascript`,
+[`xclip`][], or `powershell`. Otherwise, pass it an html file.
+
+[`xclip`]: https://github.com/astrand/xclip
 
 For easy inserting of stuff into other documents, `--quote` is on by
 default and wraps the markdown in a blockquote:

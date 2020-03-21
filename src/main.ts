@@ -18,7 +18,7 @@ export function toMd(html: string, options?: ParseOptions): string {
 
 /**
  * Opt-in local telemetry. If `~/.config/2md/local-telemetry-opt-in` exists, the
- * current time will be appended to it on evey run of 2md.
+ * current time will be appended to it on every run of 2md.
  */
 async function saveTelemetryMaybe() {
   const homeDir = process.env.HOME;

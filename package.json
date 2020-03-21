@@ -9,9 +9,11 @@
     "clipboard"
   ],
   "files": [
-    "lib/**/*.js"
+    "lib/**/*.js",
+    "types/public/*.d.ts"
   ],
   "main": "lib/public/api.js",
+  "types": "types/public/api.d.ts",
   "bin": {
     "2md": "lib/main.js"
   },
@@ -19,7 +21,7 @@
     "test": "tsc && yarn run pretty:check && mocha -r ./babel-register --exclude 'node_modules/**' 'src/**/*-test.ts' && yarn audit",
     "pretty": "prettier --write '*.js' '*.json' 'src/**/*.ts'",
     "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts'",
-    "package": "tsc && rm -rf lib && babel --extensions=.ts --source-maps=false -d lib src && find lib \\( -name '*-test.js' -o -name '*.d.js' \\) -print0 | xargs -0 rm && yarn pack",
+    "package": "rm -rf types && tsc --project tsconfig-publish.json && rm -rf lib && babel --extensions=.ts --source-maps=false -d lib src && find lib \\( -name '*-test.js' -o -name '*.d.js' \\) -print0 | xargs -0 rm && yarn pack",
     "dist": "parcel build --bundle-node-modules --target=node -o 2md.js src/parcel-main.ts"
   },
   "engines": {

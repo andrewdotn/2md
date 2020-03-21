@@ -93,14 +93,14 @@ The current release process, to be automated later, is:
 
  3. Commit to git, and `git tag vA.B.C`
 
- 4. `git push --tags master`.
+ 4. `git push --tags $REMOTE master`.
 
     Optional: figure out automation to put `CHANGELOG.md` excerpt into
     auto-created [GitHub releases][gh-release].
 
 [gh-release]: https://github.com/andrewdotn/2md/releases
 
- 5. `yarn run pack` and inspect tarball
+ 5. `yarn run package` and inspect tarball
 
  6. `npm publish 2md-vA.B.C.tgz`.
 

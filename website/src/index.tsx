@@ -1,3 +1,5 @@
+import "regenerator-runtime";
+
 import { render } from "react-dom";
 import React from "react";
 import { ErrorBoundary } from "./demo/error-boundary";

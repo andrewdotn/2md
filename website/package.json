@@ -1,0 +1,39 @@
+{
+  "name": "2md-website",
+  "private": true,
+  "version": "0.0.0",
+  "license": "unlicensed",
+  "description": "private package for website",
+  "scripts": {
+    "pretty": "prettier --write '*.js' '*.json' 'src/**/*.ts' 'src/**/*.tsx'",
+    "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts' 'src/**/*.tsx'"
+  },
+  "devDependencies": {
+    "2md": "0.0.5-pre",
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.0.0-0",
+    "@babel/plugin-transform-modules-commonjs": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/preset-react": "^7.9.1",
+    "@babel/preset-typescript": "^7.9.0",
+    "@babel/register": "^7.9.0",
+    "@types/prettier": "^1.19.0",
+    "@types/react": "^16.9.23",
+    "@types/react-dom": "^16.9.5",
+    "@types/yargs": "^15.0.4",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "bootstrap": "^4.4.1",
+    "copy-to-clipboard": "^3.3.1",
+    "endent": "^1.4.1",
+    "parcel": "^1.12.4",
+    "prettier": "^1.19.1",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0",
+    "regenerator-runtime": "^0.13.3",
+    "remark": "^11.0.1",
+    "remark-html": "^11.0.1",
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {}
+}

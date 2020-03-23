@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { ContentEditable } from "./demo/content-editable";
-import { parseToIr } from "../parse";
-import { BlockRendering } from "../render";
+import { parseToIr } from "2md/src/parse";
+import { BlockRendering } from "2md/src/render";
 import { renderToStaticMarkup } from "react-dom/server";
 import copy from "copy-to-clipboard";
 

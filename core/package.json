@@ -1,0 +1,64 @@
+{
+  "name": "2md",
+  "version": "0.0.5-pre",
+  "license": "Apache-2.0",
+  "description": "convert formatted text to markdown",
+  "homepage": "https://github.com/andrewdotn/2md",
+  "keywords": [
+    "markdown",
+    "clipboard"
+  ],
+  "files": [
+    "lib/**/*.js",
+    "types/public/*.d.ts"
+  ],
+  "main": "lib/public/api.js",
+  "types": "types/public/api.d.ts",
+  "bin": {
+    "2md": "lib/main.js"
+  },
+  "scripts": {
+    "test": "tsc && yarn run pretty:check && mocha -r ./babel-register --exclude 'node_modules/**' 'src/**/*-test.ts' && yarn audit",
+    "pretty": "prettier --write '*.js' '*.json' 'src/**/*.ts'",
+    "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts'",
+    "package": "rm -rf types && tsc --project tsconfig-publish.json && rm -rf lib && babel --extensions=.ts --source-maps=false -d lib src && find lib \\( -name '*-test.js' -o -name '*.d.js' \\) -print0 | xargs -0 rm && yarn pack",
+    "dist": "parcel build --bundle-node-modules --target=node -o 2md.js src/parcel-main.ts"
+  },
+  "engines": {
+    "node": ">=12.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.0.0-0",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/preset-typescript": "^7.9.0",
+    "@babel/register": "^7.9.0",
+    "@types/chai": "^4.2.11",
+    "@types/fs-extra": "^8.1.0",
+    "@types/jsdom": "^16.1.0",
+    "@types/lodash": "^4.14.144",
+    "@types/mocha": "^7.0.2",
+    "@types/prettier": "^1.19.0",
+    "@types/yargs": "^15.0.4",
+    "chai": "^4.2.0",
+    "endent": "^1.4.1",
+    "mocha": "^7.1.1",
+    "parcel": "^1.12.4",
+    "prettier": "^1.19.1",
+    "remark": "^11.0.1",
+    "remark-html": "^11.0.1",
+    "tslib": "^1.11.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "fs-extra": "^9.0.0",
+    "grapheme-splitter": "^1.0.4",
+    "jsdom": "^16.2.1",
+    "lodash": "^4.17.15",
+    "yargs": "^15.3.1"
+  },
+  "alias": {
+    "canvas": "./src/canvas-shim.js"
+  },
+  "browserslist": "current node"
+}

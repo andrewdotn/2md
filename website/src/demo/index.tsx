@@ -1,3 +1,5 @@
+import "regenerator-runtime";
+
 import "./style.css";
 
 import React from "react";
@@ -9,10 +11,10 @@ async function loadFixtures() {
   // parcel gets these using fetch; would prefer static inclusion, but not
   // enough to spend any time making it happen.
   const fixturePromises = {
-    "Ars Technica": import("../../../fixtures/quote1.html"),
-    MDN: import("../../../fixtures/quote2.html"),
-    "Node JS": import("../../../fixtures/nodejs.html"),
-    "Stack Overflow": import("../../../fixtures/quote3.html")
+    "Ars Technica": import("2md/fixtures/quote1.html"),
+    MDN: import("2md/fixtures/quote2.html"),
+    "Node JS": import("2md/fixtures/nodejs.html"),
+    "Stack Overflow": import("2md/fixtures/quote3.html")
   };
   await Promise.all(Object.keys(fixturePromises));
   const ret = new Map<string, string>();

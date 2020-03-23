@@ -104,7 +104,6 @@ class Wrap {
     const prefix = Prefix.render(this.prefixStack);
     this.result += prefix;
     this.col += prefix.length;
-    this.currentPrefixRendered = true;
   }
 
   ensureStartOfLine() {
@@ -123,7 +122,6 @@ class Wrap {
   maxWidth: number;
   atStartOfLine = true;
   col = 0;
-  currentPrefixRendered = false;
   prefixStack: Prefix[];
   private preserveNewlines: boolean;
   result: string;

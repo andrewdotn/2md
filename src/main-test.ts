@@ -123,6 +123,10 @@ describe("2md", function() {
       expect(toMd("foo\nbar\nbaz\n")).to.eql("foo bar baz\n");
     });
 
+    it("doesn’t crash on a br all by tiself", async function() {
+      expect(toMd("<br>")).to.eql("");
+    });
+
     it("turns two brs into a newline", async function() {
       expect(toMd(await fixture("two-br.html"))).to.eql("foo\n\nbar\n\nbaz\n");
     });

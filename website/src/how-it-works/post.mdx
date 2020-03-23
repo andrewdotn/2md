@@ -1,0 +1,38 @@
+import { ToMd } from '../ToMd';
+import { PauseableImage } from './pauseable-image';
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+
+# Compiling HTML to Markdown with TypeScript: How [2md][] works
+[2md]: https://github.com/andrewdotn/2md
+
+  </div>
+</div>
+
+### Andrew Neitsch, 2020‑04‑04
+
+*I’d been hoping to give this as a talk at a local developer conference today,
+but since that’s been cancelled, I’ve written this article instead.*
+
+2md is a tool I built so that I could copy-and-paste from browsers into
+plain-text files, while preserving a lot of the formatting by automatically
+converting the HTML to Markdown.
+
+It works on mac, linux, and windows.
+
+<figure class="figure">
+  <PauseableImage src="/doc/demo.gif" className="figure-img img-fluid rounded"/>
+  <figcaption class="figure-caption">
+    Copying from the browser and getting markdown on a mac terminal.
+  </figcaption>
+</figure>
+
+Since I wrote it in TypeScript, it works in the browser too, so you can
+even try it out right here on this page:
+
+<ToMd/>
+
+## How 2md works
+
+Today

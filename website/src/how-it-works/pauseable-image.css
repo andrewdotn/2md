@@ -1,0 +1,8 @@
+/*
+* This is applied to `img` in bootstrap’s _reboot.scss; adding it here fixes a
+ * jumping-vertical-whitespace bug when swapping img and canvas.
+ */
+.pauseable-image__canvas {
+  vertical-align: middle;
+  border-style: none;
+}

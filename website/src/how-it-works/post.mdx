@@ -10,21 +10,21 @@ import { PauseableImage } from './pauseable-image';
   </div>
 </div>
 
-### Andrew Neitsch, 2020‑04‑04
-
-*I’d been hoping to give this as a talk at a local developer conference today,
-but since that’s been cancelled, I’ve written this article instead.*
+[*2020-04-04: I’d been hoping to give this as a talk at a local developer
+conference today, but since that was cancelled, I’ve written this article
+instead.*]
 
 2md is a tool I built so that I could copy-and-paste from browsers into
 plain-text files, while preserving a lot of the formatting by automatically
 converting the HTML to Markdown.
 
-It works on mac, linux, and windows.
+It works on mac, linux, and windows, reading HTML off the clipboard from
+the command line.
 
 <figure class="figure">
   <PauseableImage src="/doc/demo.gif" className="figure-img img-fluid rounded"/>
   <figcaption class="figure-caption">
-    Copying from the browser and getting markdown on a mac terminal.
+    Copying from the browser and getting markdown in the macOS terminal.
   </figcaption>
 </figure>
 
@@ -35,4 +35,92 @@ even try it out right here on this page:
 
 ## How 2md works
 
-Today
+
+
+
+### Motivation
+
+For many, many, many years I’ve kept a terminal open in one corner of the
+screen where I make notes in a text editor while I work. It’s sort of like
+talking to myself while I work, but it doesn’t seem weird because it’s
+silent, and I end up with a searchable, timestamped record of what I was
+thinking while I was working on something: what issues I was running into
+when programming, the options I considered, sources I consulted, and the
+resolution I ultimately arrived at.
+
+When my work involves bits of research, I often copy and paste relevant
+snippets from web sources such as [O’Reilly books][], Stack Overflow,
+library documentation and so on.
+
+[O’Reilly books]: https://learning.oreilly.com/
+
+Over the years
+my notes have become increasingly markdown-ish;
+
+and I spend
+
+I’m reading the Ars Technica review of MacOS catalina
+
+    > starting in January of 2020, third-party apps that haven’t been
+    > notarized will require extra steps to run on a Mac with the default
+    > Gatekeeper settings enabled
+
+https://arstechnica.com/gadgets/2019/10/macos-10-15-catalina-the-ars-technica-review/11/#h4
+
+but in the original,
+[starting in January of 2020][]
+is a link to https://developer.apple.com/news/?id=09032019a
+
+[starting in January of 2020]: https://developer.apple.com/news/?id=09032019a
+
+Neal Ford in [The Productive Programmer][], discussing automation,
+describes that when weighing whether to do a task via brute force or to
+spend time and effort automating it, while automation often pays off
+time-wise,
+
+[The Productive Programmer]: https://learning.oreilly.com/library/view/the-productive-programmer/9780596519780/ch04.html#I_sect13_d1e5404
+
+> … that’s not the important point. Performing simple, repetitive tasks
+> by hand makes you dumber, and it steals part of your concentration, which
+> is your most productive asset.
+>
+> Figuring out a clever way to automate the task makes you smarter because
+> you learn something along the way.
+
+
+### Related work
+
+I built this for myself as a fun challenge, never pausing to consider
+whether it already existed until after I’d coded it up myself from scratch.
+
+It wasn’t until the initial version was working pretty well and I was
+updating the project description on the GitHub page that I saw that were
+was already an [html-to-markdown tag][] on GitHub with lots of projects,
+many already written in JavaScript.
+
+[html-to-markdown tag]: https://github.com/topics/html-to-markdown
+
+The [turndown][] project is the big one; if you want a much more mature
+html-to-markdown tool, you might want to take a look at that.
+
+[turndown]: https://github.com/domchristie/turndown
+
+And then many months later I was mortified to find that
+[github.com/phodal/2md][] and [github.com/zshipu/2md][] had already existed
+for three years, with an interactive web version at
+[phodal.github.io/2md/][]! Same name and everything :S When I saw that the
+name was free on [npm][], I assumed that the `2md` was totally original.
+And by the time I found out it wasn’t, I’d gotten attached to the name for
+my project over many months, and wasn’t up for changing it.
+
+[github.com/phodal/2md]: https://github.com/phodal/2md
+[github.com/zshipu/2md]: https://github.com/zshipu/2md
+[phodal.github.io/2md/]: https://phodal.github.io/2md/
+[npm]: https://www.npmjs.com
+
+Also someone had asked for almost exactly what I built in a [2013 Stack
+Overflow question][].
+
+[2013 Stack Overflow question]: https://stackoverflow.com/q/16953581/14558
+
+

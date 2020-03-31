@@ -101,7 +101,7 @@ exposed through the public api.
 
 The current release process, to be automated later, is:
 
- 1. Remove the `-pre` tag from the package.json version field
+ 1. Remove the `-pre` tag from the `core/package.json` version field
 
  2. Update `CHANGELOG.md`
 
@@ -112,15 +112,34 @@ The current release process, to be automated later, is:
     Optional: figure out automation to put `CHANGELOG.md` excerpt into
     auto-created [GitHub releases][gh-release].
 
-[gh-release]: https://github.com/andrewdotn/2md/releases
+    [gh-release]: https://github.com/andrewdotn/2md/releases
 
  5. `yarn run package` and inspect tarball
 
  6. `npm publish 2md-vA.B.C.tgz`.
 
-     If publishing a pre-release, add `npm publish --tag next` to [set the
-     correct npm tag][npm-next].
+    If publishing a pre-release, add `npm publish --tag next` to [set the
+    correct npm tag][npm-next].
 
-[npm-next]: https://medium.com/@mbostock/prereleases-and-npm-e778fc5e2420
+    [npm-next]: https://medium.com/@mbostock/prereleases-and-npm-e778fc5e2420
 
- 7. Bump version and add `-pre` version suffix in `package.json`
+ 7. Bump version and add `-pre` version suffix in `core/package.json`;
+    update the `2md` dependency version in `website/package.json` as well.
+
+    <details>
+    <summary>Otherwise yarn won’t use the local version.</summary>
+
+    <p>
+    The <a href="https://classic.yarnpkg.com/en/docs/workspaces/"
+    >yarn workspaces documentation</a> says,
+    </p>
+
+    <blockquote>
+    if <tt>workspace-b</tt> depends on a different version than the one
+    referenced in <tt>workspace-a</tt>’s package.json, the dependency
+    will be installed from npm rather than linked from your local
+    filesystem. This is because some packages actually need to use the
+    previous versions in order to build the new ones (Babel is one of
+    them).
+    </blockquote>
+    </details>

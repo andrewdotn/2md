@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <title>How 2md works</title>
     <link rel="stylesheet" href="how-it-works/style.css" />
+    <meta name="referrer" content="same-origin" />
     <meta
       name="viewport"
       content="width=device-width,initial-scale=1,shrink-to-fit=no"
@@ -11,6 +12,75 @@
   </head>
   <body>
     <div id="app"></div>
+    <footer class="sticky-footer bg-light">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3 my-2">
+            Feedback is welcome!
+            <br class="d-none d-md-block" />
+            <a href="mailto:feedback@2md.ca">Send me an email</a>
+          </div>
+
+          <div class="col-md-9 my-2">
+            <h5>Mailing list</h5>
+
+            <form>
+              <p>
+                If you liked this article and want to be one of the first to see
+                future articles on other topics, subscribe to my mailing list.
+              </p>
+
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="emailInput"
+                  >Email
+                </label>
+                <input
+                  required
+                  type="email"
+                  class="form-control col-sm-10"
+                  id="emailInput"
+                  placeholder="foo@example.org"
+                />
+              </div>
+
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="nameInput"
+                  >Name
+                </label>
+                <input
+                  class="form-control col-sm-10"
+                  id="nameInput"
+                  placeholder="(Optional)"
+                />
+              </div>
+
+              <div class="row">
+                <div class="form-control-label col d-sm-none">
+                  <input
+                    class="btn btn-primary btn-sm"
+                    type="submit"
+                    value="Subscribe"
+                  />
+                </div>
+                <div class="form-control-plaintext col d-none d-sm-block">
+                  <input
+                    class="btn btn-outline-primary btn-sm float-right"
+                    type="submit"
+                    value="Subscribe"
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="col my-2">
+            <b class="text-muted"
+              >Copyright &copy; 2019-2020 All rights reserved.</b
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
     <script src="how-it-works/index.tsx"></script>
   </body>
 </html>

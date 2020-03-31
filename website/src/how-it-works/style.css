@@ -2,3 +2,14 @@ blockquote {
   padding-left: 1em;
   border-left: 6px solid #d6d6d6;
 }
+
+/* https://philipwalton.github.io/solved-by-flexbox/demos/sticky-footer/ */
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+#app {
+  flex: 1;
+}

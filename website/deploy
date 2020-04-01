@@ -1,0 +1,59 @@
+#!/bin/bash
+
+set -eu
+
+DIR="$(dirname -- "${0}")"
+
+cd "${DIR}"
+
+TARGET="${1}"
+USER="${TARGET%@*}"
+DOMAIN="${TARGET#*@}"
+
+rm -rf dist && \
+    yarn parcel build --no-source-maps \
+        src/index.html \
+        src/demo.html \
+        src/how-it-works.html
+
+mv dist/how-it-works{.html,}
+mv dist/demo{.html,}
+
+cat <<EOF > dist/.htaccess
+<If "%{HTTPS} != 'on'">
+RewriteEngine On
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</If>
+<Else>
+AuthType Basic
+AuthName "Authorization required"
+AuthUserFile /home/${USER}/${DOMAIN}/.htpasswd
+Require user andrew
+</Else>
+
+Header set Content-Security-Policy "default-src 'self'; style-src 'self'; img-src *;"
+Header set Strict-Transport-Security max-age=2592000
+
+AddDefaultCharset UTF-8
+
+ErrorDocument 401 default
+ErrorDocument 403 default
+ErrorDocument 404 default
+ErrorDocument 500 default
+
+Options -Indexes
+
+<Files how-it-works>
+ForceType text/html
+</Files>
+<Files demo>
+ForceType text/html
+</Files>
+EOF
+cp .htpasswd dist/
+
+mkdir dist/doc/
+cp ../doc/demo.gif dist/doc/
+
+rsync -avP --delete dist/ \
+    "${USER}@${DOMAIN}:${DOMAIN}/"

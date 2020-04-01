@@ -18,4 +18,4 @@
 // This shim file is defined as an `alias` in `package.json` to turn that
 // error into a no-op.
 
-module.exports = {}
+module.exports = {};

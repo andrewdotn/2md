@@ -24,7 +24,14 @@
           <div class="col-md-9 my-2">
             <h5>Mailing list</h5>
 
-            <form>
+            <form
+              method="post"
+              action="https://scripts.dreamhost.com/add_list.cgi"
+            >
+              <input type="hidden" name="emailit" value="1" />
+              <input type="hidden" name="list" value="announce" />
+              <input type="hidden" name="domain" value="2md.ca" />
+
               <p>
                 If you liked this article and want to be one of the first to see
                 future articles on other topics, subscribe to my mailing list.
@@ -37,6 +44,7 @@
                 <input
                   required
                   type="email"
+                  name="email"
                   class="form-control col-sm-10"
                   id="emailInput"
                   placeholder="foo@example.org"
@@ -50,6 +58,7 @@
                 <input
                   class="form-control col-sm-10"
                   id="nameInput"
+                  name="name"
                   placeholder="(Optional)"
                 />
               </div>
@@ -61,13 +70,29 @@
                     type="submit"
                     value="Subscribe"
                   />
+
+                  <input
+                    class="btn btn-outline-danger btn-sm float-right"
+                    type="submit"
+                    name="submit"
+                    value="Unsubscribe"
+                  />
                 </div>
                 <div class="form-control-plaintext col d-none d-sm-block">
-                  <input
-                    class="btn btn-outline-primary btn-sm float-right"
-                    type="submit"
-                    value="Subscribe"
-                  />
+                  <div class="float-right">
+                    <input
+                      class="btn btn-outline-danger btn-sm"
+                      type="submit"
+                      name="submit"
+                      value="Unsubscribe"
+                    />
+
+                    <input
+                      class="btn btn-primary btn-sm"
+                      type="submit"
+                      value="Subscribe"
+                    />
+                  </div>
                 </div>
               </div>
             </form>

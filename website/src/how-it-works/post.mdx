@@ -1,14 +1,17 @@
 import { ToMd } from '../ToMd';
 import { PauseableImage } from './pauseable-image';
 
-<div class="jumbotron jumbotron-fluid">
-  <div class="container">
+<div class="container-fluid px-0">
+  <div class="jumbotron">
 
-# Compiling HTML to Markdown with TypeScript: How [2md][] works
+# Compiling HTML to Markdown with TypeScript
+## How [2md][] works
 [2md]: https://github.com/andrewdotn/2md
 
   </div>
 </div>
+
+<div class="container">
 
 [*2020-04-04: I’d been hoping to give this as a talk at a local developer
 conference today, but since that was cancelled, I’ve written this article
@@ -33,14 +36,25 @@ even try it out right here on this page:
 
 <ToMd/>
 
-## How 2md works
+# How 2md works
 
+In this article, I’m going to walk through how this code works in case
+you’re just curious or want to be able to build something like this
+yourself. At some point this would definitely have been beyond my
+capabilities, and now it’s relatively straightforward for me. But there’s
+no single place I know of that can help people learn how to do this. I’m
+hoping to fill that gap a bit.
 
+I’m also going to talk about why I think TypeScript is great.
 
+And I’m going to cover some pretty gritty low-level programming details; a
+lot of learning is the accumulation of low-level tricks over many years. I
+love reading about those tricks in case they come in handy some day, and
+enjoy sharing them too.
 
 ### Motivation
 
-For many, many, many years I’ve kept a terminal open in one corner of the
+For many years I’ve kept a terminal open in one corner of the
 screen where I make notes in a text editor while I work. It’s sort of like
 talking to myself while I work, but it doesn’t seem weird because it’s
 silent, and I end up with a searchable, timestamped record of what I was
@@ -50,28 +64,39 @@ resolution I ultimately arrived at.
 
 When my work involves bits of research, I often copy and paste relevant
 snippets from web sources such as [O’Reilly books][], Stack Overflow,
-library documentation and so on.
+documentation, source code, and so on. In the moment it’s really handy to
+be able to glance at the corner of the screen to see the most pertinent
+documentation excerpts. Then later, I often run into an error message that
+seems familiar, and am able to search upwards in my notes to find the
+context around where I ran into that error message before, and the relevant
+snippet that explains how to fix it.
 
 [O’Reilly books]: https://learning.oreilly.com/
 
-Over the years
-my notes have become increasingly markdown-ish;
+As I’ve gotten used to markdown over the years, my text notes have taken on
+a markdown-ish flavour. You have to know how to use markdown to contribute
+on Stack Overflow or write pull request descriptions on GitHub. And once
+you know it, it becomes very convenient for general writing about
+programming: it’s faster and easier to type and read and diff than raw
+HTML. So I naturally started using it not only for writing things like this
+article, but also in my notes. My notes aren’t all markdown because they go
+back many any years and it’s still mostly me talking to myself, but I try
+to use it where I can easily do so.
 
-and I spend
+When pasting from the web to a `.txt` file, I found that I’d started
+manually massaging what I’d pasted to make it markdown-ish.
 
-I’m reading the Ars Technica review of MacOS catalina
+  - Adding `>` characters at the start to clearly distinguish quotes from
+    my own thoughts.
+  - Wrapping the text to fit in 80 columns.
+  - Separating out bullet points into little text lists.
+  - Preserving *italics* where important.
+  - Inserting hyperlinks.
 
-    > starting in January of 2020, third-party apps that haven’t been
-    > notarized will require extra steps to run on a Mac with the default
-    > Gatekeeper settings enabled
-
-https://arstechnica.com/gadgets/2019/10/macos-10-15-catalina-the-ars-technica-review/11/#h4
-
-but in the original,
-[starting in January of 2020][]
-is a link to https://developer.apple.com/news/?id=09032019a
-
-[starting in January of 2020]: https://developer.apple.com/news/?id=09032019a
+After doing this a bunch of times, I started to think, “Surely I can
+automate this.” And I was probably doing this a few times a day, just a
+moment or two of rearranging a handful of lines of text in my text editor,
+but getting those regular reminders saying, “I can automate this.”
 
 Neal Ford in [The Productive Programmer][], discussing automation,
 describes that when weighing whether to do a task via brute force or to
@@ -87,6 +112,8 @@ time-wise,
 > Figuring out a clever way to automate the task makes you smarter because
 > you learn something along the way.
 
+One day I let these constant reminders get through to me, started
+automating it, and am really glad I did.
 
 ### Related work
 
@@ -108,10 +135,11 @@ html-to-markdown tool, you might want to take a look at that.
 And then many months later I was mortified to find that
 [github.com/phodal/2md][] and [github.com/zshipu/2md][] had already existed
 for three years, with an interactive web version at
-[phodal.github.io/2md/][]! Same name and everything :S When I saw that the
-name was free on [npm][], I assumed that the `2md` was totally original.
-And by the time I found out it wasn’t, I’d gotten attached to the name for
-my project over many months, and wasn’t up for changing it.
+[phodal.github.io/2md/][]! Same name and everything. Oops. When I saw that
+the `2md` package name was free on [npm][], I assumed that the name `2md`
+was totally original. And by the time I found out it wasn’t, I’d gotten
+attached to the name for my project over many months, and wasn’t up for
+changing it.
 
 [github.com/phodal/2md]: https://github.com/phodal/2md
 [github.com/zshipu/2md]: https://github.com/zshipu/2md
@@ -119,8 +147,8 @@ my project over many months, and wasn’t up for changing it.
 [npm]: https://www.npmjs.com
 
 Also someone had asked for almost exactly what I built in a [2013 Stack
-Overflow question][].
+Overflow question][], so it’s definitely not an original idea.
 
 [2013 Stack Overflow question]: https://stackoverflow.com/q/16953581/14558
 
-
+</div>

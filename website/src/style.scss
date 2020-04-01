@@ -1,0 +1,32 @@
+// We don’t want anything too wide, so we skip the `lg` size entirely, and set a
+// narrower max-width for `md`.
+$grid-breakpoints: (
+  xs: 0,
+  sm: 480px,
+  md: 768px
+);
+
+$container-max-widths: (
+  sm: 420px,
+  md: 600px
+);
+
+$code-color: #067a1e;
+
+@import "~bootstrap/scss/bootstrap.scss";
+
+pre {
+  overflow: visible;
+  @include clearfix();
+  border: solid 1px $gray-300;
+  float: left;
+
+  code {
+    display: block;
+    background-color: $light;
+    overflow: visible;
+    word-break: keep-all;
+    white-space: pre;
+    word-wrap: normal;
+  }
+}

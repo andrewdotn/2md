@@ -1,6 +1,6 @@
 import "regenerator-runtime";
 
-import "../style.css";
+import "../style.scss";
 
 import Post from "./post.mdx";
 
@@ -10,9 +10,7 @@ import React from "react";
 document.addEventListener("DOMContentLoaded", async function() {
   const appDiv = document.getElementById("app");
   render(
-    <div className="container">
       <Post />
-    </div>,
     appDiv
   );
 });

@@ -34,8 +34,10 @@
     "regenerator-runtime": "^0.13.3",
     "remark": "^11.0.1",
     "remark-html": "^11.0.1",
+    "sass": "^1.26.3",
     "tslib": "^1.11.1",
     "typescript": "^3.8.3"
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }

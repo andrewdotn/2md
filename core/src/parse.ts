@@ -4,7 +4,7 @@ import {
   Bold,
   Br,
   Code,
-  Doc,
+  Document,
   Heading,
   HeadingLevel,
   I,
@@ -62,7 +62,10 @@ function parse1(irNode: IrNode, htmlNode: Node) {
         receiver = new ListItem([]);
         break;
       case "A":
-        receiver = new A([], { href: e.getAttribute("href") || "" });
+        const href = e.getAttribute("href");
+        if (href) {
+          receiver = new A([], { href });
+        }
         break;
       case "PRE":
         receiver = new Preformatted([]);
@@ -115,7 +118,7 @@ function stripStyles(htmlNode: Node) {
 }
 
 export function parseToIr(doc: Node, options: ParseOptions): IrNode {
-  const root = new Doc([]);
+  const root = new Document([]);
   let parseRoot = root;
 
   if (options.quote) {

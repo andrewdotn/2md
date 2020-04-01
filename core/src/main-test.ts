@@ -4,7 +4,7 @@ import { readFile } from "fs-extra";
 import remark from "remark";
 import html from "remark-html";
 import { toMd } from "./main";
-import { A, Bold, Doc, Heading, ListItem, P, Preformatted } from "./2md";
+import { A, Bold, Document, Heading, ListItem, P, Preformatted } from "./2md";
 import { parse } from "./parse";
 import { BlockRendering } from "./render";
 
@@ -26,7 +26,7 @@ describe("2md", function() {
 
     it("can parse the first sample", async function() {
       const html = await fixture("quote1.html");
-      const expected = new Doc([
+      const expected = new Document([
         new Heading(["The end of 32-bit apps (and other removals)"], {
           level: 2
         }),
@@ -59,7 +59,7 @@ describe("2md", function() {
 
     it("turns <pre><code> into just a preformatted node", function() {
       const parsed = parse(`<pre><code>foo</code></pre>`);
-      expect(parsed).to.deep.equal(new Doc([new Preformatted(["foo"])]));
+      expect(parsed).to.deep.equal(new Document([new Preformatted(["foo"])]));
     });
   });
 
@@ -117,6 +117,15 @@ describe("2md", function() {
 
     it("handles tt elements", function() {
       expect(toMd("<tt>foo</tt>")).to.eql("`foo`\n");
+    });
+
+    it("ignores links with empty hrefs", function() {
+      expect(toMd("foo <a href=''>bar</a>")).to.eql("foo bar\n");
+      expect(toMd("foo <a name='blah'>bar</a>")).to.eql("foo bar\n");
+    });
+
+    it("ignores links with no content", function() {
+      expect(toMd("foo<a href=example.org></a>")).to.eql("foo\n");
     });
 
     it("wraps normal text", function() {

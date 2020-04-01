@@ -17,7 +17,6 @@ $code-color: #067a1e;
 
 pre {
   overflow: visible;
-  @include clearfix();
   border: solid 1px $gray-300;
   float: left;
 

@@ -96,7 +96,9 @@ function numberLists(node: IrNode) {
     if (typeof c !== "string" && c.name === "OrderedList") {
       const newChildren = c.copyOfChildren().map(n => {
         if (typeof n !== "string" && n.name === "ListItem") {
-          return new NumberedListItem(n.copyOfChildren(), { index: counter++ });
+          return new NumberedListItem(n.copyOfChildren(), {
+            number: counter++
+          });
         } else {
           return n;
         }

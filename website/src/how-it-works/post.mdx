@@ -1,5 +1,6 @@
 import { ToMd } from '../ToMd';
 import { PauseableImage } from './pauseable-image';
+import { DemoDom, DemoFlow, DemoHtmlEditor, DemoMarkdown, DemoIntermediate, DemoContent } from './demo-flow.tsx';
 
 <div class="container-fluid px-0">
   <div class="jumbotron">
@@ -27,7 +28,8 @@ the command line.
 <figure class="figure">
   <PauseableImage src="/doc/demo.gif" className="figure-img img-fluid rounded"/>
   <figcaption class="figure-caption">
-    Copying from the browser and getting markdown in the macOS terminal.
+    Copying from the browser and getting markdown in the macOS terminal.<br/>
+    Click or tap to pause animation.
   </figcaption>
 </figure>
 
@@ -150,5 +152,125 @@ Also someone had asked for almost exactly what I built in a [2013 Stack
 Overflow question][], so it’s definitely not an original idea.
 
 [2013 Stack Overflow question]: https://stackoverflow.com/q/16953581/14558
+
+## Overview
+
+### Details
+
+for some raw html
+
+<DemoFlow>
+
+<div style={{border: "1px solid gray"}}>
+<DemoContent/>
+</div>
+<div className="clearfix"/>
+
+## Editable HTML
+
+<DemoHtmlEditor/>
+
+## DOM:
+
+we get a DOM tree
+
+<DemoDom/>
+
+    function parse1(irNode: IrNode, htmlNode: Node) {
+      if (
+        htmlNode.nodeType == htmlNode.TEXT_NODE &&
+        htmlNode.textContent !== null
+      ) {
+        if (
+          htmlNode.textContent !== "\n" ||
+          irNode.isOrHasParentNamed("Preformatted")
+        ) {
+          irNode.push(htmlNode.textContent);
+        }
+      } else if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
+        const e = <Element>htmlNode;
+        let receiver = irNode;
+        switch (htmlNode.nodeName) {
+          case "H1":
+          case "H2":
+          case "H3":
+          case "H4":
+          case "H5":
+          case "H6":
+            receiver = new Heading([], {
+              level: extractHeadingLevel(htmlNode.nodeName)
+            });
+            break;
+          case "B":
+          case "STRONG":
+            receiver = new Bold([]);
+            break;
+          case "I":
+          case "EM":
+            receiver = new I([]);
+            break;
+          case "OL":
+            receiver = new OrderedList([]);
+            break;
+          case "LI":
+            receiver = new ListItem([]);
+            break;
+          case "A":
+            const href = e.getAttribute("href");
+            if (href) {
+              receiver = new A([], { href });
+            }
+            break;
+          case "PRE":
+            receiver = new Preformatted([]);
+            break;
+          case "P":
+          // There’s no standard markdown representation for these, but putting them
+          // on separate lines is better than jamming them together in a single
+          // paragraph.
+          case "DL":
+          case "DT":
+            receiver = new P([]);
+            break;
+          case "BLOCKQUOTE":
+            receiver = new Blockquote([]);
+            break;
+          case "TT":
+          case "CODE":
+            receiver = new Code([]);
+            break;
+          case "BR":
+            receiver = new Br([]);
+            break;
+        }
+        if (irNode !== receiver) irNode.push(receiver);
+
+        for (let i = 0; i < htmlNode.childNodes.length; i++) {
+          const c = htmlNode.childNodes[i];
+          parse1(receiver, c);
+        }
+      }
+    }
+
+## Intermediate:
+
+and map that to IR
+
+<DemoIntermediate/>
+<div className="clearfix"/>
+
+## Markdown
+
+<DemoMarkdown/>
+<div className="clearfix"/>
+
+</DemoFlow>
+
+
+
+
+
+
+
 
 </div>

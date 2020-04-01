@@ -102,7 +102,7 @@ const nodeNames = tuple(
   "Br",
   "Separator",
   "Code",
-  "Doc",
+  "Document",
   "Preformatted",
   "Heading",
   "I",
@@ -114,8 +114,8 @@ const nodeNames = tuple(
 );
 type NodeName = typeof nodeNames[number];
 
-export class Doc extends IrNode {
-  static irName: NodeName = "Doc";
+export class Document extends IrNode {
+  static irName: NodeName = "Document";
 }
 
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
@@ -207,20 +207,20 @@ export class OrderedList extends IrNode {
 export class NumberedListItem extends IrNode {
   static irName: NodeName = "NumberedListItem";
 
-  constructor(children: (IrNode | string)[], { index }: { index: number }) {
+  constructor(children: (IrNode | string)[], { number }: { number: number }) {
     super(children);
-    this.index = index;
+    this.number = number;
   }
 
   render(r: BlockRendering) {
-    const number = this.index.toFixed(0).padStart(2);
+    const number = this.number.toFixed(0).padStart(2);
     const prefix = new Prefix(`${number}. `, "    ");
     r.pushPrefix(prefix);
     super.render(r);
     r.popPrefix(prefix);
   }
 
-  index: number;
+  number: number;
 }
 
 export class Code extends IrNode {

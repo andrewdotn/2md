@@ -9,8 +9,5 @@ import React from "react";
 
 document.addEventListener("DOMContentLoaded", async function() {
   const appDiv = document.getElementById("app");
-  render(
-      <Post />
-    appDiv
-  );
+  render(<Post />, appDiv);
 });

@@ -2,12 +2,13 @@
 
 import { PauseableImage } from './pauseable-image';
 import {
+  DemoCharCount,
+  DemoContent,
   DemoDom,
   DemoFlow,
   DemoHtmlEditor,
-  DemoMarkdown,
   DemoIntermediate,
-  DemoContent
+  DemoMarkdown,
 } from "./demo-flow.tsx";
 
 <div className="container-fluid px-0">
@@ -200,7 +201,7 @@ Although that’s doable, the code `div.classList.toggle('expanded')` is much
 shorter, easier to read and understand, faster to run, and less
 error-prone.
 
-There’s some cost of parsing the html into a data structure and turning it
+There’s some cost of parsing the HTML into a data structure and turning it
 back into a string at the end, but when there are many operations to
 perform, or a desire to handle variations and corner cases, or when you
 start to think about the problem of specifying *which* div to operate on;
@@ -211,12 +212,13 @@ input into some
 By working at this higher level of abstraction we gain precise focus,
 much more readable code, and a chance at clean APIs.
 
-In fact DOM is a fine data structure for HTML input, and that’s what 2md
-uses for its input stage. It’s the default API in browser environments
-where you also get a free parser by setting `innerHTML` on elements.
-`jsdom` provides command-line tools with the same DOM API as in the
-browser. And whatever issues the DOM API may have for HTML, those are made
-up for many times over by its ubiquity and familiarity.
+In fact the Document Object Model standard aka DOM is a fine data structure
+for HTML input, and that’s what 2md uses for its input stage. It’s the
+default API in browser environments where you also get a free parser by
+setting `innerHTML` on elements. `jsdom` provides command-line tools with
+the same DOM API as in the browser. And whatever issues the DOM API may
+have for HTML, those are made up for many times over by its ubiquity and
+familiarity.
 
 #### <small>Principle 2:</small><br/> Transform the input through a sequence of data types
 
@@ -235,47 +237,100 @@ it’ll be a new output type more suited to future steps.
 Though there are many benefits to using the DOM API to represent HTML, it’s
 a poor fit for representing markdown. It has a bunch of stuff we don’t
 need, like `classList`, and it doesn’t include a bunch of stuff that we do
-care about for Markdown, like the index of an `<li>` inside an `<ol>`.
+care about for markdown, like the index of an `<li>` inside an `<ol>`.
 
 So we simplify by introducing a new data structure called an intermediate
 representation: something that’s logically between two other
 representations, and has similarities with both but isn’t actually either.
 
-For 2md, the intermediate representation is called ‘Ir,’ and it’s not html
+For 2md, the intermediate representation is called `Ir`, and it’s not HTML
 anymore, though it’s close, and it’s not quite markdown yet, though it’s
 also close. I could have come up with a more descriptive name than
-Ir—markml? htdown? mdish?—but there’s not confusion here yet. Sometimes the
-term ‘intermediate representation’ gets very confusing if you end up with a
-bunch of different intermediate representations inside a compiler, with all
-of those different representations having very similar names.
+Ir—markml? htdown? mdish?—but calling it an IR, or IL for ‘intermediate
+language,’ is traditional. Sometimes the term ‘intermediate representation’
+gets very confusing if you end up with a bunch of different intermediate
+representations inside a compiler, with all of those different
+representations having very similar names. For 2md, there is another
+intermediate representation called OutputBlocks, but the names are
+different enough to avoid confusion.
 
-How many different representations do you need? Well, it depends.
-I started out with two, DOM and Ir, and
-later added a third called OutputBlocks.
+How many different intermediate representations do you need? Well, it
+depends. I started out with two, DOM and Ir, and later added a third called
+OutputBlocks when that seemed prudent. It’s something you learn about the
+problem space as you write code that works in it. If the current
+representation is getting too complicated, or you’re adding a bunch of
+specialized functionality, it makes sense to introduce a new
+representation. And sometimes you end up with too many intermediate steps
+that are too similar that just waste a lot of time passing the same data
+around, and waste your time when you’re trying to find the part where
+things actually happen, and you edit the code to reduce the number of
+intermediate representations.
 
-### Details
+It’s a lot like object-oriented programming, where you often start out with
+one class, and then that one class starts doing too many different things,
+split it up into different more-focused classes. Except here instead of a
+single class, each representation is composed of a whole family of classes.
 
-for some raw html
+## Details
 
-## Editable HTML
+All right, finally it’s time to look at some source code excerpts, and some
+real live data structures!
 
-Here’s that selector again:
+Here’s that selector/paste box again:
 
 <DemoContent/>
 <div className="clearfix"/>
 
-now the raw HTML we get for that is pretty messy
+### Raw HTML
 
-these examples all come from copying and pasting from Safari on a mac,
-which means all the styles get inlined
+The raw HTML for these snippets is generally pretty messy:
 
 <DemoHtmlEditor/>
 
-## DOM:
+These examples mostly come from copying and pasting from Safari on a mac.
+Other browsers seem to be similar, but the important thing is that to make
+note of is that, on order to make the snippet self-contained, the browser
+took all the computed styles from all the CSS and inlined it on every
+element, making the markup really messy.
 
-we get a DOM tree
+Instead of staring at a <DemoCharCount/>-character string, let’s pop it
+into a DOM tree to collapse the `style="…"` nodes and reveal the tree
+structure.
+
+### DOM tree
+
+Parsing HTML into DOM objects is a very important part of the browser’s
+reason for existence, and it’ll just do that naturally if formatted text is
+pasted into a `contentEditable` area, at which point your object reference
+to the `contentEditable` is your handle into the DOM tree.
+
+To get DOM objects from HTML *strings* inside a browser, you can create a
+new document and then set the body HTML:
+
+    const doc = document.implementation.createHTMLDocument();
+    doc.body.innerHTML = 'Hello, <b>world</b>';
+    doc.documentElement.outerHTML;
+    // returns "<html><head></head><body>Hello, <b>world</b></body></html>"
+
+In node.js, the `jsdom` package provides a string-taking constructor
+directly, and returns objects with the same API that you’d get in the
+browser:
+
+    const { JSDOM } = require('jsdom');
+    const doc = new JSDOM('Hello, <b>world</b>').window.document;
+    doc.documentElement.outerHTML;
+    // returns "<html><head></head><body>Hello, <b>world</b></body></html>"
+
+At this point, you’ve got DOM `Node` objects with familiar APIs like
+`node.childNodes`, `node.appendChild()`, `node.replaceChild()`,
+`node.nodeType` which has to be compared against various integer constants;
+essentially all the stuff that jQuery does behind the scenes.
 
 <DemoDom/>
+
+### Building the intermediate representation
+
+How to start turning that DOM tree into markdown?
 
     function parse1(irNode: IrNode, htmlNode: Node) {
       if (

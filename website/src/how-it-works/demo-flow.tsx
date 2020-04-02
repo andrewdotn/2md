@@ -124,7 +124,7 @@ export function DemoHtmlEditor() {
           />
         )}
       </DemoContext.Consumer>
-      <div className="bg-light border border-top-0 py-1">
+      <div className="bg-light border border-top-0 py-1 mb-3">
         Yes, this HTML is also editable, so that you can see how changes here
         flow through the other steps of the process.
       </div>
@@ -132,11 +132,21 @@ export function DemoHtmlEditor() {
   );
 }
 
+export function DemoCharCount() {
+  return (
+      <DemoContext.Consumer>
+        {({ rawHtml }) => rawHtml?.length?.toString() ?? "??"}
+      </DemoContext.Consumer>
+  );
+}
+
 export function DemoDom() {
   return (
+      <div className="mb-3">
     <DemoContext.Consumer>
       {({ dom }) => dom && <DomView node={dom} />}
     </DemoContext.Consumer>
+      </div>
   );
 }
 

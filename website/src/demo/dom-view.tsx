@@ -4,6 +4,16 @@ interface DomViewProps {
   node: Node;
 }
 
+function vis(s: string | null) {
+  if (!s) {
+    return '""'
+  }
+  if (/^\s*$/.test(s)) {
+    return `"${s}"`;
+  }
+  return s.replace(/\n/g, '\\n');
+}
+
 export class DomView extends Component<DomViewProps> {
   render() {
     const node = this.props.node;
@@ -19,7 +29,7 @@ export class DomView extends Component<DomViewProps> {
       for (let i = 0; i < element.attributes.length; i++) {
         const attr = element.attributes[i];
         attrInfo.push(" ");
-        attrInfo.push(<span title={attr.value}>{attr.name}</span>);
+        attrInfo.push(<span title={attr.value}>{attr.name}="…"</span>);
       }
     }
 
@@ -32,7 +42,7 @@ export class DomView extends Component<DomViewProps> {
         {isText && (
           <>
             {" "}
-            <code>{node.textContent}</code>
+            <code>{vis(node.textContent)}</code>
           </>
         )}
         {!isText && <br />}

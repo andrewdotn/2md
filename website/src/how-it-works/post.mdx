@@ -1,18 +1,17 @@
-import { ToMd } from '../ToMd';
 import { PauseableImage } from './pauseable-image';
 import { DemoDom, DemoFlow, DemoHtmlEditor, DemoMarkdown, DemoIntermediate, DemoContent } from './demo-flow.tsx';
 
-<div class="container-fluid px-0">
-  <div class="jumbotron">
+<div className="container-fluid px-0">
+  <div className="jumbotron">
 
 # Compiling HTML to Markdown with TypeScript
 ## How [2md][] works
-[2md]: https://github.com/andrewdotn/2md
+[2md]: https://2md.ca
 
   </div>
 </div>
 
-<div class="container">
+<div className="container">
 
 [*2020-04-04: I’d been hoping to give this as a talk at a local developer
 conference today, but since that was cancelled, I’ve written this article
@@ -25,9 +24,9 @@ converting the HTML to Markdown.
 It works on mac, linux, and windows, reading HTML off the clipboard from
 the command line.
 
-<figure class="figure">
+<figure className="figure">
   <PauseableImage src="/doc/demo.gif" className="figure-img img-fluid rounded"/>
-  <figcaption class="figure-caption">
+  <figcaption className="figure-caption">
     Copying from the browser and getting markdown in the macOS terminal.<br/>
     Click or tap to pause animation.
   </figcaption>
@@ -36,7 +35,15 @@ the command line.
 Since I wrote it in TypeScript, it works in the browser too, so you can
 even try it out right here on this page:
 
-<ToMd/>
+<DemoFlow>
+
+<DemoContent/>
+<div className="clearfix"/>
+
+2md turns that markup into this markdown:
+
+<DemoMarkdown/>
+<div className="clearfix"/>
 
 # How 2md works
 
@@ -159,14 +166,17 @@ Overflow question][], so it’s definitely not an original idea.
 
 for some raw html
 
-<DemoFlow>
+## Editable HTML
 
-<div style={{border: "1px solid gray"}}>
+Here’s that selector again:
+
 <DemoContent/>
-</div>
 <div className="clearfix"/>
 
-## Editable HTML
+now the raw HTML we get for that is pretty messy
+
+these examples all come from copying and pasting from Safari on a mac,
+which means all the styles get inlined
 
 <DemoHtmlEditor/>
 

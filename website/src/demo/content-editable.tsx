@@ -1,6 +1,7 @@
 import React, { Component } from "react";
+import classNames from "classnames";
 
-interface ContentEditableProps {
+export interface ContentEditableProps {
   value?: string;
   className?: string;
   onInput?: (newValue: string, domElement?: Element) => void;
@@ -49,7 +50,7 @@ export class ContentEditable extends Component<
   render() {
     return (
       <div
-        className={this.props.className}
+        className={classNames("content-editable", this.props.className)}
         onInput={this.handleInput}
         ref={e => (this.div = e)}
       />

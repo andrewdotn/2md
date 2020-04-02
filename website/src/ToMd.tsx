@@ -1,17 +1,26 @@
-import React, { Component } from "react";
+import React, { Component, ReactElement } from "react";
 import { ContentEditable } from "./demo/content-editable";
 import { parseToIr } from "2md/src/parse";
 import { BlockRendering } from "2md/src/render";
 import { renderToStaticMarkup } from "react-dom/server";
 import copy from "copy-to-clipboard";
 
+interface ToMdProps {
+  render: (options: {
+    toMd: ToMd;
+    editor: ReactElement<ContentEditable>;
+    toggleQuote: ReactElement<HTMLInputElement>;
+    markdown: string;
+  }) => ReactElement;
+}
+
 interface ToMdState {
   doc?: Element;
   quote: boolean;
 }
 
-export class ToMd extends Component<{}, ToMdState> {
-  constructor(props: {}) {
+export class ToMd extends Component<ToMdProps, ToMdState> {
+  constructor(props: ToMdProps) {
     super(props);
 
     // Initial message
@@ -59,49 +68,24 @@ export class ToMd extends Component<{}, ToMdState> {
       markdown = rendered.finish();
     }
 
-    return (
-      <div className="container">
-        <div className="row justify-content-md-center">
-          <div className="col-md-auto">
-            <div>
-              <h1 className="d-inline">
-                <a href="https://github.com/andrewdotn/2md">2md</a>:{" "}
-              </h1>
-              <h2 className="d-inline">Convert formatted text to Markdown</h2>
-            </div>
-            <ContentEditable
-              className="border border-primary my-4"
-              onInput={this.setHtml}
-              value={this.state.doc?.innerHTML}
-            />
-            <div className="d-flex flex-wrap">
-              <h3 className="d-inline mb-0">Markdown</h3>
-              <div className="flex-fill" />
-              <div className="mb-0 align-self-baseline form-group form-check">
-                <label>
-                  <input
-                    type="checkbox"
-                    className="form-check-input"
-                    onChange={this.toggleQuote}
-                    checked={this.state.quote}
-                  />
-                  Quote
-                </label>
-              </div>
-              <a className="align-self-baseline btn btn-link" href="demo.html">
-                Developer demo
-              </a>
-              <button
-                className="align-self-baseline btn btn-primary btn-sm mb-2"
-                onClick={this.copyToClipboard(markdown)}
-              >
-                Copy to clipboard
-              </button>
-            </div>
-            <pre className="border bg-light">{markdown}</pre>
-          </div>
-        </div>
-      </div>
-    );
+    return this.props.render({
+      toMd: this,
+      editor: (
+        <ContentEditable
+          className="border border-primary my-4"
+          onInput={this.setHtml}
+          value={this.state.doc?.innerHTML}
+        />
+      ),
+      toggleQuote: (
+        <input
+          type="checkbox"
+          className="form-check-input"
+          onChange={this.toggleQuote}
+          checked={this.state.quote}
+        />
+      ),
+      markdown
+    });
   }
 }

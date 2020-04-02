@@ -5,8 +5,8 @@ import remark from "remark";
 import html from "remark-html";
 import { toMd } from "./main";
 import { A, Bold, Document, Heading, ListItem, P, Preformatted } from "./2md";
-import { parse } from "./parse";
 import { BlockRendering } from "./render";
+import { parse } from "./parse-with-jsdom";
 
 export async function fixtureBuffer(filename: string): Promise<Buffer> {
   const path = resolve(__dirname, "../fixtures", filename);

@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 import yargs from "yargs";
-import { parse, ParseOptions } from "./parse";
+import { ParseOptions } from "./parse";
 import { BlockRendering } from "./render";
 import { tuple } from "./tuple";
 import { appendFile, pathExists, readFile } from "fs-extra";
 import { inspect } from "util";
 import { join as pathJoin } from "path";
 import { readClipboard } from "./clipboard";
-import { parseHtml } from "./parse-with-jsdom";
+import { parseHtml, parse } from "./parse-with-jsdom";
 
 export function toMd(html: string, options?: ParseOptions): string {
   const intermediate = parse(html, options);

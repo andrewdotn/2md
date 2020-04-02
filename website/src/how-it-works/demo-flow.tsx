@@ -6,6 +6,7 @@ import { BlockRendering } from "../../../core/src/render";
 import { IrNode } from "../../../core/src/2md";
 import { FixtureSelector } from "../demo/fixture-selector";
 import { fixtures } from "../generated-fixtures";
+import { renderToStaticMarkup } from "react-dom/server";
 
 interface DemoFlowState {
   rawHtml?: string;
@@ -22,6 +23,26 @@ const DemoContext = React.createContext({
 export class DemoFlow extends Component<{}, DemoFlowState> {
   constructor(props: {}) {
     super(props);
+
+    if (!fixtures.has("Hello world")) {
+      fixtures.set(
+        "Hello world",
+        renderToStaticMarkup(
+          <div>
+            {/*
+            With content-editable, sometimes doing select-all, then paste, was
+            pasting into the <h3> node, causing badly messed-up markdown output.
+            By having a <p> first it doesn’t look as nice but we skip that bug.
+        */}
+            <p className="mb-1">Welcome</p>
+            <h3 className="">Input</h3>
+            <p>
+              Paste <i>formatted</i> text here to see it turned into Markdown.
+            </p>
+          </div>
+        )
+      );
+    }
 
     this.state = {
       setHtml: this.setHtml,
@@ -63,19 +84,24 @@ export class DemoContent extends Component {
     return (
       <DemoContext.Consumer>
         {({ rawHtml, setHtml }) => (
-          <div>
-            <p>
+          <>
+            <p className="bg-light mb-0 pb-2 border border-bottom-0">
               Select a sample from{" "}
-              <FixtureSelector onChange={setHtml} fixtures={fixtures} />, click
-              to start typing, or paste something.
+              <FixtureSelector
+                html={rawHtml}
+                onChange={setHtml}
+                fixtures={fixtures}
+              />
+              , click to start typing, or select all and paste something.
             </p>
             <ContentEditable
+              className="border border-primary p-1 mb-3"
               onInput={(newValue, element) =>
                 element && setHtml(element?.innerHTML)
               }
               value={rawHtml}
             />
-          </div>
+          </>
         )}
       </DemoContext.Consumer>
     );
@@ -84,15 +110,25 @@ export class DemoContent extends Component {
 
 export function DemoHtmlEditor() {
   return (
-    <DemoContext.Consumer>
-      {({ rawHtml, setHtml }) => (
-        <textarea
-          className="toMd-demo__input-textarea"
-          onChange={e => setHtml(e.currentTarget.value)}
-          value={rawHtml}
-        />
-      )}
-    </DemoContext.Consumer>
+    <>
+      <DemoContext.Consumer>
+        {({ rawHtml, setHtml }) => (
+          <textarea
+            // <textarea> defaults to `vertical-align: baseline`, resulting in
+            // mysterious vertical gaps between it and things met to adjoin
+            // it. https://stackoverflow.com/a/35906942/14558
+            className="w-100 align-bottom"
+            rows={20}
+            onChange={e => setHtml(e.currentTarget.value)}
+            value={rawHtml}
+          />
+        )}
+      </DemoContext.Consumer>
+      <div className="bg-light border border-top-0 py-1">
+        Yes, this HTML is also editable, so that you can see how changes here
+        flow through the other steps of the process.
+      </div>
+    </>
   );
 }
 
@@ -123,7 +159,11 @@ export function DemoIntermediate() {
 export function DemoMarkdown() {
   return (
     <DemoContext.Consumer>
-      {({ markdown }) => <pre>{markdown}</pre>}
+      {({ markdown }) => (
+        <pre>
+          <code>{markdown}</code>
+        </pre>
+      )}
     </DemoContext.Consumer>
   );
 }

@@ -28,4 +28,14 @@ pre {
     white-space: pre;
     word-wrap: normal;
   }
+  min-width: 100%;
+}
+
+.content-editable pre {
+  float: none;
+}
+
+.markdown-output {
+  min-width: 100%;
+  float: left;
 }

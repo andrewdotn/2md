@@ -15,7 +15,6 @@ import {
   Preformatted
 } from "./2md";
 import { applyTreeTransforms } from "./tree-transforms";
-import { parseHtml } from "./parse-with-jsdom";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
   if (!/^H[1-6]$/.test(nodeName)) throw new Error("Not a heading");
@@ -137,9 +136,8 @@ export function parseToIr(doc: Node, options: ParseOptions): IrNode {
   return root;
 }
 
-export function parse(html: string, options?: ParseOptions): IrNode {
-  options = Object.assign(defaultParseOptions, options);
+export function parse(element: Element, options?: ParseOptions): IrNode {
+  options = { ...defaultParseOptions, ...options };
 
-  const doc = parseHtml(html);
-  return parseToIr(doc, options);
+  return parseToIr(element, options);
 }

@@ -118,7 +118,7 @@ export function DemoHtmlEditor() {
             // mysterious vertical gaps between it and things met to adjoin
             // it. https://stackoverflow.com/a/35906942/14558
             className="w-100 align-bottom"
-            rows={20}
+            rows={10}
             onChange={e => setHtml(e.currentTarget.value)}
             value={rawHtml}
           />

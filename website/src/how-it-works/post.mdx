@@ -1,5 +1,14 @@
+<!-- Copyright © 2020 Andrew Neitsch all rights reserved. -->
+
 import { PauseableImage } from './pauseable-image';
-import { DemoDom, DemoFlow, DemoHtmlEditor, DemoMarkdown, DemoIntermediate, DemoContent } from './demo-flow.tsx';
+import {
+  DemoDom,
+  DemoFlow,
+  DemoHtmlEditor,
+  DemoMarkdown,
+  DemoIntermediate,
+  DemoContent
+} from "./demo-flow.tsx";
 
 <div className="container-fluid px-0">
   <div className="jumbotron">
@@ -19,7 +28,7 @@ instead.*]
 
 2md is a tool I built so that I could copy-and-paste from browsers into
 plain-text files, while preserving a lot of the formatting by automatically
-converting the HTML to Markdown.
+converting the HTML to markdown.
 
 It works on mac, linux, and windows, reading HTML off the clipboard from
 the command line.
@@ -161,6 +170,88 @@ Overflow question][], so it’s definitely not an original idea.
 [2013 Stack Overflow question]: https://stackoverflow.com/q/16953581/14558
 
 ## Overview
+
+The general bodies of theory drawn from here are programming language
+compilation, data structures, and graph theory. Mostly it’s about the
+graphs of data structures typical of the middle stages inside a compiler.
+But there’s a lot of compiler theory that’s not really relevant for this
+project: we’re not implementing any lexing ourselves, and there’s no
+register allocation or anything.
+
+To help make the problem manageable, we’re going to rely on two
+complementary principles:
+
+#### <small>Principle 1:</small><br/> Instead of working with strings, work with objects
+
+Why not go directly from HTML to markdown? You might be thinking regular
+expressions would be a good start, turning `<b>…</b>` into `**…**` and so
+on. And indeed a sufficiently motivated person could get surprisingly far
+doing that. But things will get complicated quickly, with lots of corner
+cases, and you’ll end up with too much going on at once.
+
+An example of this sort of an approach: in some HTML, to update the CSS
+class on some div, it’s definitely possible to search for the markup `<div
+… class="…">` and edit the contents. You might need to create the `class`
+attribute first if it doesn’t already exist, and you’ll probably want to
+handle variations like `class="foo"` vs. `class='foo'` vs. `class=foo`, but
+it’s doable.
+
+Although that’s doable, the code `div.classList.toggle('expanded')` is much
+shorter, easier to read and understand, faster to run, and less
+error-prone.
+
+There’s some cost of parsing the html into a data structure and turning it
+back into a string at the end, but when there are many operations to
+perform, or a desire to handle variations and corner cases, or when you
+start to think about the problem of specifying *which* div to operate on;
+the increased simplicity and precision of working with objects to perform
+all those operations add up to greatly outweigh the cost of parsing the
+input into some
+
+By working at this higher level of abstraction we gain precise focus,
+much more readable code, and a chance at clean APIs.
+
+In fact DOM is a fine data structure for HTML input, and that’s what 2md
+uses for its input stage. It’s the default API in browser environments
+where you also get a free parser by setting `innerHTML` on elements.
+`jsdom` provides command-line tools with the same DOM API as in the
+browser. And whatever issues the DOM API may have for HTML, those are made
+up for many times over by its ubiquity and familiarity.
+
+#### <small>Principle 2:</small><br/> Transform the input through a sequence of data types
+
+To turn HTML into markdown, we’re going to perform a series of
+transformation steps to make it a bit more markdown-like until it
+eventually *is* markdown.
+
+<p>
+<img className="center-md" src="/doc/flow.svg"/>
+</p>
+
+In this transformation sequence, sometimes the output of a step will be the
+same as its input type—that’s what the loop is indicating—and sometimes
+it’ll be a new output type more suited to future steps.
+
+Though there are many benefits to using the DOM API to represent HTML, it’s
+a poor fit for representing markdown. It has a bunch of stuff we don’t
+need, like `classList`, and it doesn’t include a bunch of stuff that we do
+care about for Markdown, like the index of an `<li>` inside an `<ol>`.
+
+So we simplify by introducing a new data structure called an intermediate
+representation: something that’s logically between two other
+representations, and has similarities with both but isn’t actually either.
+
+For 2md, the intermediate representation is called ‘Ir,’ and it’s not html
+anymore, though it’s close, and it’s not quite markdown yet, though it’s
+also close. I could have come up with a more descriptive name than
+Ir—markml? htdown? mdish?—but there’s not confusion here yet. Sometimes the
+term ‘intermediate representation’ gets very confusing if you end up with a
+bunch of different intermediate representations inside a compiler, with all
+of those different representations having very similar names.
+
+How many different representations do you need? Well, it depends.
+I started out with two, DOM and Ir, and
+later added a third called OutputBlocks.
 
 ### Details
 

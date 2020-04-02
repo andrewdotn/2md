@@ -97,6 +97,12 @@ You can see the results of individual steps with the `--output-format`
 option to the cli. These are subject to change without notice, and not
 exposed through the public api.
 
+## License
+
+All the original code here is licensed under the Apache License, version
+2.0, included in `LICENSE.code`; except for the contents of the “how it
+works” article `how-it-works/post.mdx`, which is not redistributable.
+
 ## Releasing
 
 The current release process, to be automated later, is:

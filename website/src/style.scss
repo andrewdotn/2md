@@ -43,3 +43,12 @@ pre {
   min-width: 100%;
   float: left;
 }
+
+@import "./demo/dom-view.css";
+
+@include media-breakpoint-up(md) {
+  .center-md {
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+}

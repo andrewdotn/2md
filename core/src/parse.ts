@@ -116,7 +116,11 @@ function stripStyles(htmlNode: Node) {
   }
 }
 
-export function parseToIr(doc: Node, options: ParseOptions): IrNode {
+export function parseToIr(
+  doc: Node,
+  options: ParseOptions,
+  skipTreeTransforms = false
+): IrNode {
   const root = new Document([]);
   let parseRoot = root;
 
@@ -131,7 +135,9 @@ export function parseToIr(doc: Node, options: ParseOptions): IrNode {
     parse1(parseRoot, doc.childNodes[i]);
   }
 
-  applyTreeTransforms(root);
+  if (!skipTreeTransforms) {
+    applyTreeTransforms(root);
+  }
 
   return root;
 }

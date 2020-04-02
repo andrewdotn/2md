@@ -7,11 +7,13 @@ import { IrNode } from "../../../core/src/2md";
 import { FixtureSelector } from "../demo/fixture-selector";
 import { fixtures } from "../generated-fixtures";
 import { renderToStaticMarkup } from "react-dom/server";
+import { IrView } from "../demo/ir-view";
 
 interface DemoFlowState {
   rawHtml?: string;
   dom?: Node;
   intermediate?: IrNode;
+  untransformedIntermediate?: IrNode;
   markdown?: string;
   setHtml: (html: string) => void;
 }
@@ -59,11 +61,12 @@ export class DemoFlow extends Component<{}, DemoFlowState> {
     const dom = doc;
 
     const intermediate = parseToIr(doc, {});
+    const untransformedIntermediate = parseToIr(doc, {}, true);
     const rendered = new BlockRendering();
     intermediate.render(rendered);
     const markdown = rendered.finish();
 
-    return { rawHtml, dom, intermediate, markdown };
+    return { rawHtml, dom, intermediate, untransformedIntermediate, markdown };
   };
 
   setHtml = (rawHtml: string) => {
@@ -134,34 +137,36 @@ export function DemoHtmlEditor() {
 
 export function DemoCharCount() {
   return (
-      <DemoContext.Consumer>
-        {({ rawHtml }) => rawHtml?.length?.toString() ?? "??"}
-      </DemoContext.Consumer>
+    <DemoContext.Consumer>
+      {({ rawHtml }) => rawHtml?.length?.toString() ?? "??"}
+    </DemoContext.Consumer>
   );
 }
 
 export function DemoDom() {
   return (
-      <div className="mb-3">
+    <div className="mb-3">
+      <DemoContext.Consumer>
+        {({ dom }) => dom && <DomView node={dom} />}
+      </DemoContext.Consumer>
+    </div>
+  );
+}
+
+export function DemoUntransformedIntermediate() {
+  return (
     <DemoContext.Consumer>
-      {({ dom }) => dom && <DomView node={dom} />}
+      {({ untransformedIntermediate }) => (
+        <IrView ir={untransformedIntermediate} />
+      )}
     </DemoContext.Consumer>
-      </div>
   );
 }
 
 export function DemoIntermediate() {
   return (
     <DemoContext.Consumer>
-      {({ intermediate }) => (
-        <pre className="toMd-demo__output">
-          {JSON.stringify(
-            intermediate,
-            (k, v) => (k == "parent" ? undefined : v),
-            2
-          )}
-        </pre>
-      )}
+      {({ intermediate }) => <IrView ir={intermediate} />}
     </DemoContext.Consumer>
   );
 }

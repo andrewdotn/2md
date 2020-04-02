@@ -1,17 +1,8 @@
 import React, { Component } from "react";
+import { vis } from "./util";
 
 interface DomViewProps {
   node: Node;
-}
-
-function vis(s: string | null) {
-  if (!s) {
-    return '""'
-  }
-  if (/^\s*$/.test(s)) {
-    return `"${s}"`;
-  }
-  return s.replace(/\n/g, '\\n');
 }
 
 export class DomView extends Component<DomViewProps> {

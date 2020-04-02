@@ -9,6 +9,7 @@ import {
   DemoHtmlEditor,
   DemoIntermediate,
   DemoMarkdown,
+  DemoUntransformedIntermediate,
 } from "./demo-flow.tsx";
 
 <div className="container-fluid px-0">
@@ -32,7 +33,10 @@ plain-text files, while preserving a lot of the formatting by automatically
 converting the HTML to markdown.
 
 It works on mac, linux, and windows, reading HTML off the clipboard from
-the command line.
+the command line. You can see source code and install instructions [on
+GitHub][2md-github].
+
+[2md-github]: https://github.com/andrewdotn/2md
 
 <figure className="figure">
   <PauseableImage src="/doc/demo.gif" className="figure-img img-fluid rounded"/>
@@ -50,7 +54,7 @@ even try it out right here on this page:
 <DemoContent/>
 <div className="clearfix"/>
 
-2md turns that markup into this markdown:
+2md turns the markup for that into this markdown:
 
 <DemoMarkdown/>
 <div className="clearfix"/>
@@ -279,7 +283,6 @@ real live data structures!
 Here’s that selector/paste box again:
 
 <DemoContent/>
-<div className="clearfix"/>
 
 ### Raw HTML
 
@@ -332,6 +335,59 @@ essentially all the stuff that jQuery does behind the scenes.
 
 How to start turning that DOM tree into markdown?
 
+Well, there’s lots that can be thrown away, like any HTML comments, the
+contents of any `class=""` attributes; and we don’t care about `<div>`s or
+`<span>`s; … in fact we’re going to throw away everything except for a
+small number of tags, and do some normalization such as mapping both
+`<i>foo</i>` and `<em>foo</em>` into the same thing because they’ll both
+come out the markdown end as `*foo*`.
+
+And where Ir comes into play: it’s a simplified, normalized data structure
+to make the HTML input more markdown-like.
+
+Each Ir node has:
+
+  - A name, and possibly an attribute, from the following list, roughly
+    corresponding to the subset of HTML that’s relevant to generating
+    markdown:
+      - A (attribute: href)
+      - Blockquote
+      - Bold
+      - Br
+      - Code
+      - Heading (attribute: level)
+      - I
+      - ListItem
+      - NumberedListItem (attribute: number)
+      - OrderedList
+      - P
+      - Preformatted
+      - Document
+  - A list of children, all of which are either other Ir nodes or plain
+    strings.
+
+The code to actually do this is in `src/parse.ts`:
+
+  - If the current DOM node is text, add it to the current Ir node’s
+    children
+  - If the current DOM node is an ‘interesting’ HTML tag, create a new Ir node
+    for it, and add it as a child of the current Ir node
+  - Then recurse down into any child nodes of the current DOM node
+
+The code:
+
+    function parse(doc: Node): IrNode {
+      const root = new Document([]);
+
+      for (let i = 0; i < doc.childNodes.length; i++) {
+        parse1(root, doc.childNodes[i]);
+      }
+    }
+
+    // This is the actual recursive function; I think I picked up the naming
+    // convention from Lisp. When a recursive function needs accumulators, `foo()`
+    // is the simplified API used by callers that does the initial setup, and
+    // `foo1()` recurses.
     function parse1(irNode: IrNode, htmlNode: Node) {
       if (
         htmlNode.nodeType == htmlNode.TEXT_NODE &&
@@ -401,6 +457,7 @@ How to start turning that DOM tree into markdown?
         }
         if (irNode !== receiver) irNode.push(receiver);
 
+        // Recurse
         for (let i = 0; i < htmlNode.childNodes.length; i++) {
           const c = htmlNode.childNodes[i];
           parse1(receiver, c);
@@ -408,17 +465,20 @@ How to start turning that DOM tree into markdown?
       }
     }
 
-## Intermediate:
+The result is a 
 
-and map that to IR
+<DemoUntransformedIntermediate/>
+
+### Tree transforms
 
 <DemoIntermediate/>
-<div className="clearfix"/>
 
-## Markdown
+### OutputBlocks
+
+### Markdown
 
 <DemoMarkdown/>
-<div className="clearfix"/>
+
 
 </DemoFlow>
 

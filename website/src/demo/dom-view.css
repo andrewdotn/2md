@@ -1,3 +1,8 @@
 .dom-view__node-wrapper {
   margin-left: 10px;
+  font-weight: normal;
+}
+
+.dom-view__node-wrapper:hover {
+  font-weight: bold;
 }

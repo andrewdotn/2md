@@ -31,7 +31,7 @@ AuthUserFile /home/${USER}/${DOMAIN}/.htpasswd
 Require user andrew
 </Else>
 
-Header set Content-Security-Policy "default-src 'self'; style-src 'self'; img-src *;"
+Header set Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src *;"
 Header set Strict-Transport-Security max-age=2592000
 
 AddDefaultCharset UTF-8

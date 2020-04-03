@@ -32,6 +32,9 @@ function concatenateStrings(node: IrNode) {
     if (typeof c0 === "string" && typeof c1 === "string") {
       node.setChild(i, c0 + c1);
       node.removeChild(i + 1);
+      // Since we just deleted the element at the current index, decrement
+      // the loop index, otherwise we’ll miss the next element which has
+      // shifted down into the current position.
       i--;
     }
   }
@@ -77,14 +80,7 @@ function collapseCodeInsidePre(node: IrNode) {
   if (node.childCount() === 1) {
     const c = node.child(0);
     if (typeof c !== "string" && c.name === "Code") {
-      // Roundabout way of doing `node.children = c.children;`
-      const copy = c.copyOfChildren();
-      while (node.hasChildren()) {
-        node.removeChild(0);
-      }
-      for (let c1 of copy) {
-        node.push(c1);
-      }
+      node.replaceChildWithItsChildren();
     }
   }
 }

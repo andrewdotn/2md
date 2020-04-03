@@ -20,7 +20,7 @@ export class IrView extends Component<IrViewProps> {
       if (!ignoredProperties.includes(name)) {
         renderAttrs.push(
           <span>
-            {name}=<code>{vis(ir[name]?.toString())}</code>
+            {name}=<code>{vis((ir as any)[name]?.toString())}</code>
           </span>
         );
       }

@@ -47,7 +47,7 @@ GitHub][2md-github].
 </figure>
 
 Since I wrote it in TypeScript, it works in the browser too, so you can
-even try it out right here on this page:
+even try it out right here on this page.
 
 <DemoFlow>
 
@@ -292,9 +292,10 @@ The raw HTML for these snippets is generally pretty messy:
 
 These examples mostly come from copying and pasting from Safari on a mac.
 Other browsers seem to be similar, but the important thing is that to make
-note of is that, on order to make the snippet self-contained, the browser
+note of is that, in order to make the snippet self-contained, the browser
 took all the computed styles from all the CSS and inlined it on every
-element, making the markup really messy.
+element, making the markup really messy. And glomming everything onto one
+line makes it a lot harder to read.
 
 Instead of staring at a <DemoCharCount/>-character string, let’s pop it
 into a DOM tree to collapse the `style="…"` nodes and reveal the tree
@@ -335,15 +336,15 @@ essentially all the stuff that jQuery does behind the scenes.
 
 How to start turning that DOM tree into markdown?
 
-Well, there’s lots that can be thrown away, like any HTML comments, the
-contents of any `class=""` attributes; and we don’t care about `<div>`s or
-`<span>`s; … in fact we’re going to throw away everything except for a
-small number of tags, and do some normalization such as mapping both
-`<i>foo</i>` and `<em>foo</em>` into the same thing because they’ll both
-come out the markdown end as `*foo*`.
+Well, there’s lots that can be thrown away, like any HTML comments, the contents
+of any `class=""` attributes; and we don’t care about `<div>`s or `<span>`s; …
+in fact we’re going to throw away everything except for text and a small number
+of tags, and do some normalization such as mapping both `<i>foo</i>` and
+`<em>foo</em>` into the same thing because they’ll both come out the markdown
+end as `*foo*`.
 
-And where Ir comes into play: it’s a simplified, normalized data structure
-to make the HTML input more markdown-like.
+And this is where Ir comes into play: it’s a simplified, normalized data
+structure to make the HTML input more markdown-like.
 
 Each Ir node has:
 
@@ -465,11 +466,98 @@ The code:
       }
     }
 
-The result is a 
+The result is a tree, a lot like the DOM tree, but with only about a dozen
+possible node types, only three of which can have any attributes.
 
 <DemoUntransformedIntermediate/>
 
 ### Tree transforms
+
+Now that we’re getting closer to markdown, we can perform some operations
+directly on the Ir tree, without moving to a new representation.
+
+Here are some examples of tree transform functions from
+`src/tree-transforms.ts`.
+
+  - Turn things that started out as `<pre><code>…</code></pre>` into plain
+    Preformatted Ir nodes, without an inner Code node.
+
+    Markdown has two different kinds of code blocks: inline
+    code, <code>&#96;foo&#96;</code>, normally rendered as <code>&lt;code
+    …/&gt;</code>, and code-blocks typically designated with a
+    four-space-indent inside markdown source:
+
+        function foo () {
+            ...
+        }
+
+    which gets rendered into HTML as `<pre><code>…</code></pre>`.
+
+    When going from HTML to markdown, `<code>` should turn
+    into <code>&#96;foo&#96;</code>, and 2md has a Code class to represent an
+    inline code block. Meanwhile HTML of the form `<pre><code>…</code></pre>`
+    should turn into a Preformatted Ir node, with no Code object.
+
+    The initial Ir tree comes from a fairly direct mapping of HTML tags, so
+    also ends up with a Code node as a child of a Preformatted node.
+    There’s no need for that, and we don’t want to emit four-space-indented
+    blocks with an extra <code>&DiacriticalGrave;</code> in there,
+    so that should be simplified.
+
+    The code to do that is
+
+        function collapseCodeInsidePre(node: IrNode) {
+          if (node.name !== "Preformatted") {
+            return;
+          }
+
+          if (node.childCount() === 1) {
+            const c = node.child(0);
+            if (typeof c !== "string" && c.name === "Code") {
+              node.replaceChildWithItsChildren();
+            }
+          }
+        }
+
+    which is called from a wrapper function that handles the traversal
+    boilerplate.
+
+  - For `<ul><li>…` markup we can emit `"  - "` markdown without regard for the
+    context surround where the `<li>` occurs.
+
+    But for an `<li>` inside an `<ol>`, we need to emit a number
+    corresponding to the index in the parent list.
+
+    So there’s a `numberLists` transform which walks along, counting, and
+    sets the correct `index` attribute on every NumberedListItem.
+
+  - Concatenate adjacent string children into a single string, purely to
+    make it easier to understand what is going on. This is especially
+    noticeable for the syntax highlighting in the ‘Node JS’ and ‘Stack
+    Overflow’ examples, where each `<span … />` for colour ends up being a
+    separate string without this optimization.
+
+        /**
+         * If two subsequent nodes are strings, concatenate them. This optimization pass
+         * should be quick, and is here entirely to make unit test input cleaner.
+         */
+        function concatenateStrings(node: IrNode) {
+          for (let i = 0; i < node.childCount() - 1; i++) {
+            const c0 = node.child(i);
+            const c1 = node.child(i + 1);
+            if (typeof c0 === "string" && typeof c1 === "string") {
+              node.setChild(i, c0 + c1);
+              node.removeChild(i + 1);
+              // Since we just deleted the element at the current index, decrement
+              // the loop index, otherwise we’ll miss the next element which has
+              // shifted down into the current position.
+              i--;
+            }
+          }
+        }
+
+With all that and more, the output is the same Ir tree as before, now a bit
+more markdown-ish.
 
 <DemoIntermediate/>
 

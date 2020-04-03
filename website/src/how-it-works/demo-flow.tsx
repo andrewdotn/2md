@@ -155,19 +155,23 @@ export function DemoDom() {
 
 export function DemoUntransformedIntermediate() {
   return (
-    <DemoContext.Consumer>
-      {({ untransformedIntermediate }) => (
-        <IrView ir={untransformedIntermediate} />
-      )}
-    </DemoContext.Consumer>
+    <div className="mb-2">
+      <DemoContext.Consumer>
+        {({ untransformedIntermediate }) => (
+          <IrView ir={untransformedIntermediate} />
+        )}
+      </DemoContext.Consumer>
+    </div>
   );
 }
 
 export function DemoIntermediate() {
   return (
-    <DemoContext.Consumer>
-      {({ intermediate }) => <IrView ir={intermediate} />}
-    </DemoContext.Consumer>
+    <div className="mb-2">
+      <DemoContext.Consumer>
+        {({ intermediate }) => <IrView ir={intermediate} />}
+      </DemoContext.Consumer>
+    </div>
   );
 }
 

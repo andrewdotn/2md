@@ -19,6 +19,6 @@ export const fixtures = new Map([
   ],
   [
     "Nested lists",
-    "<p>A list:</p>\n<ul>\n<li>\n<p>Foo</p>\n</li>\n<li>\n<p>Bar</p>\n<ul>\n<li>\n<p>Alpha</p>\n</li>\n<li>\n<p>Beta</p>\n</li>\n<li>\n<p>Gamma</p>\n<ol>\n<li>\n<p>One</p>\n</li>\n<li>\n<p>Two</p>\n</li>\n<li>\n<p>Three</p>\n</li>\n</ol>\n</li>\n</ul>\n</li>\n<li>\n<p>Baz</p>\n</li>\n</ul>\n"
+    "<p>A list:</p>\n<ul>\n<li>\n<p>Foo</p>\n</li>\n<li>\n<p>Bar</p>\n<ul>\n<li>\n<p>Alpha</p>\n</li>\n<li>\n<p>Beta</p>\n</li>\n<li>\n<p>Gamma</p>\n<ol>\n<li>\n<p>One</p>\n<p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean\ncommodo ligula eget dolor. Aenean massa. Cum sociis natoque\npenatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>\n</li>\n<li>\n<p>Two</p>\n<p>Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.\nNulla consequat massa quis enim. Donec pede justo, fringilla vel,\naliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut,\nimperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede\nmollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum\nsemper nisi.</p>\n</li>\n<li>\n<p>Three</p>\n<p>Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu,\nconsequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in,\nviverra quis, feugiat a, tellus.</p>\n<p>Phasellus viverra nulla ut metus varius laoreet.</p>\n</li>\n</ol>\n</li>\n</ul>\n</li>\n<li>\n<p>Baz</p>\n</li>\n</ul>\n"
   ]
 ]);

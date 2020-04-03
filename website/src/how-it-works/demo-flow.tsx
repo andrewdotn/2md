@@ -187,11 +187,13 @@ export function DemoIntermediate() {
 export function DemoOutputBlocks() {
   return (
     <>
-      <div className="mb-2">
-        <DemoContext.Consumer>
-          {({ rendered }) => <BlockView blocks={rendered} />}
-        </DemoContext.Consumer>
-      </div>
+      <DemoContext.Consumer>
+        {({ rendered }) => (
+          <div className="mb-2 float-left">
+            <BlockView blocks={rendered} />
+          </div>
+        )}
+      </DemoContext.Consumer>
       <div className="clearfix" />
     </>
   );

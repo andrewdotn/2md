@@ -21,6 +21,10 @@ function extractHeadingLevel(nodeName: string): HeadingLevel {
   return <HeadingLevel>(nodeName.charCodeAt(1) - "0".charCodeAt(0));
 }
 
+// This is the actual recursive function; I think I picked up the naming
+// convention from Lisp. When a recursive function needs accumulators, `foo()`
+// is the simplified API used by callers that does the initial setup, and
+// `foo1()` recurses.
 function parse1(irNode: IrNode, htmlNode: Node) {
   if (
     htmlNode.nodeType == htmlNode.TEXT_NODE &&

@@ -37,7 +37,7 @@ export class Prefix {
   private _rendered = false;
 }
 
-class OutputBlock {
+export class OutputBlock {
   constructor(prefixStack: Prefix[], wrapOptions?: BlockOptions) {
     this.prefixStack = prefixStack;
     this.wrapOptions = { ...wrapOptions };
@@ -144,6 +144,8 @@ export class BlockRendering {
   }
 
   finish(): string {
+    this.outputBlocks = this.outputBlocks.filter(b => b.contents() !== null);
+
     let ret = new TextRendering(this.outputBlocks).toText();
 
     let prefix = "";

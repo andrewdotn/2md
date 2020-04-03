@@ -8,7 +8,7 @@ interface BlockViewProps {
 }
 
 function expand(s: string) {
-    return <code>"{s.replace(/ /g, '\xa0')}"</code>
+  return <code>"{s.replace(/ /g, "\xa0")}"</code>;
 }
 
 export class BlockView extends Component<BlockViewProps> {
@@ -21,42 +21,35 @@ export class BlockView extends Component<BlockViewProps> {
     }
 
     const ret = [];
-    ret.push(<div>{blocks.length} blocks</div>);
-
-    // ret.push(<pre>{JSON.stringify(blocks, null, 2)}</pre>);
-
-    let prevPrefix;
-    let commonPrefix = [];
     for (let i = 0; i < blocks.length; i++) {
       const b = blocks[i];
+      const prefix = b.prefixStack[depth];
 
       if (b.prefixStack.length === depth) {
-      ret.push(
-        <div>
-          <pre>{vis(b.contents())}</pre>
-        </div>
-      );
-      } else {
-          ret.push(
-              <div className="" style={{marginLeft: '10px'}}>
-                  <div className="d-inline-block border-primary">
-                  {depth}<br/>
-                  {expand(b.prefixStack[depth].first)}, {expand(b.prefixStack[depth].subsequent)}
-              </div>
-              <div className="d-inline-block border-info">
-              <BlockView blocks={[b]} depth={depth + 1}/>
-              <div className="clearfix"/>
+        ret.push(
+          <div className="block-view__content">
+            <code>{vis(b.contents())}</code>
           </div>
-              </div>
+        );
+      } else {
+        ret.push(
+          <div className="block-view__item">
+            <div className="block-view__prefix">
+              {expand(prefix.first)}
+              {prefix.first !== prefix.subsequent && (
+                <>
+                  {" "}
+                  <br />
+                  then
+                  <br />
+                  {expand(prefix.subsequent)}
+                </>
+              )}
+            </div>
+            <BlockView blocks={[b]} depth={depth + 1} />
+          </div>
+        );
       }
-
-      // if (!prevPrefix || b.prefixStack?.[depth] === prevPrefix) {
-      //   commonPrefix.push(b);
-      // } else {
-      //   // ret.push(<BlockView blocks={commonPrefix} depth={depth + 1} />);
-      //   commonPrefix = [];
-      // }
-      // prevPrefix = b.prefixStack?.[0];
     }
 
     return ret;

@@ -52,3 +52,20 @@ pre {
     transform: translateX(-50%);
   }
 }
+
+.block-view {
+  background-color: yellow;
+}
+.block-view__content {
+  background-color: pink;
+  max-width: 20em;
+}
+.block-view__item {
+  display: flex;
+  margin-top: 10px;
+  background-color: lightgreen;
+}
+.block-view__prefix {
+  margin-right: 10px;
+  background-color: $light;
+}

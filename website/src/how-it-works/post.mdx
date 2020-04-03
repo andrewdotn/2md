@@ -282,6 +282,11 @@ one class, and then that one class starts doing too many different things,
 split it up into different more-focused classes. Except here instead of a
 single class, each representation is composed of a whole family of classes.
 
+Incidentally, even if you weren’t working in a vacuum and reused an
+existing library like `mdast` to represent the markdown output, I expect
+that the code would be easier to write and maintain with an intermediate
+representation expect between the DOM and markdown representations.
+
 ## Details
 
 All right, finally it’s time to look at some source code excerpts, and some
@@ -742,11 +747,48 @@ each line—finally we have markdown!
 
 </DemoFlow>
 
+## The development process
 
 
+took about a week
 
 
+## Conclusion
 
+This was meant to be a fun challenge that produced something useful for me,
+and I’m very happy with how it’s turned out.
 
+I’ve mapped the 2md binary to typing `,2` in vim normal mode (`map ,2
+:r!2md <CR>` in `~/.vimrc`) so that pasting markdown in the terminal is
+just two keystrokes and a fraction of a second, and I seem to run it on
+average 3 or 4 times a day.
+
+It’s not complete by any means; although I’ve covered the most common
+formatting that I tend to copy and paste, there’s a lot of room for
+improvement. When I notice something off in the markdown output when
+running 2md, I save the input (`2md --output-format=raw`) to a folder for
+future fixes, and do minor manual fixups to avoid shifting focus from the
+task at hand to working on 2md. But if other people are interested in this
+tool, I could definitely start working through those samples…
+
+Actually, when the markdown output looks funny, often it’s because the
+input HTML is a bit off, e.g., `<b>Hello </b>world` comes out as `**Hello
+**world`. That’s something 2md could clean up automatically, and I might do
+that some time, as well as taking a look at some parsing the styles, so
+that some day `<span style="…; font-weight: bold; …">foo</span>` comes out
+as `**foo**`.
+
+This feels like the first project I’ve done that’s really, really easy for
+other people to use: just click a link and get something interactive. For
+the ability to give people that, I will definitely use more TypeScript in
+the future!
+
+Relating back to the quote from Neal Ford on automation: instead of getting
+bored adding markdown formatting by hand, I learned a ton automating the
+process, and I’m really, really happy about that. In fact the hard part now
+is resisting the urge to simultaneously explore all the new avenues this
+has opened up.
+
+— Andrew.
 
 </div>

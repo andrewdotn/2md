@@ -76,7 +76,13 @@ lot of learning is the accumulation of low-level tricks over many years. I
 love reading about those tricks in case they come in handy some day, and
 enjoy sharing them too.
 
-### Motivation
+<div className="toc">
+
+### Table of Contents
+
+
+## Motivation
+</div>
 
 For many years I’ve kept a terminal open in one corner of the
 screen where I make notes in a text editor while I work. It’s sort of like
@@ -567,12 +573,10 @@ We’re almost ready for output!
 
 ### OutputBlocks
 
-There’s actually another important thing about Ir objects that I didn’t
-mention earlier: a `render()` method. This is how the Ir tree gets turned
-into a markdown string.
+There’s one final important thing that Ir objects have: a `render()`
+method. This is how the Ir tree gets turned into a markdown string.
 
-All the Ir classes are defined in `src/2md.ts`,
-and here’s one of them:
+All the Ir classes are defined in `src/2md.ts`, and here’s one of them:
 
     export class Code extends IrNode {
       static irName: NodeName = "Code";
@@ -588,7 +592,7 @@ Pretty easy! To output an inline code block: output a <code>&#96;</code>
 character, call the superclass `render()` method to render any children of
 this node, and then output another <code>&#96;</code> character.
 
-What about a block?
+That example uses inline markdown. What about a block?
 
     export class ListItem extends IrNode {
       static irName: NodeName = "ListItem";
@@ -601,8 +605,9 @@ What about a block?
       }
     }
 
-Pretty straightforward: the prefix says to use `"  - "` for the first line
-of a bullet list, and `"    "` for subsequent lines.
+Pretty straightforward: add a prefix ofj `"  - "` for the first line the
+bullet item and `"    "` for subsequent lines, recursively render the
+`IrNode`’s contents, then remove the prefix.
 
 The interface for `BlockRendering` is pretty small:
 
@@ -616,7 +621,9 @@ The interface for `BlockRendering` is pretty small:
       finish(): string;
     }
 
-At this point, why can’t we directly write out the contents as a string?
+At this point, it may look like it’s possible to write out the final
+markdown string, but my attempts at that were problematic. Sure, a lot of
+html can be correctly handled that way, but there is an issue:
 
 Nesting. Nesting gets complicated.
 
@@ -650,9 +657,13 @@ and that renders back to HTML as
 The render function inside the Code class doesn’t and shouldn’t know
 whether it’s on the first line of a bullet point item or not.
 
-After trying out a number of unsuccessful hacks, I decided that the
-complexity here justified introducing a new intermediate representation
-called an OutputBlock, roughly corresponding to a paragraph.
+After trying out a number of unsuccessful hacks, I decided that the issue
+was complicated enough to justify introducing a new intermediate
+representation called an OutputBlock, roughly corresponding to a paragraph.
+
+Instead of `IrNode.render()` appending to the final markdown string, it
+ends up writing into OutputBlock objects, with a new OutputBlock
+automatically created whenever the prefix changes.
 
 Each OutputBlock contains:
 
@@ -663,13 +674,6 @@ Each OutputBlock contains:
 The prefix class is fairly simple: the text to use on the first line, the
 text to use on subsequent lines, and whether or not it’s already been
 rendered.
-
-Then when something inside a bulleted list is ready for output, deciding
-whether to start the line with `"  - "` at the start of the bulleted list
-or `"    "` for later lines is as simple as asking the prefix object
-whether its first line has already been printed or not. Even if the
-something that’s ready for output is quite deeply nested inside the
-bulleted list.
 
     /**
      * A string that gets prepended to each line of an output block in Markdown,
@@ -707,10 +711,20 @@ bulleted list.
       private _rendered = false;
     }
 
-The structure here is usually pretty boring, but is particularly noticeable
-on the ‘Nested lists’ example.
+Then when something inside a bulleted list is ready for output, deciding
+whether to start the line with `"  - "` at the start of the bulleted list
+or `"    "` for later lines is as simple as asking the prefix object
+whether its first line has already been printed or not. Even if the
+something that’s ready for output is quite deeply nested inside the
+bulleted list.
+
+Here’s that OutputBlock representation, which is much much closer to
+finally being markdown:
 
 <DemoOutputBlocks/>
+
+The structure here is usually pretty boring, but is particularly noticeable
+on the ‘Nested lists’ example.
 
 Any `""` prefix blocks are used as paragraph markers; empty lines will
 later be emitted at the end of every output block.

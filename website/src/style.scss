@@ -53,3 +53,13 @@ pre {
     transform: translateX(-50%);
   }
 }
+
+.toc p {
+  margin-bottom: 0;
+}
+.toc li {
+  list-style-type: none;
+}
+.toc ul {
+  padding-left: 20px;
+}

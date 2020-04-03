@@ -40,7 +40,7 @@ export class BlockView extends Component<BlockViewProps> {
 
         const style: CSSProperties = {
           gridRowStart: `span ${span}`,
-        gridColumnStart: (depth + 1).toString();
+          gridColumnStart: (depth + 1).toString()
         };
         ret.push(
           <div className="block-view__prefix" style={style}>

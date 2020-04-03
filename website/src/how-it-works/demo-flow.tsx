@@ -50,7 +50,7 @@ export class DemoFlow extends Component<{}, DemoFlowState> {
 
     this.state = {
       setHtml: this.setHtml,
-      ...this.computeState(fixtures.get("Nested lists")!)
+      ...this.computeState(fixtures.get("Ars Technica")!)
     };
   }
 
@@ -189,7 +189,7 @@ export function DemoOutputBlocks() {
     <>
       <DemoContext.Consumer>
         {({ rendered }) => (
-          <div className="mb-2 float-left">
+          <div className="mb-3 float-left">
             <BlockView blocks={rendered} />
           </div>
         )}

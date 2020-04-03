@@ -618,17 +618,20 @@ The interface for `BlockRendering` is pretty small:
 
 At this point, why can’t we directly write out the contents as a string?
 
-Nesting. If you have, for example, a code block in a bulleted list
-inside a blockquote, the start of the line is
+Nesting. Nesting gets complicated.
+
+For example, if there’s a code block in a bulleted list inside a
+blockquote, the start of the line is
 
     >   -     foo
 
-which shows up as
+which renders back to HTML as
 
 >   -     foo
 
 but if that same code block starts on a later line of the bullet point,
-there’s no `-`:
+there’s no bullet-point marker on the same line as the start of the code
+block:
 
     >   - Here is some code:
     >
@@ -636,7 +639,7 @@ there’s no `-`:
     >
     > …
 
-and ithat shows up as:
+and that renders back to HTML as
 
 >   - Here is some code:
 >
@@ -645,16 +648,83 @@ and ithat shows up as:
 > …
 
 The render function inside the Code class doesn’t and shouldn’t know
-whether it’s at the start of a bullet point or not.
+whether it’s on the first line of a bullet point item or not.
+
+After trying out a number of unsuccessful hacks, I decided that the
+complexity here justified introducing a new intermediate representation
+called an OutputBlock, roughly corresponding to a paragraph.
+
+Each OutputBlock contains:
+
+  - some already-markdown text content
+
+  - a stack of prefixes to insert at the beginning of each line
+
+The prefix class is fairly simple: the text to use on the first line, the
+text to use on subsequent lines, and whether or not it’s already been
+rendered.
+
+Then when something inside a bulleted list is ready for output, deciding
+whether to start the line with `"  - "` at the start of the bulleted list
+or `"    "` for later lines is as simple as asking the prefix object
+whether its first line has already been printed or not. Even if the
+something that’s ready for output is quite deeply nested inside the
+bulleted list.
+
+    /**
+     * A string that gets prepended to each line of an output block in Markdown,
+     * e.g., `#` or `>`. The first line is often different from subsequent lines,
+     * for example with a bulleted list that is simply indented on subsequent lines.
+     *
+     * You should always make a new prefix instead of caching one, because it
+     * contains state to track whether the first line has been printed or not.
+     */
+    export class Prefix {
+      constructor(first: string, subsequent?: string) {
+        this.first = first;
+        this.subsequent = subsequent !== undefined ? subsequent : first;
+      }
+
+      static render(prefixStack: Prefix[]): string {
+        let ret = "";
+        for (let p of prefixStack) {
+          if (!p._rendered) {
+            p._rendered = true;
+            ret += p.first;
+          } else {
+            ret += p.subsequent;
+          }
+        }
+        return ret;
+      }
+
+      equals(other: Prefix): boolean {
+        return this.first === other.first && this.subsequent === other.subsequent;
+      }
+
+      readonly first: string;
+      readonly subsequent: string;
+      private _rendered = false;
+    }
+
+The structure here is usually pretty boring, but is particularly noticeable
+on the ‘Nested lists’ example.
 
 <DemoOutputBlocks/>
 
+Any `""` prefix blocks are used as paragraph markers; empty lines will
+later be emitted at the end of every output block.
+
+By the way, any links here haven’t been lost; they’re stored in the object
+that holds the `OutputBlocks[]` list, and will be appended at the end of
+the final markdown text.
+
 ### Markdown
 
-And finally we have markdown!
+After wrapping the text in each OutputBlock, and prepending the prefix to
+each line—finally we have markdown!
 
 <DemoMarkdown/>
-
 
 </DemoFlow>
 

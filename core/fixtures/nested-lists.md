@@ -10,13 +10,13 @@ A list:
 
       - Gamma
 
-         1. One
+         1. *One*
 
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean
-            commodo ligula eget dolor. Aenean massa. Cum sociis natoque
+            [Lorem ipsum][1] dolor sit amet, consectetuer adipiscing elit.
+            Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque
             penatibus et magnis dis parturient montes, nascetur ridiculus mus.
 
-         2. Two
+         2. **Two**
 
             Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem.
             Nulla consequat massa quis enim. Donec pede justo, fringilla vel,
@@ -25,7 +25,7 @@ A list:
             mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum
             semper nisi.
 
-         3. Three
+         3. `Three`
 
             Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu,
             consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in,
@@ -34,3 +34,5 @@ A list:
             Phasellus viverra nulla ut metus varius laoreet.
 
   - Baz
+
+[1]: https://en.wikipedia.org/wiki/Lorem_ipsum

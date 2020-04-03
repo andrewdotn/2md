@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { ContentEditable } from "../demo/content-editable";
 import { DomView } from "../demo/dom-view";
-import { parseToIr } from "../../../core/src/parse";
-import { BlockRendering } from "../../../core/src/render";
-import { IrNode } from "../../../core/src/2md";
+import { parseToIr } from "2md/src/parse";
+import { BlockRendering, OutputBlock } from "2md/src/render";
+import { IrNode } from "2md/src/2md";
 import { FixtureSelector } from "../demo/fixture-selector";
 import { fixtures } from "../generated-fixtures";
 import { renderToStaticMarkup } from "react-dom/server";
 import { IrView } from "../demo/ir-view";
+import { BlockView } from "../demo/block-view";
 
 interface DemoFlowState {
   rawHtml?: string;
@@ -15,6 +16,7 @@ interface DemoFlowState {
   intermediate?: IrNode;
   untransformedIntermediate?: IrNode;
   markdown?: string;
+  rendered?: OutputBlock[];
   setHtml: (html: string) => void;
 }
 
@@ -48,7 +50,7 @@ export class DemoFlow extends Component<{}, DemoFlowState> {
 
     this.state = {
       setHtml: this.setHtml,
-      ...this.computeState(fixtures.get("Ars Technica")!)
+      ...this.computeState(fixtures.get("Nested lists")!)
     };
   }
 
@@ -66,7 +68,14 @@ export class DemoFlow extends Component<{}, DemoFlowState> {
     intermediate.render(rendered);
     const markdown = rendered.finish();
 
-    return { rawHtml, dom, intermediate, untransformedIntermediate, markdown };
+    return {
+      rawHtml,
+      dom,
+      intermediate,
+      untransformedIntermediate,
+      rendered: rendered.outputBlocks,
+      markdown
+    };
   };
 
   setHtml = (rawHtml: string) => {
@@ -172,6 +181,19 @@ export function DemoIntermediate() {
         {({ intermediate }) => <IrView ir={intermediate} />}
       </DemoContext.Consumer>
     </div>
+  );
+}
+
+export function DemoOutputBlocks() {
+  return (
+    <>
+      <div className="mb-2">
+        <DemoContext.Consumer>
+          {({ rendered }) => <BlockView blocks={rendered} />}
+        </DemoContext.Consumer>
+      </div>
+      <div className="clearfix" />
+    </>
   );
 }
 

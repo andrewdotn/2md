@@ -9,6 +9,7 @@ import {
   DemoHtmlEditor,
   DemoIntermediate,
   DemoMarkdown,
+  DemoOutputBlocks,
   DemoUntransformedIntermediate,
 } from "./demo-flow.tsx";
 
@@ -482,21 +483,22 @@ Here are some examples of tree transform functions from
   - Turn things that started out as `<pre><code>…</code></pre>` into plain
     Preformatted Ir nodes, without an inner Code node.
 
-    Markdown has two different kinds of code blocks: inline
-    code, <code>&#96;foo&#96;</code>, normally rendered as <code>&lt;code
-    …/&gt;</code>, and code-blocks typically designated with a
-    four-space-indent inside markdown source:
+    Markdown has two different kinds of code blocks: *inline
+    code*, <code>&#96;foo&#96;</code>, normally rendered as <code>&lt;code
+    …/&gt;</code>, and *code blocks*, typically designated with a
+    four-space-indent inside markdown source
 
         function foo () {
             ...
         }
 
-    which gets rendered into HTML as `<pre><code>…</code></pre>`.
+    that gets rendered into HTML as `<pre><code>…</code></pre>`.
 
     When going from HTML to markdown, `<code>` should turn
-    into <code>&#96;foo&#96;</code>, and 2md has a Code class to represent an
-    inline code block. Meanwhile HTML of the form `<pre><code>…</code></pre>`
-    should turn into a Preformatted Ir node, with no Code object.
+    into <code>&#96;foo&#96;</code>, and 2md has a Code class to represent
+    inline code. Meanwhile HTML of the form `<pre><code>…</code></pre>`
+    should turn into a Preformatted Ir node, with no Code object,
+    to represent a code *block*.
 
     The initial Ir tree comes from a fairly direct mapping of HTML tags, so
     also ends up with a Code node as a child of a Preformatted node.
@@ -561,9 +563,95 @@ more markdown-ish.
 
 <DemoIntermediate/>
 
+We’re almost ready for output!
+
 ### OutputBlocks
 
+There’s actually another important thing about Ir objects that I didn’t
+mention earlier: a `render()` method. This is how the Ir tree gets turned
+into a markdown string.
+
+All the Ir classes are defined in `src/2md.ts`,
+and here’s one of them:
+
+    export class Code extends IrNode {
+      static irName: NodeName = "Code";
+
+      render(r: BlockRendering) {
+        r.append("`");
+        super.render(r);
+        r.append("`");
+      }
+    }
+
+Pretty easy! To output an inline code block: output a <code>&#96;</code>
+character, call the superclass `render()` method to render any children of
+this node, and then output another <code>&#96;</code> character.
+
+What about a block?
+
+    export class ListItem extends IrNode {
+      static irName: NodeName = "ListItem";
+
+      render(r: BlockRendering) {
+        const prefix = new Prefix("  - ", "    ");
+        r.pushPrefix(prefix);
+        super.render(r);
+        r.popPrefix(prefix);
+      }
+    }
+
+Pretty straightforward: the prefix says to use `"  - "` for the first line
+of a bullet list, and `"    "` for subsequent lines.
+
+The interface for `BlockRendering` is pretty small:
+
+    export declare class BlockRendering {
+      append(s: string, newline?: boolean): void;
+      pushPrefix(prefix: Prefix, wrapOptions?: BlockOptions): void;
+      popPrefix(prefix: Prefix): void;
+      /** Used for collecting link info to add on at the end */
+      addTrailer(s: string): void;
+
+      finish(): string;
+    }
+
+At this point, why can’t we directly write out the contents as a string?
+
+Nesting. If you have, for example, a code block in a bulleted list
+inside a blockquote, the start of the line is
+
+    >   -     foo
+
+which shows up as
+
+>   -     foo
+
+but if that same code block starts on a later line of the bullet point,
+there’s no `-`:
+
+    >   - Here is some code:
+    >
+    >         foo
+    >
+    > …
+
+and ithat shows up as:
+
+>   - Here is some code:
+>
+>         foo
+>
+> …
+
+The render function inside the Code class doesn’t and shouldn’t know
+whether it’s at the start of a bullet point or not.
+
+<DemoOutputBlocks/>
+
 ### Markdown
+
+And finally we have markdown!
 
 <DemoMarkdown/>
 

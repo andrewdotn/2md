@@ -758,8 +758,8 @@ each line—finally we have markdown!
 
 ## The development process
 
-2md, and the details I’ve given about how it works, didn’t pop into myj
-head (or out of it into my computer) fully formed. I’m sharing the
+2md, and the details I’ve given about how it works, didn’t pop into my
+head (or out of it onto my computer) fully formed. I’m sharing the
 development process here in the hopes that it might help you get started on
 something too.
 
@@ -913,7 +913,7 @@ eventually becoming its own object that tracks if it’s been rendered yet
 and is attached to a new OutputBlock structure. And through every step of
 that process, the type-checker showed me all the areas that were affected
 by those changes so I could update them appropriately, instead of being
-surprised by a easily-detectable error.
+surprised by an easily-detectable error.
 
 There are definitely some drawbacks to TypeScript. It is tricky to learn,
 and if someone is just starting out with JavaScript I would actively
@@ -1074,7 +1074,7 @@ Now this is one part of 2md where I did not reinvent the wheel. Because the
 term ‘character’ is so overloaded, this abstract idea of a distinguishable
 single entity made out of some potentially large number of Unicode code
 points, themselves made out of a potentially larger number of code points
-thanks to surrogates, is terms a *grapheme*.
+thanks to surrogates, is termed a *grapheme*.
 
 I just used the grapheme-splitter package to measure word length:
 
@@ -1098,7 +1098,7 @@ compiles, throwing away types, turning `import`s into `require`s, and other
 transpilation tasks. This is still much faster than waiting for the
 typescript compiler to run.
 
-But it was also taking a bit over a second for the code that’s shipped to
+But it was also taking a bit over a second with the code that’s shipped to
 npm, where there is zero babel work done at runtime. A second isn’t very
 long on an absolute scale, but enough to be a noticeable pause that can
 break concentration.
@@ -1382,7 +1382,8 @@ With this proxy setup:
 
      1. Run
 
-            Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+            Enable-WindowsOptionalFeature -Online \
+                -FeatureName Microsoft-Windows-Subsystem-Linux
 
         in powershell.
 

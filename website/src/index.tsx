@@ -27,15 +27,12 @@ document.addEventListener("DOMContentLoaded", async function() {
                   <div className="d-flex flex-wrap">
                     <h3 className="d-inline mb-0">Markdown</h3>
                     <div className="flex-fill" />
-                    <div className="mb-0 align-self-baseline form-group form-check">
+                    <div className="mb-0 align-self-baseline form-group form-check mr-2">
                       <label>
                         {toggleQuote}
                         Quote
                       </label>
                     </div>
-                    <a className="align-self-baseline btn btn-link" href="demo">
-                      Developer demo
-                    </a>
                     <button
                       className="align-self-baseline btn btn-primary btn-sm mb-2"
                       onClick={toMd.copyToClipboard(markdown)}

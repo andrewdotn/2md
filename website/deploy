@@ -13,23 +13,15 @@ DOMAIN="${TARGET#*@}"
 rm -rf dist && \
     yarn parcel build \
         src/index.html \
-        src/demo.html \
         src/how-it-works.html
 
 mv dist/how-it-works{.html,}
-mv dist/demo{.html,}
 
 cat <<EOF > dist/.htaccess
 <If "%{HTTPS} != 'on'">
 RewriteEngine On
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </If>
-<Else>
-AuthType Basic
-AuthName "Authorization required"
-AuthUserFile /home/${USER}/${DOMAIN}/.htpasswd
-Require user andrew
-</Else>
 
 Header set Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src *;"
 Header set Strict-Transport-Security max-age=2592000
@@ -50,10 +42,9 @@ ForceType text/html
 ForceType text/html
 </Files>
 EOF
-cp .htpasswd dist/
 
 mkdir dist/doc/
-cp ../doc/demo.gif dist/doc/
+rsync -avP ../doc/*.{gif,png,svg} dist/doc/
 
 rsync -avP --delete dist/ \
     "${USER}@${DOMAIN}:${DOMAIN}/"

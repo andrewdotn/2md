@@ -33,6 +33,9 @@ document.addEventListener("DOMContentLoaded", async function() {
                         Quote
                       </label>
                     </div>
+                    <a className="align-self-baseline btn btn-link" href="demo">
+                      Developer demo
+                    </a>
                     <button
                       className="align-self-baseline btn btn-primary btn-sm mb-2"
                       onClick={toMd.copyToClipboard(markdown)}

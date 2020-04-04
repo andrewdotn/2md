@@ -20,7 +20,7 @@ interface DemoFlowState {
   setHtml: (html: string) => void;
 }
 
-const DemoContext = React.createContext({
+export const DemoContext = React.createContext({
   setHtml: () => {}
 } as DemoFlowState);
 

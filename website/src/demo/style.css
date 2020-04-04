@@ -12,7 +12,10 @@ a {
 }
 .toMd-demo__wrapper {
   display: grid;
-  grid-template-columns: repeat(6, min(20em, 40%));
+  grid-template-columns:
+    repeat(2, min(20em, 40%))
+    repeat(4, min(30em, 40%))
+    fit-content(40em);
   grid-gap: 10px;
 }
 .toMd-demo__column {

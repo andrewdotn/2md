@@ -18,12 +18,14 @@ DOMAIN="${TARGET#*@}"
 
 rm -rf dist && \
     yarn parcel build \
+        src/demo.html \
         src/email.html \
         src/index.html \
         src/how-it-works.html
 
-mv dist/how-it-works{.html,}
+mv dist/demo{.html,}
 mv dist/email{.html,}
+mv dist/how-it-works{.html,}
 
 if $require_password; then
     PASSWORD_CONFIG="

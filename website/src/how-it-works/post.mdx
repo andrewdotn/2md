@@ -830,10 +830,15 @@ likely try to get those in from the beginning.
 
 ### JavaScript
 
-This project is written in JavaScript and I would argue that it should be
-the default language for most projects for most people. Actual webapps, of
-course, but also scripting, automation, little throwaway command-line
-utilities: do it all in JavaScript.
+*[The next few subsections are more opinion-based, skip ahead to <a
+href="#complexities">the next section</a> if you’d like to stick to the
+technical bits.]*
+
+This project is written in JavaScript and I suggest that it should be the
+default language for most projects for most people. For actual webapps, of
+course, which is hardly a controversial opinion; but also scripting,
+automation, little throwaway command-line utilities: do it all in
+JavaScript.
 
 Why?
 
@@ -842,29 +847,177 @@ To start, there are some convenient things about working with node.
 The node.js project provides static relocatable binaries for almost every
 platform, including Raspberry Pi, so it’s fast and easy to get any
 supported version of node running on almost any machine, even if you don’t
-have root access. It’s just `wget https://… && tar …`.
+have root access. It’s just `wget https://… && tar …`, even for the very
+latest versions.
 
-And those packages include `npx` which makes it really easy to run tools
-off of npm; `npx 2md` should just work anywhere. Need any tool at all on
-some machine you’re SSHed into, says a curses json file explorer? `npm fx`.
+And those distributions of node include `npx` which makes it really easy to
+run tools off of npm; `npx 2md` should just work anywhere. Need any tool at
+all on some random machine you’re SSHed into, like maybe a curses json file
+explorer? `npm fx`. Write your tools in JavaScript and it can be that easy
+for others to use your software too.
 
 But outside the command-line world there is the browser. Which is how most
 people use software.
 
 If your goal is to build software that other people actually use, you might
 as well make something where people can click a link and immediately start
-using it. If your users would benefit from interactivity or visuals or
-networking of some sort, make it a webpage with JavaScript. If you want to
-have interactivity or visuals or remote access when debugging the internals
-of your own stuff, write it in JavaScript to begin with so that you can get
-those without having to rewrite it in a new programming language.
+using it. If your users would benefit in some way from interactivity or
+visuals or networking, use JavaScript and make it a webpage. If you want to
+have interactivity or visuals, even for inspecting the internals of your
+program, or if you might want somebody to be able to remotely perform an
+action using your software some day, write it in JavaScript to begin with
+so that you can later add those benefits without having to rewrite
+everything in a new programming language.
 
 I built 2md primarily as a command-line program with the intent of later
 enabling it to work in a browser. Doing so was pretty anti-climactic. I had
-to clean up some dependencies so it wasn’t trying to touch the filesystem,
-but that was pretty much it.
+to tidy up some dependency references so it wasn’t trying to touch the
+filesystem, but that was pretty much it.
 
-#### TypeScript
+### TypeScript
+
+TypeScript is a popular variant of JavaScript that adds type annotations to
+JavaScript. 2md is written in TypeScript, and I found it really useful for
+its linting capabilities.
+
+I think I can explain, in fairly simple terms, why using types appeals to
+me so much. I make mistakes when I’m coding. It’s unavoidable. We’re taking
+vague, uncertain ideas and trying to turn them into precise instructions
+for unforgiving machines. I believe something is precise, but not until I
+try to make the code work do I find out that it is not, and I will need to
+think about it more to get it right.
+
+There’s a whole class of low-level bug-inducing detail that is really easy
+for machines to catch and really easy for humans to miss. Let’s let them
+help us by letting them do that.
+
+  - “‘BlockQuote’ is not a valid option here, but ‘Blockquote’ is.”
+
+  - “You are trying to give a number to a function that says it only
+    accepts strings.”
+
+  - “What would you like to have happen if `undefined` is passed to this
+    function—surely you do not wish the program to crash in the event of
+    such an occurrence?”
+
+  - “If you add an argument to this function signature, as you are surely
+    already aware, you are going to have to update these twelve callers of
+    the function. I have highlighted them for you.”
+
+Thank you, computer. That was very helpful.
+
+Using TypeScript helped give me confidence when refactoring. The prefix
+parameter started out as just a string, then was a pair of strings,
+eventually becoming its own object that tracks if it’s been rendered yet
+and is attached to a new OutputBlock structure. And through every step of
+that process, the type-checker showed me all the areas that were affected
+by those changes so I could update them appropriately, instead of being
+surprised by a easily-detectable error.
+
+There are definitely some drawbacks to TypeScript. It is tricky to learn,
+and if someone is just starting out with JavaScript I would actively
+discourage working in TypeScript at the start. That way you can learn the
+fun of working in JavaScript without risking long fights with corner cases
+of the type system. There’s only so much you can learn at once, and better
+to have some buggy code that mostly works, was fun to write, and can be
+cleaned up by adding type-checking later, than a perfectly-typed program
+that never grew big enough to be useful.
+
+The TypeScript compiler is intended to do type-checking and then emit
+JavaScript code, but I’ve found using babel to be a much more pleasant
+experience for the code-generation part. `@babel/preset-typescript`
+essentially throws away all the type annotations—a very quick
+process!—leaving you with plain JavaScript to flow through the rest of the
+babel pipeline. With `@babel/register`, that happens at runtime, allowing
+you to to run `.ts` files directly, without waiting for the typescript
+compiler, and even if they have type errors because you’re experimenting.
+
+And the 800-lb gorilla in the room is Microsoft, the corporate sponsor of
+TypeScript. As the topic of Microsoft’s history, present, and possible
+futures is something much bigger than I am able to go into right now, I
+will keep things relatively short. While I find TypeScript highly useful, I
+expect Microsoft’s primary overriding long-term motivation to always be
+economic, and that does not align with indefinitely spending a lot of money
+giving away valuable things.
+
+Please don’t interpret my use of TypeScript (or React or
+Bootstrap) as an endorsement of any of Microsoft’s (or Facebook’s or
+Twitter’s) products, services, business practices, or impacts on society.
+
+Should the powers-that-be at Microsoft some day decide that TypeScript no
+longer makes financial sense to continue to invest in, at least we will
+have the option of dropping all the types from our code and going on with
+JavaScript alone. Type systems for JavaScript and dialects of JavaScript
+will come and go, but JavaScript itself will remain highly relevant for a
+very long time.
+
+## Complexities
+
+The earlier technical stuff was a reasonably straightforward application of
+existing theory on parsing and transforming structured text.
+
+Now we get more into what Fred Brooks Jr. termed accidental complexity:
+all the things we have to do to get the problem solved
+that aren’t part of any abstract solution,
+but are consequences of the tools and conventions we
+
+### Command-line speed
+
+1.6s to 0.6s
+
+
+adding
+
+  "alias": {
+    "canvas": "./src/canvas-shim.js"
+  },
+  "browserslist": "current node"
+
+### Line wrapping graphemes
+
+did not reinvent wheel
+
+ü = U+00FC
+U+0075 U+0308 “Combining Diaeresis”
+
+<span class="tex">T<sub>e</sub>X</span>book
+
+🦊
+U+1F98A “FOX FACE”
+
+
+`🏄🏾‍♀️`
+
+  - U+1F3C4 ‘`🏄`’ Surfer
+  - U+1F3FE ‘`🏾`’ Emoji Modifier [Fitzpatrick][] Type-5
+  - U+200D ‘`‍︎`’ Zero Width Joiner
+  - U+2640 ‘`♀️`’ Female Sign
+  - U+FE0F ‘`️`’ [Variation Selector][]-16
+
+
+
+As an extreme case, if you consider
+
+‘[`H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ`][bobince]’
+
+if you’re 
+
+[bobince]: https://stackoverflow.com/a/1732454/14558
+
+  which is 83 UTF-16 code units
+  (which JavaScript uses for `String.length`
+  158 bytes in UTF-8 but only 0
+
+[Fitzpatrick]: https://en.m.wikipedia.org/wiki/Fitzpatrick_scale
+[Variation Selector]: https://en.wikipedia.org/wiki/Miscellaneous_Symbols#Emoji
+
+5 Unicode code points
+7 UTF-16 code units
+17 bytes in UTF-8
+
+I just used the grapheme-splitter package
+
+### Windows clipboard
 
 ## Conclusion
 

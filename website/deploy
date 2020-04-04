@@ -6,6 +6,12 @@ DIR="$(dirname -- "${0}")"
 
 cd "${DIR}"
 
+require_password=true
+if [ "${1}" = "--no-password" ]; then
+    require_password=false
+    shift
+fi
+
 TARGET="${1}"
 USER="${TARGET%@*}"
 DOMAIN="${TARGET#*@}"
@@ -17,11 +23,24 @@ rm -rf dist && \
 
 mv dist/how-it-works{.html,}
 
+if $require_password; then
+    PASSWORD_CONFIG="
+<Else>
+AuthType Basic
+AuthName \"Authorization required\"
+AuthUserFile /home/${USER}/${DOMAIN}/.htpasswd
+Require user andrew
+</Else>"
+else
+    PASSWORD_CONFIG=""
+fi
+
 cat <<EOF > dist/.htaccess
 <If "%{HTTPS} != 'on'">
 RewriteEngine On
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </If>
+${PASSWORD_CONFIG}
 
 Header set Content-Security-Policy "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src *;"
 Header set Strict-Transport-Security max-age=2592000
@@ -42,9 +61,12 @@ ForceType text/html
 ForceType text/html
 </Files>
 EOF
+if $require_password; then
+    cp .htpasswd dist/
+fi
 
 mkdir dist/doc/
-rsync -avP ../doc/*.{gif,png,svg} dist/doc/
+cp -p ../doc/*.{gif,png,svg} dist/doc/
 
-rsync -avP --delete dist/ \
+rsync -avP --delete-after dist/ \
     "${USER}@${DOMAIN}:${DOMAIN}/"

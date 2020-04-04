@@ -933,20 +933,20 @@ babel pipeline. With `@babel/register`, that happens at runtime, allowing
 you to to run `.ts` files directly, without waiting for the typescript
 compiler, and even if they have type errors because you’re experimenting.
 
-And the 800-lb gorilla in the room is Microsoft, the corporate sponsor of
-TypeScript. As the topic of Microsoft’s history, present, and possible
+And the 800-lb gorilla in the room is microsoft, the corporate sponsor of
+TypeScript. As the topic of microsoft’s history, present, and possible
 futures is something much bigger than I am able to go into right now, I
 will keep things relatively short. While I find TypeScript highly useful, I
-expect Microsoft’s primary overriding long-term motivation to always be
+expect microsoft’s primary overriding long-term motivation to always be
 economic, and that does not align with indefinitely spending lots of money
 giving away valuable things and not somehow getting something more valuable
 in return.
 
 Please don’t interpret my use of TypeScript (or React or
-Bootstrap) as an endorsement of any of Microsoft’s (or Facebook’s or
+Bootstrap) as an endorsement of any of microsoft’s (or Facebook’s or
 Twitter’s) products, services, business practices, or impacts on society.
 
-Should the powers-that-be at Microsoft some day decide that TypeScript no
+Should the powers-that-be at microsoft some day decide that TypeScript no
 longer makes financial sense to continue to invest in, at least we will
 have the option of dropping all the types from our code and going on with
 JavaScript alone. Type systems for JavaScript and dialects of JavaScript
@@ -1227,6 +1227,315 @@ run, but much slower to write code for as it has its own API. I may switch
 to that eventually.
 
 ### Reading from the clipboard
+
+I was hoping there’d be some nice cross-platform way to read HTML from the
+clipboard. My web searches show that there is in Electron, because it is
+linked against Chromium which implements HTML copy-paste in C++ across all
+platforms; but not in node.js.
+
+On the mac it turned out to be [straightforward to run some
+AppleScript][mac-clipboard]:
+
+[mac-clipboard]: https://stackoverflow.com/q/17217450/14558
+
+    $ osascript -e 'the clipboard as «class HTML»'
+    «data HTML3C7370616E207374796C653D22…223E68656C6C6F20776F726C643C2F7370616E3E»
+
+After unhexlifying that, it’s plain old HTML:
+
+    <span style="">hello world</span>
+
+This would likely run faster if there was some native code to read the
+clipboard directly, but figuring out how to do that with node really didn’t
+seem like a worthwhile use of my time at the beginning of the project.
+
+And on linux, assuming `xclip` is installed, again it’s fairly easy
+to shell out:
+
+    xclip -o -selection clipboard -t text/html
+
+and again, native code has potential speed advantages but adds complexity.
+
+But windows was trickier.
+
+#### Firewalling windows
+
+I’d like my software to work for people who are forced to use windows, but
+with things like ads for candy crush in the start menu, every program or
+document search I type into the start menu being sent to microsoft with no
+opt-out, [microsoft silently disabling the ability to use local user
+accounts][force-ms-acct], and that search-query-history plus forced-login
+combination used to build personality profiles which are sold to
+advertisers—at this point I have to treat windows itself as malware. And I
+will continue to do so until microsoft adds a clear toggle to disable
+sending any data back to microsoft.
+
+[force-ms-acct]: https://www.howtogeek.com/442609/confirmed-windows-10-setup-now-prevents-local-account-creation/
+
+Fortunately there are techniques for dealing with malware. I used a
+proxy-only network.
+
+ 1. In VMware Fusion → Preferences → Network, create a new network and
+    disable all the options around connectivity to your mac, external
+    networks, or getting DHCP addresses. Double-click the network’s name to
+    rename it if you want to better be able to keep track of different
+    virtual networks here.
+
+    <DemoImage src="/doc/vmware-network-settings.png"/>
+
+ 2. Create a linux VM, and give it two network adapters: the first on any
+    network with external access, the second on your proxy-only network.
+
+ 3. Pick an IP range for the proxy-only network; I used 192.168.237.0/24.
+    Configure your Linux VM to do normal DHCP on the main interface,
+    and to have a static IP of .1 on the proxy-only interface.
+
+ 4. Start a DHCP server on the linux VM. All it’ll do is give out IP
+    addresses, so `/etc/dhcp/dhcpd.conf` can be as simple as
+
+        subnet 192.168.237.0 netmask 255.255.255.0 {
+            range 192.168.237.10 192.168.237.100;
+        }
+
+    There’s no need to specify a router or nameserver because there won’t
+    be any on this network.
+
+ 5. Install squid on the linux VM, and edit `squid.conf` so that all the
+    default `allow` lines are gone, and configure a limited number of
+    domains which will be allowed through the proxy, with everything else
+    blocked.
+
+        --- squid.conf.default
+        +++ squid.conf
+        # Example rule allowing access from your local networks.
+        # Adapt localnet in the ACL section to list your (internal) IP networks
+        # from where browsing should be allowed
+        -http_access allow localnet
+        -http_access allow localhost
+
+        +acl allowlist dstdomain .debian.org
+        +acl allowlist dstdomain .nodejs.org
+        +acl allowlist dstdomain .npmjs.org
+        +acl allowlist dstdomain .yarnpkg.com
+        +
+        +# Windows update only
+        +acl allowlist dstdomain .update.microsoft.com
+        +acl allowlist dstdomain .download.windowsupdate.com
+        +acl allowlist dstdomain .delivery.mp.microsoft.com
+        +acl allowlist dstdomain .ctldl.windowsupdate.com
+        +
+        +http_access allow allowlist
+        +
+        # And finally deny all other access to this proxy
+        http_access deny all
+
+    The update domains here are a subset of those [documented by
+    microsoft][ms-update]; only enough to get windows update running for
+    me.
+
+    [ms-update]: https://docs.microsoft.com/en-us/windows-server/administration/windows-server-update-services/deploy/2-configure-wsus#211-connection-from-the-wsus-server-to-the-internet
+
+ 6. Create another linux VM with a single network adapter on the proxy-only
+    network and do some testing. Make sure you can’t ping the outside
+    world. Make sure you can’t do DNS lookups. Try using the proxy:
+
+        https_proxy=http://192.168.119.139:3128 \
+        http_proxy=http://192.168.119.139:3128 \
+            curl …
+
+    You should be able to access any site on a subdomain of the allowlist,
+    and nothing else.
+
+Congratulations, you have a network on which it’s safe to run windows!
+Just make sure there’s only a single network adapter, and that it’s on the
+proxy-only network.
+
+When windows is installed, it won’t know about any internet access until
+you tell it about the proxy in Internet Settings. Once that’s done you can
+enable the proxy system-wide:
+
+    netsh winhttp import proxy source=ie
+    netsh winhttp show proxy
+
+The above configuration worked for me to run windows update so that I could
+test compatibility of my software against the latest version.
+
+It’s satisfying to tail the squid logs and see windows relentlessly trying
+to call home to www.bing.com or login.live.com every few seconds, but
+getting TCP_DENIED/403 every time. If something you want isn’t working,
+you’ll see the hostnames in the squid log file, and if they’re safe, you
+can always add them by edit `squid.conf` and running `squid -k reconfigure`
+
+With this proxy setup:
+
+  - For npm to work, tell it about the proxy.
+
+        npm config set proxy http://...
+        npm config set https-proxy http://...
+
+    Yarn will automatically pick up that config.
+
+  - To get WSL working, you can use [Manually download Windows Subsystem
+    for Linux distro packages][wsl-inst] as a rough guide.
+
+    [wsl-inst]: https://docs.microsoft.com/en-us/windows/wsl/install-manual
+
+     1. Run
+
+            Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+
+        in powershell.
+
+     2. Download the [Debian `.appx` file][deb-appx] on a different machine
+        on the VM host and drag-and-drop it to the guest.
+
+        [deb-appx]: https://aka.ms/wsl-debian-gnulinux
+
+        It’s just a zip file, so unzip it and double-click the Debian.exe
+        file to install. After it’s done installing, hit WinKey-R for run,
+        type `bash`, and hit enter.
+
+     3. Then inside the debian WSL instance, add some configuration so that
+        it too knows about the proxy.
+
+        admin@DESKTOP-YP1DX14:/etc/apt/apt.conf.d$ cat 00proxy
+        Acquire::http::Proxy "http://192.168.237.1:3128";
+        Acquire::https::Proxy "http://192.168.237.1:3128";
+
+        [This guide][buster-upgrade] can help you upgrade to the latest Debian.
+
+        [buster-upgrade]: https://xlii.io/2019/07/11/updating-your-wsl-debian-image-to-buster/
+
+  - Firefox, unlike IE or Chrome, allows setting a custom proxy
+    configuration that only applies to Firefox. You should be able to
+    configure that so that it authenticates with squid, allowing
+    unrestricted web browsing from inside the VM but without enabling the
+    adware and spyware built into windows.
+
+Of course this may only bide time until microsoft starts running both
+updates and invasive tracking over the same hostnames, or refuses to let
+you log in without proving your identity to microsoft’s servers first, but
+it’s a reasonable defense against the current level of maliciousness.
+
+#### The windows clipboard
+
+With a safe dev instance of windows available, it’s possible to work on
+getting HTML off the clipboard.
+
+The CF_HTML text format is [documented][CF_HTML], and should be easy to get
+with powershell:
+
+    C:\Users\admin>powershell Get-Clipboard -TextFormatType Html
+    Version:0.9
+    StartHTML:00000131
+    EndHTML:00000414
+    StartFragment:00000165
+    EndFragment:00000378
+    SourceURL:https://nodejs.org/en/
+    <html><body>
+    <!--StartFragment--><p>Node.jsÂ® is a JavaScript runtime built on <a
+    href="https://v8.dev/">Chrome's V8 JavaScript engine</a>.</p>
+    …
+
+[CF_HTML]: https://docs.microsoft.com/en-us/windows/win32/dataxchg/html-clipboard-format
+
+Oh dear, the dreaded [mojibake][]: `Â`. There’s some sort of encoding issue
+here. The CF_HTML docs say it’s supposed to be UTF-8, but something’s
+getting messed up.
+
+[mojibake]: https://en.wikipedia.org/wiki/Mojibake
+
+Is it a codepage issue? Let’s try putting the terminal into UTF-8 mode:
+
+    C:\Users\admin>chcp 65001
+    Active code page: 65001
+
+    C:\Users\admin>powershell Get-Clipboard -TextFormatType Html
+    Version:0.9
+    …
+    <!--StartFragment--><p>Node.jsAr is a JavaScript runtime built on <a
+    …
+
+Oh dear, that’s *significantly* worse.
+
+To avoid any terminal-level encoding issues, let’s try running `powershell
+Get-Clipboard` from node, capturing the output in a pipe, and printing a
+hexdump. And let’s use something complicated, like an emoji, to be sure we
+get it right: “The quick brown 🦊 jumped over the lazy dogs,”
+where the fox is U+1f98a.
+
+    000000b0  6d 65 6e 74 2d 2d 3e 54  68 65 20 71 75 69 63 6b  |ment-->The quick|
+    000000c0  20 62 72 6f 77 6e 20 64  59 dd 53 20 6a 75 6d 70  | brown dY.S jump|
+
+The fox is coming out as the plain-ASCII string ‘dY.S’, which is terrible
+because now we can’t distinguish an emoji fox on paste from the ascii
+string ‘dY.S’.
+
+After struggling for quite a while I hit upon: let’s try avoiding any
+confusion around codepages or translations between processes by having
+powershell itself write to a file:
+
+    PS C:\Users\admin>Get-Clipboard -TextFormatType Html > out
+    $ hexdump -c out
+    00000000  ff fe 56 00 65 00 72 00  73 00 69 00 6f 00 6e 00  |..V.e.r.s.i.o.n.|
+    ...
+    000008a0  71 00 75 00 69 00 63 00  6b 00 20 00 62 00 72 00  |q.u.i.c.k. .b.r.|
+    000008b0  6f 00 77 00 6e 00 20 00  f0 00 78 01 a6 00 60 01  |o.w.n. ...x...`.|
+    000008c0  20 00 6a 00 75 00 6d 00  70 00 65 00 64 00 20 00  | .j.u.m.p.e.d. .|
+
+Ok, UTF-16le encoding; this is something we can work with. The fox has
+turned into four code units: `0xf0 0x178 0xa6 0x160`. What is that? Is
+that the UTF-8?
+
+I know how to type out conversion much faster in Python than node, so
+
+    >>> '\U0001f98a'.encode('UTF-8')
+    b'\xf0\x9f\xa6\x8a'
+
+We should see the four code units:
+
+    0xf0 0x9f 0xa6 0x8a
+
+That’s almost right. Two of them match, but why would 0x9f be mixed up with
+0x178? Or 0x8a and 0x160? Is the problem on every other byte??
+
+After beating my head against this for a long time, [something on
+stackoverflow][Markus] that had seemed preposterous at first started to
+seem very sane:
+
+[Markus]: https://stackoverflow.com/a/38067962/14558
+
+> [link to cp1252 table]
+>
+> Soln: Create a translation dictionary and search and replace.
+
+Checking the cp1252 table: U+0160 is encoded as 0x8a in cp1252. Those are
+the same numbers, in the opposite direction of the garbling I’m seeing.
+U+0178 is encoded as 0x9f in cp1252. Again, same numbers, in the opposite
+direction.
+
+That’s it!
+
+Inside powershell(/win32?) what seems to be happening is:
+
+  - Get UTF-8
+  - Decode as if it was cp1252
+  - Encode into UTF-16le, adding BOM
+  - Then translate again into some other output encoding
+
+So, to read HTML from the clipboard on windows:
+
+  - Run powershell, writing to a file to avoid corruption due to additional
+    encoding
+  - Load the resulting file as UTF-16le
+  - Encode with cp1252
+  - Now decode that as UTF-8
+
+And that’s what the code’s doing now. It may not work at all on non-English
+versions of windows where the default codepage is something other than
+cp1252.
+
+<DemoImage src="/doc/2md-windows1.gif"/>
 
 ## Conclusion
 

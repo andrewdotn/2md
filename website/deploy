@@ -11,7 +11,7 @@ USER="${TARGET%@*}"
 DOMAIN="${TARGET#*@}"
 
 rm -rf dist && \
-    yarn parcel build --no-source-maps \
+    yarn parcel build \
         src/index.html \
         src/demo.html \
         src/how-it-works.html

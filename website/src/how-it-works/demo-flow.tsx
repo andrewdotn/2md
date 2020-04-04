@@ -210,3 +210,15 @@ export function DemoMarkdown() {
     </DemoContext.Consumer>
   );
 }
+
+export class DemoImage extends Component<{ src: string }> {
+  render() {
+    return (
+      <div className="demo-image">
+        <a href={this.props.src}>
+          <img style={{ maxWidth: "100%" }} src={this.props.src} />
+        </a>
+      </div>
+    );
+  }
+}

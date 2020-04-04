@@ -6,6 +6,7 @@ import {
   DemoContent,
   DemoDom,
   DemoFlow,
+  DemoImage,
   DemoHtmlEditor,
   DemoIntermediate,
   DemoMarkdown,
@@ -937,8 +938,9 @@ TypeScript. As the topic of Microsoft’s history, present, and possible
 futures is something much bigger than I am able to go into right now, I
 will keep things relatively short. While I find TypeScript highly useful, I
 expect Microsoft’s primary overriding long-term motivation to always be
-economic, and that does not align with indefinitely spending a lot of money
-giving away valuable things.
+economic, and that does not align with indefinitely spending lots of money
+giving away valuable things and not somehow getting something more valuable
+in return.
 
 Please don’t interpret my use of TypeScript (or React or
 Bootstrap) as an endorsement of any of Microsoft’s (or Facebook’s or
@@ -954,70 +956,277 @@ very long time.
 ## Complexities
 
 The earlier technical stuff was a reasonably straightforward application of
-existing theory on parsing and transforming structured text.
+existing theory around parsing and transforming structured text.
 
-Now we get more into what Fred Brooks Jr. termed accidental complexity:
-all the things we have to do to get the problem solved
-that aren’t part of any abstract solution,
-but are consequences of the tools and conventions we
-
-### Command-line speed
-
-1.6s to 0.6s
-
-
-adding
-
-  "alias": {
-    "canvas": "./src/canvas-shim.js"
-  },
-  "browserslist": "current node"
+Now we get more into what Fred Brooks Jr. termed accidental difficulties:
+all the things we have to do to get the problem solved, that aren’t part of
+any abstract platonic solution, but are consequences of the machines,
+tools, and conventions that we happen to be using.
 
 ### Line wrapping graphemes
 
-did not reinvent wheel
+The markdown I work with is text hard-wrapped at a very traditional 80
+columns. To get that in 2md’s output, I wrote some line-wrapping code. Each
+OutputBlock contains a stack of Prefix objects and some markdown text that
+hasn’t been wrapped yet, so the algorithm measures the width of the prefix,
+subtracts that from the 80-column allowance, and wraps the text to fit in
+what remains.
 
-ü = U+00FC
-U+0075 U+0308 “Combining Diaeresis”
+Line-wrapping can be a very involved topic; the <span
+class="tex">T<sub>e</sub>X</span>book goes into it in considerable detail.
+With proportionate fonts and proportionate spacing, justified text, and
+hyphenation, you want to consider many possible different break points
+between words. Then for all the possible sets of breakpoints, a ‘niceness’
+function is applied to the aesthetics of the resulting lines, and the set
+of breakpoints that maximizes niceness is chosen. Dynamic programming is
+used to keep runtime low in the face of possible combinatorial explosion of
+subcases.
 
-<span class="tex">T<sub>e</sub>X</span>book
+An example of where this complexity is warranted: if one line ends with a
+short word like ‘a’ or ‘be’ or ‘the’, often the overall alignment can be
+made much more even by moving that word, even if it’ll fit, to the start of
+the next line.
 
-🦊
-U+1F98A “FOX FACE”
+As an example from [“Breaking Paragraphs into Lines”][knuth-plass], the
+greedy algorithm which tries to fit as much as possible into each line
+produces:
 
+[knuth-plass]: https://dx.doi.org/10.1002/spe.4380111102
 
-`🏄🏾‍♀️`
+<div class="non-breaking-quote">
+has seen so much, was astonished whenever it shone <b>in</b><br/>
+her face. Close by the king’s castle lay a great dark<br/>
+forest, …
+</div>
 
-  - U+1F3C4 ‘`🏄`’ Surfer
-  - U+1F3FE ‘`🏾`’ Emoji Modifier [Fitzpatrick][] Type-5
-  - U+200D ‘`‍︎`’ Zero Width Joiner
-  - U+2640 ‘`♀️`’ Female Sign
-  - U+FE0F ‘`️`’ [Variation Selector][]-16
+But if that ‘in’ is moved to the next line, which has enough room for ‘in’
+but not for ‘forest’, the line lengths are much more balanced:
 
+<div class="non-breaking-quote">
+has seen so much, was astonished whenever it shone<br/>
+<b>in</b> her face. Close by the king’s castle lay a great dark<br/>
+forest, …
+</div>
 
+I was able to convince myself that for monospaced text, the greedy
+algorithm will give an acceptable appearance for now.
 
-As an extreme case, if you consider
+However, one area of complexity here is around Unicode. The `length`
+property of a JavaScript string reports the number of UTF-16 code units,
+which is not what we’d normally think of as character length.
+
+There are two main issues: surrogate characters and combining characters.
+
+First, surrogate characters. JavaScript strings are made up of 16-bit
+characters, allowing at most 65,536 possible character values.
+
+[After JavaScript was invented][unicode-history], in 1996 Unicode was
+expanded to allow many more possible character values, and a standard
+encoding mechanism was defined for representing character values that need
+more than 16 bits: a pair of 16-bit surrogate values. These 16-bit values
+fit into a JavaScript character but only represent a Unicode character when
+combined with another complementary surrogate.
+
+[unicode-history]: https://learning.oreilly.com/library/view/unicode-demystified/0201700522/0201700522_ch02lev1sec5.html
+
+Consider ‘𝒾’, U+01D4BE “Mathematical script small i”, Unicode character
+number #119,998 in decimal. Its code point does not fit into 16 bits, so
+JavaScript thinks it’s a 2-character string, composed of the surrogates
+0xD835 and 0xDCBE:
+
+    > i = '𝒾'
+    '𝒾'
+    > i.length
+    2
+    > i.charCodeAt(0).toString(16)
+    'd835'
+    > i.charCodeAt(1).toString(16)
+    'dcbe'
+
+Line-wrapping should account for that when measuring the width of words.
+
+The second issue has to do with combining characters.
+
+Many characters are variations on other characters. For example ‘ü’ U+00FC
+“Latin small letter u with diaeresis” is a ‘u’ with umlauts added on top.
+Many characters like this have their own code point for historical
+compatibility reasons, but even Unicode doesn’t have room to predefine
+every possible variation of every character as a separate code point.
+
+To allow *arbitrary* variations on characters, the Unicode standard defines
+combining characters: the same ‘ü’ character may also be represented as
+plain ‘u’ U+0075 followed by U+0308 ‘ ̈’ “Combining Diaeresis”. And this
+mechanism lets you create characters like ‘j̈’ by adding combining
+characters wherever you want.
+
+As an extreme case, this is sometimes taken to a form of art
 
 ‘[`H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ`][bobince]’
 
-if you’re 
-
 [bobince]: https://stackoverflow.com/a/1732454/14558
 
-  which is 83 UTF-16 code units
-  (which JavaScript uses for `String.length`
-  158 bytes in UTF-8 but only 0
+which at 7 letters and one space easily fits onto one line, but with all
+the combining characters ends up at 83 code units long, and would be broken
+into two by a naïve line breaking algorithm trying to keep things to 80
+columns.
 
-[Fitzpatrick]: https://en.m.wikipedia.org/wiki/Fitzpatrick_scale
-[Variation Selector]: https://en.wikipedia.org/wiki/Miscellaneous_Symbols#Emoji
+Now this is one part of 2md where I did not reinvent the wheel. Because the
+term ‘character’ is so overloaded, this abstract idea of a distinguishable
+single entity made out of some potentially large number of Unicode code
+points, themselves made out of a potentially larger number of code points
+thanks to surrogates, is terms a *grapheme*.
 
-5 Unicode code points
-7 UTF-16 code units
-17 bytes in UTF-8
+I just used the grapheme-splitter package to measure word length:
 
-I just used the grapheme-splitter package
+    const splitter = new GraphemeSplitter()
+    …
+    const length = splitter.countGraphemes(text.substring(…));
 
-### Windows clipboard
+and it does its job well, accounting for both surrogates and combining
+characters. It would be good to add a call here to `wcswidth()` to account
+for the double-width of graphemes such as emoji; I am currently using the
+excuse that I did not find an up-to-date JavaScript library for that.
+
+### Command-line speed
+
+I was initially focused on functionality, not speed, but once I had 2md in
+a good state and was using it more casually, it did seem slow.
+
+Running it on my mac takes around 1.6s in development, with
+`@babel/register` configuring itself at startup, intercepting all the
+compiles, throwing away types, turning `import`s into `require`s, and other
+transpilation tasks. This is still much faster than waiting for the
+typescript compiler to run.
+
+But it was also taking a bit over a second for the code that’s shipped to
+npm, where there is zero babel work done at runtime. A second isn’t very
+long on an absolute scale, but enough to be a noticeable pause that can
+break concentration.
+
+Fortunately, in comparison to previous ancient experiences with open-source
+profiling tools, I was very happily surprised by the quality of the node
+profiler.
+
+It’s as simple as running `node --cpu-prof …` to drop a `CPU.….cpuprofile`
+JSON file in the current directory, and then in Chrome Devtools, on the
+performance tab, clicking the ‘Load Profile’ button to open that JSON file.
+
+<DemoImage src="/doc/load-profile.png"/>
+
+This yields an interactive flamegraph:
+
+<DemoImage src="/doc/lib-overview-flamegraph.png"/>
+
+There are three main phases here:
+
+  - Loading libraries
+  - Waiting for a shell command to return clipboard contents: the blank
+    space in the middle
+  - Actual html-to-markdown work
+
+and loading libraries is dominating.
+
+Clicking on any of the items shows details of the function call at the
+bottom of the ‘Summary’ tab. During the library-loading phase, there are a
+lot of calls to `Module._compile` which has an `(anonymous)` child which
+corresponds to running the top-level module code of imports. And here we
+see that simply loading `jsdom` is, by itself, taking more than half the
+total runtime.
+
+My first thought on seeing long load times is to try bundling. Maybe it’s
+just taking forever scanning the filesystem, repeatedly checking hundreds
+of different folders for hundreds of little javascript files that together
+make up the library. Maybe the bundler will infer that some import will
+never ever be used so it’ll skip loading it entirely.
+
+It took a fair bit of fiddling to get the bundler to run without crashing.
+Key to this were a few edits to `package.json`.
+
+First,
+
+    "browserslist": "current node",
+
+tells parcel that it should generate code to target the version of node
+under which it is running, using all the latest language features instead
+of trying to generate code that is backwards-compatible with old browsers,
+or adding dependencies on needless polyfills that would then need to be
+imported.
+
+Second, jsdom will look for the `canvas` library, and load it if it exists,
+so that jsdom users can actually draw to `<canvas>` objects in their
+programs or unit tests and save the outputs to files—pretty neat, but not
+of use to generating markdown. And parcel was confused both if the canvas
+library wasn’t installed, in which case it thought there was a missing
+dependency, or it would fail to bundle the canvas module if it *was*
+installed; problems that were rectified by adding
+
+    "alias": {
+      "canvas": "./src/canvas-shim.js"
+    },
+
+where `src/canvas-shim.js` contains `module.exports = {};`
+
+Also parcel does not like `#!/usr/bin/env node` in any files it imports;
+it’ll bundle the files but then node will crash on seeing that in the
+middle of a bundled JS source file.
+
+And `require.main === module` checks do not work in parcel—once bundled,
+both everything and nothing is the main module in some sense—so if you’re
+using that in your main launcher script so that you can also import it from
+unit tests, you’ll need a separate parcel launcher script without that
+guard.
+
+But after all that, following invocation worked
+
+    parcel build --bundle-node-modules --target=node -o 2md.js src/parcel-main.ts
+
+and then it’s just running node on the resultant standalone bundled file:
+
+    node 2md.js
+
+With that improvement, runtime is down to 0.6s which at least to me feels
+instant: I don’t start thinking about other things while waiting for it to
+finish. I’m not sure how much tree-shaking, if any, is going on here, but
+I’m happy with the result.
+
+<DemoImage src="/doc/bundle-overview-flamegraph.png"/>
+
+However I’m not sure about the etiquette here of distributing a module with
+a bundled copy of all its dependencies in a single 3MB file. So if you’re
+using the npm version you’re getting the slower unbundled version for now.
+
+Well, most of the time seems to be spent in the accidental parts of the
+program. What about the essential bits? Zooming in on the actual
+translation work that’s done:
+
+<DemoImage src="/doc/operation-flamegraph.png"/>
+
+It looks like the split is roughly half the time is spent in JSDOM parsing
+the HTML the other half of the time spent running GraphemeSplitter, and
+roughly zero time spent on html-to-markdown conversion. Taking so little
+time makes sense for a handful of paragraphs of markdown; that may look
+very very different on large inputs though.
+
+Only in hindsight do I realize that jsdom is a pretty heavyweight library;
+I use it frequently for the huge convenience of having the same API as the
+browser, but it’s much more than simply an HTML parser + `Node`/`Element`
+implementation.
+
+jsdom does bill itself is as much more than a DOM API:
+
+> jsdom is a pure-JavaScript implementation of many web standards, notably
+> the WHATWG DOM and HTML Standards
+
+For testing purposes, it can act as a headless browser, including script
+evaluation and triggering click handlers and so on, which is fantastic for
+testing and presumably much faster than firing up a real headless browser,
+but not so much if you don’t want to wait a half-second for it to load just
+to parse a few kB of HTML. On another project I’ve used `parse5`, the
+underlying HTML5 parser used by `jsdom`, and found it to be much faster to
+run, but much slower to write code for as it has its own API. I may switch
+to that eventually.
+
+### Reading from the clipboard
 
 ## Conclusion
 

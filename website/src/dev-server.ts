@@ -16,7 +16,7 @@ async function main() {
   const docDir = pathResolve(__dirname, "..", "..", "doc");
   app.use("/doc", express.static(docDir));
 
-  const files = ["index", "demo", "how-it-works"];
+  const files = ["index", "demo", "email", "how-it-works"];
 
   await new Promise((resolve, reject) => {
     const bundler = new Bundler(
@@ -26,11 +26,6 @@ async function main() {
     bundler.on("bundled", () => resolve());
     bundler.on("buildError", () => reject());
   });
-
-  // on(name: 'buildEnd', cb: () => void): void;
-  // on(name: 'bundled', cb: (bundle: ParcelBundler.ParcelBundle) => void): void;
-  // on(name: 'buildStart', cb: (entryPoints: string[]) => void): void;
-  // on(name: 'buildError', cb: (error: Error) => void): void;
 
   app.get("/", (req, res) => res.redirect("/index.html"));
   for (const f of files) {

@@ -18,10 +18,12 @@ DOMAIN="${TARGET#*@}"
 
 rm -rf dist && \
     yarn parcel build \
+        src/email.html \
         src/index.html \
         src/how-it-works.html
 
 mv dist/how-it-works{.html,}
+mv dist/email{.html,}
 
 if $require_password; then
     PASSWORD_CONFIG="
@@ -58,6 +60,9 @@ Options -Indexes
 ForceType text/html
 </Files>
 <Files demo>
+ForceType text/html
+</Files>
+<Files email>
 ForceType text/html
 </Files>
 EOF

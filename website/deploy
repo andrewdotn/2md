@@ -16,6 +16,8 @@ TARGET="${1}"
 USER="${TARGET%@*}"
 DOMAIN="${TARGET#*@}"
 
+node -r ./babel-register.js src/gen-fixtures.tsx
+
 rm -rf dist && \
     yarn parcel build \
         src/demo.html \

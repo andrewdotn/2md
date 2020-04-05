@@ -30,78 +30,70 @@ export function Demo() {
               see <a href="/how-it-works">how it works</a>
             </span>
           </div>
-          <div className="toMd-demo__wrapper">
-            <div className="toMd-demo__column">
-              <h2>Input</h2>
-
-              <DemoContext.Consumer>
-                {({ rawHtml, setHtml }) => (
-                  <>
-                    <p>
-                      Select a sample from{" "}
-                      <FixtureSelector
-                        html={rawHtml}
-                        onChange={setHtml}
-                        fixtures={fixtures}
-                      />
-                      , click to start typing, or select all and paste
-                      something.
-                    </p>
-                    <ContentEditable
-                      className="toMd-demo__input-area"
-                      onInput={(newValue, element) =>
-                        element && setHtml(element?.innerHTML)
-                      }
-                      value={rawHtml}
+          <DemoContext.Consumer>
+            {({
+              rawHtml,
+              setHtml,
+              setFixture,
+              selectedFixture,
+              dom,
+              markdown,
+              rendered
+            }) => (
+              <div className="toMd-demo__wrapper">
+                <div className="toMd-demo__column">
+                  <h2>Input</h2>
+                  <p>
+                    Select a sample from{" "}
+                    <FixtureSelector
+                      defaultValue={selectedFixture}
+                      onChange={setFixture}
+                      fixtures={fixtures}
                     />
-                  </>
-                )}
-              </DemoContext.Consumer>
-            </div>
-            <div className="toMd-demo__column toMd-demo__column__flex">
-              <h2>Raw</h2>
-              <DemoContext.Consumer>
-                {({ rawHtml, setHtml }) => (
+                    , click to start typing, or select all and paste something.
+                  </p>
+                  <ContentEditable
+                    className="toMd-demo__input-area"
+                    onInput={(newValue, element) =>
+                      element && setHtml(element?.innerHTML)
+                    }
+                    value={rawHtml}
+                  />
+                </div>
+                <div className="toMd-demo__column toMd-demo__column__flex">
+                  <h2>Raw</h2>
                   <textarea
                     className="toMd-demo__input-textarea"
                     onChange={e => setHtml(e.currentTarget.value)}
                     value={rawHtml}
                   />
-                )}
-              </DemoContext.Consumer>
-            </div>
-            <div className="toMd-demo__column">
-              <h2>DOM</h2>
-              <DemoContext.Consumer>
-                {({ dom }) => dom && <DomView node={dom} />}
-              </DemoContext.Consumer>
-            </div>
-            <div className="toMd-demo__column">
-              <h2>Intermediate pre-transform</h2>
-              <DemoUntransformedIntermediate />
-            </div>
-            <div className="toMd-demo__column">
-              <h2>Intermediate post-transform</h2>
-              <DemoIntermediate />
-            </div>
-            <div className="toMd-demo__column">
-              <h2>Output blocks</h2>
-              <DemoContext.Consumer>
-                {({ rendered }) => <BlockView blocks={rendered} />}
-              </DemoContext.Consumer>
-            </div>
-            <div className="toMd-demo__column">
-              <h2>Markdown</h2>
+                </div>
+                <div className="toMd-demo__column">
+                  <h2>DOM</h2>
+                  <DomView node={dom!} />
+                </div>
+                <div className="toMd-demo__column">
+                  <h2>Intermediate pre-transform</h2>
+                  <DemoUntransformedIntermediate />
+                </div>
+                <div className="toMd-demo__column">
+                  <h2>Intermediate post-transform</h2>
+                  <DemoIntermediate />
+                </div>
+                <div className="toMd-demo__column">
+                  <h2>Output blocks</h2>
+                  {<BlockView blocks={rendered} />}
+                </div>
+                <div className="toMd-demo__column">
+                  <h2>Markdown</h2>
 
-              <DemoContext.Consumer>
-                {({ markdown }) => (
                   <pre className="toMd-demo__output">
                     <code>{markdown}</code>
                   </pre>
-                )}
-              </DemoContext.Consumer>
-            </div>
-          </div>
+                </div>
+              </div>
+            )}
+          </DemoContext.Consumer>
         </DemoFlow>
       </div>
     </>

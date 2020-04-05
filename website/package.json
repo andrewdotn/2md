@@ -6,7 +6,8 @@
   "description": "private package for website",
   "scripts": {
     "pretty": "prettier --write '*.js' '*.json' 'src/**/*.ts' 'src/**/*.tsx'",
-    "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts' 'src/**/*.tsx'"
+    "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts' 'src/**/*.tsx'",
+    "dev-serve": "node -r ./babel-register src/dev-server.ts"
   },
   "devDependencies": {
     "2md": "0.0.5-pre",
@@ -33,6 +34,7 @@
     "copy-to-clipboard": "^3.3.1",
     "endent": "^1.4.1",
     "express": "^4.17.1",
+    "fs-extra": "^9.0.0",
     "parcel": "^1.12.4",
     "prettier": "^1.19.1",
     "react": "^16.13.0",
@@ -46,6 +48,5 @@
     "tslib": "^1.11.1",
     "typescript": "^3.8.3"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

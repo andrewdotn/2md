@@ -6,51 +6,37 @@ import { BlockRendering, OutputBlock } from "2md/src/render";
 import { IrNode } from "2md/src/2md";
 import { FixtureSelector } from "../demo/fixture-selector";
 import { fixtures } from "../generated-fixtures";
-import { renderToStaticMarkup } from "react-dom/server";
 import { IrView } from "../demo/ir-view";
 import { BlockView } from "../demo/block-view";
+import { Fixture } from "../gen-fixtures";
 
 interface DemoFlowState {
   rawHtml?: string;
+  selectedFixture?: Fixture;
   dom?: Node;
   intermediate?: IrNode;
   untransformedIntermediate?: IrNode;
   markdown?: string;
   rendered?: OutputBlock[];
   setHtml: (html: string) => void;
+  setFixture: (fixture: Fixture) => void;
 }
 
 export const DemoContext = React.createContext({
-  setHtml: () => {}
+  setHtml: () => {},
+  setFixture: () => {}
 } as DemoFlowState);
 
 export class DemoFlow extends Component<{}, DemoFlowState> {
   constructor(props: {}) {
     super(props);
 
-    if (!fixtures.has("Hello world")) {
-      fixtures.set(
-        "Hello world",
-        renderToStaticMarkup(
-          <div>
-            {/*
-            With content-editable, sometimes doing select-all, then paste, was
-            pasting into the <h3> node, causing badly messed-up markdown output.
-            By having a <p> first it doesn’t look as nice but we skip that bug.
-        */}
-            <p className="mb-1">Welcome</p>
-            <h3 className="">Input</h3>
-            <p>
-              Paste <i>formatted</i> text here to see it turned into Markdown.
-            </p>
-          </div>
-        )
-      );
-    }
-
+    const defaultFixture = fixtures.get("Ars Technica")!;
     this.state = {
       setHtml: this.setHtml,
-      ...this.computeState(fixtures.get("Ars Technica")!)
+      setFixture: this.setFixture,
+      selectedFixture: defaultFixture,
+      ...this.computeState(defaultFixture.html)
     };
   }
 
@@ -79,7 +65,17 @@ export class DemoFlow extends Component<{}, DemoFlowState> {
   };
 
   setHtml = (rawHtml: string) => {
-    this.setState(this.computeState(rawHtml));
+    this.setState({
+      selectedFixture: undefined,
+      ...this.computeState(rawHtml)
+    });
+  };
+
+  setFixture = (newFixture: Fixture) => {
+    this.setState({
+      selectedFixture: newFixture,
+      ...this.computeState(newFixture.html)
+    });
   };
 
   render() {
@@ -95,13 +91,13 @@ export class DemoContent extends Component {
   render() {
     return (
       <DemoContext.Consumer>
-        {({ rawHtml, setHtml }) => (
+        {({ rawHtml, setHtml, setFixture, selectedFixture }) => (
           <>
             <p className="bg-light mb-0 pb-2 border border-bottom-0">
               Select a sample from{" "}
               <FixtureSelector
-                html={rawHtml}
-                onChange={setHtml}
+                defaultValue={selectedFixture}
+                onChange={setFixture}
                 fixtures={fixtures}
               />
               , click to start typing, or select all and paste something.

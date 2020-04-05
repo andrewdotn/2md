@@ -1,50 +1,54 @@
-import React, { Component, ReactNode } from "react";
-import { sortBy } from "lodash";
+import React, { Component } from "react";
+import { Fixture } from "../gen-fixtures";
 
 /** description → HTML */
-export type FixtureDictionary = Map<string, string>;
+export type FixtureDictionary = Map<string, Fixture>;
 
 interface FixtureSelectorProps {
   fixtures: FixtureDictionary;
-  html?: string;
-  onChange?: (newHtml: string) => void;
+  onChange?: (newFixture: Fixture) => void;
+  defaultValue?: Fixture;
 }
 
-interface FixtureSelectorState {
-  defaultValue: string;
+function attribution(selection?: Fixture) {
+  if (!selection || !("author" in selection)) {
+    return;
+  }
+
+  return (
+    <>
+      (<a href={selection.sourceUrl}>excerpt</a> by{" "}
+      <a href={selection.authorUrl}>{selection.author}</a>,{" "}
+      {selection.licenseName})
+    </>
+  );
 }
 
-export class FixtureSelector extends Component<
-  FixtureSelectorProps,
-  FixtureSelectorState
-> {
-  changeHandler = (newValue: string) => {
-    if (newValue) {
-      this.props.onChange?.(newValue);
+export class FixtureSelector extends Component<FixtureSelectorProps> {
+  setFixture = (fixtureTitle: string) => {
+    const selected = this.props.fixtures.get(fixtureTitle);
+    if (!selected) {
+      return;
     }
+    this.props.onChange?.(selected);
   };
 
   render() {
-    const optionList: ReactNode[] = [];
-    sortBy([...this.props.fixtures.entries()], e => e[0]).forEach(
-      ([description, html]) => {
-        const selected = { selected: false };
-        if (html === this.props.html) {
-          selected.selected = true;
-        }
-        optionList.push(
-          <option key={description} value={html} {...selected}>
-            {description}
-          </option>
-        );
-      }
-    );
-
     return (
-      <select onChange={e => this.changeHandler(e.currentTarget.value)}>
-        <option value="">Select one...</option>
-        {optionList}
-      </select>
+      <>
+        <select
+          value={this.props.defaultValue?.title ?? ""}
+          onChange={e => this.setFixture(e.currentTarget.value)}
+        >
+          <option value="">Select one...</option>
+          {[...this.props.fixtures.values()].map(fixture => (
+            <option key={fixture.title} value={fixture.title}>
+              {fixture.title}
+            </option>
+          ))}
+        </select>
+        {attribution(this.props.defaultValue)}
+      </>
     );
   }
 }

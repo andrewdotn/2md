@@ -12,11 +12,13 @@ are all preserved.
 
 ![](doc/demo.gif)
 
+You can try it out online at [2md.ca](https://2md.ca).
+
 ## Installation
 
-The easiest way to try `2md` is with [`npx`][] a tool to automatically
-download, cache, and run programs, that’s been included with Node.js
-[since 2017][]:
+The easiest way to try out `2md` from the command line is with [`npx`][], a
+tool to automatically download, cache, and run programs; it’s been included
+with Node.js [since 2017][]:
 
 [`npx`]: https://www.npmjs.com/package/npx
 [since 2017]: https://medium.com/@maybekatz/introducing-npx-an-npm-package-runner-55f7d4bd282b
@@ -62,7 +64,8 @@ prints
 
 Only exported files with `public` in the path are supported. Everything
 else is subject to change without notice. But if there’s some interesting
-code here you’d like to reuse, it should be possible to publish it.
+code here you’d like to reuse, let me know and I can look into publishing
+it as a separate package.
 
 ## Contributing
 
@@ -70,32 +73,10 @@ Contributions are welcome! There are fairly comprehensive end-to-end and
 round-trip tests, and TypeScript’s type-checking makes refactoring safer,
 so don’t be afraid to move code around.
 
-### Architecture
+## Architecture
 
-A quick sketch of how this works:
-
-  - Some AppleScript reads html off the clipboard
-
-  - `jsdom` parses input html into dom elements
-
-  - A parser iterates over the dom, emitting a tree of custom nodes that
-    correspond to markdown elements; for example, `<b>` and `<strong>` tags
-    get mapped to `Bold` nodes
-
-  - Some simplifying transformations are applied to the tree of markdown
-    elements, such as removing `<a>` tags with no text, because links like
-    `[][1]` in the markdown output aren’t useful
-
-  - The markdown nodes get `render()` called on them to generate a series
-    of `OutputBlock` objects which are, roughly, paragraphs in the
-    markdown output
-
-  - The `OutputBlock`s are wrapped to 80 columns, and separated with
-    blank lines where appropriate
-
-You can see the results of individual steps with the `--output-format`
-option to the cli. These are subject to change without notice, and not
-exposed through the public api.
+A detailed writeup of the internals exists: “[Compiling HTML to Markdown
+with TypeScript: How 2md works](https://2md.ca/how-it-works)”
 
 ## License
 

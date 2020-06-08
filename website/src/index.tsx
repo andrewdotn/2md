@@ -46,8 +46,16 @@ document.addEventListener("DOMContentLoaded", async function() {
                   <pre className="border bg-light markdown-output">
                     {markdown}
                   </pre>
-                  <div className="mx-auto">
-                    <b>2020-04-04</b>: <a href="/how-it-works">How it works</a>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <b>2020-04-04</b>:{" "}
+                      <a href="/how-it-works">How it works</a>
+                    </div>
+                    <div className="col-md-6 text-md-right">
+                      <a href="https://github.com/andrewdotn/2md">
+                        View source on GitHub
+                      </a>
+                    </div>
                   </div>
                 </div>
               )}

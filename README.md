@@ -14,6 +14,9 @@ are all preserved.
 
 You can try it out online at [2md.ca](https://2md.ca).
 
+A detailed writeup of the internals exists: “[Compiling HTML to Markdown
+with TypeScript: How 2md works](https://2md.ca/how-it-works)”
+
 ## Installation
 
 The easiest way to try out `2md` from the command line is with [`npx`][], a
@@ -72,11 +75,6 @@ it as a separate package.
 Contributions are welcome! There are fairly comprehensive end-to-end and
 round-trip tests, and TypeScript’s type-checking makes refactoring safer,
 so don’t be afraid to move code around.
-
-## Architecture
-
-A detailed writeup of the internals exists: “[Compiling HTML to Markdown
-with TypeScript: How 2md works](https://2md.ca/how-it-works)”
 
 ## License
 

@@ -10,7 +10,7 @@
     "dev-serve": "node -r ./babel-register src/dev-server.ts"
   },
   "devDependencies": {
-    "2md": "0.0.5-pre",
+    "2md": "0.0.5",
     "@babel/cli": "^7.6.4",
     "@babel/core": "^7.0.0-0",
     "@babel/plugin-transform-modules-commonjs": "^7.9.0",

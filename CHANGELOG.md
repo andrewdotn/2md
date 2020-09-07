@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.0.5
+
+  - Bump [`yargs-parser`][] version
+
+[`yargs-parser`]: https://github.com/advisories/GHSA-p9pc-299p-vxgp
+
 ## Version 0.0.4
 
   - Make main script executable, including from npx

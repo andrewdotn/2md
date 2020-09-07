@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.0.6
+
+  - Attempt to fix issues with release process
+
 ## Version 0.0.5
 
   - Bump [`yargs-parser`][] version

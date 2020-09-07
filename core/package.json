@@ -1,6 +1,6 @@
 {
   "name": "2md",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "Apache-2.0",
   "description": "convert formatted text to markdown",
   "homepage": "https://github.com/andrewdotn/2md",
@@ -15,7 +15,7 @@
   "main": "lib/public/api.js",
   "types": "types/src/public/api.d.ts",
   "bin": {
-    "2md": "lib/main.js"
+    "2md": "lib/npm-main.js"
   },
   "scripts": {
     "test": "tsc && yarn run pretty:check && mocha -r ./babel-register --exclude 'node_modules/**' 'src/**/*-test.ts' && yarn audit",

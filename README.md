@@ -92,7 +92,7 @@ The current release process, to be automated later, is:
 
  3. Commit to git, and `git tag vA.B.C`
 
- 4. `git push --tags $REMOTE master`.
+ 4. `git push --tags $REMOTE main`.
 
     Optional: figure out automation to put `CHANGELOG.md` excerpt into
     auto-created [GitHub releases][gh-release].

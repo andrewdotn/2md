@@ -10,10 +10,10 @@
   ],
   "files": [
     "lib/**/*.js",
-    "types/public/*.d.ts"
+    "types/src/public/*.d.ts"
   ],
   "main": "lib/public/api.js",
-  "types": "types/public/api.d.ts",
+  "types": "types/src/public/api.d.ts",
   "bin": {
     "2md": "lib/main.js"
   },

@@ -7,6 +7,7 @@ import { inspect } from "util";
 import { join as pathJoin } from "path";
 import { readClipboard } from "./clipboard";
 import { parseHtml, parse } from "./parse-with-jsdom";
+import { version } from "../package.json";
 
 export function toMd(html: string, options?: ParseOptions): string {
   const intermediate = parse(html, options);
@@ -49,6 +50,7 @@ export async function main() {
 
 Converts formatted text to markdown. Defaults to reading the clipboard.`
     )
+    .version(version)
     .option("output-format", { choices: outputFormats, default: "md" })
     // This magic option is handy for debugging round-trip issues, but isn’t
     // enabled by default because we don’t want users to have to pull in

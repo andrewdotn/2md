@@ -86,22 +86,23 @@ works” article `how-it-works/post.mdx`, which is not redistributable.
 
 The current release process, to be automated later, is:
 
- 1. Remove the `-pre` tag from the `core/package.json` version field
+ 1. Remove the `-pre` tag from the `version` field in `core/package.json`
+    `version`, and from the `2md` dependency in `website/package.json`
 
  2. Update `CHANGELOG.md`
 
  3. Commit to git, and `git tag vA.B.C`
 
- 4. `git push --tags $REMOTE main`.
+ 4. `git push --tags $REMOTE main`
 
     Optional: figure out automation to put `CHANGELOG.md` excerpt into
     auto-created [GitHub releases][gh-release].
 
     [gh-release]: https://github.com/andrewdotn/2md/releases
 
- 5. `yarn run package` and inspect tarball
+ 5. In the `core` directory, `yarn run package` and inspect tarball
 
- 6. `npm publish 2md-vA.B.C.tgz`.
+ 6. `npm publish 2md-vA.B.C.tgz`
 
     If publishing a pre-release, add `npm publish --tag next` to [set the
     correct npm tag][npm-next].
@@ -109,7 +110,7 @@ The current release process, to be automated later, is:
     [npm-next]: https://medium.com/@mbostock/prereleases-and-npm-e778fc5e2420
 
  7. Bump version and add `-pre` version suffix in `core/package.json`;
-    update the `2md` dependency version in `website/package.json` as well.
+    update the `2md` dependency version in `website/package.json` as well
 
     <details>
     <summary>Otherwise yarn won’t use the local version.</summary>

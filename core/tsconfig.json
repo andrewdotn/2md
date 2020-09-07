@@ -10,6 +10,7 @@
     "jsx": "react",
     "lib": ["ES2015", "DOM", "ES2017.object"],
     "module": "esnext",
+    "resolveJsonModule": true,
     "target": "esnext",
     "noUnusedLocals": true,
     "allowSyntheticDefaultImports": true,

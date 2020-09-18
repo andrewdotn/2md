@@ -5,5 +5,8 @@
       "website"
     ]
   },
+  "resolutions": {
+    "**/node-forge": "^0.10.0"
+  },
   "private": true
 }

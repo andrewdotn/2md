@@ -1,6 +1,6 @@
 {
   "name": "2md",
-  "version": "0.0.7",
+  "version": "0.0.8-pre",
   "license": "Apache-2.0",
   "description": "convert formatted text to markdown",
   "homepage": "https://2md.ca",

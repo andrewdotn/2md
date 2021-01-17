@@ -103,7 +103,8 @@ describe("2md", function() {
       "round-trip2.md",
       "round-trip3.md",
       "round-trip4.md",
-      "too-long-code.md"
+      "too-long-code.md",
+      "autolinks.md"
     ]) {
       roundTripTest(filename);
     }

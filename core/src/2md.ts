@@ -172,12 +172,27 @@ export class A extends IrNode {
   }
 
   render(r: BlockRendering) {
-    const num = r.linkCounter++;
-    r.append("[");
-    super.render(r);
-    r.append(`][${num}]`);
-    // XXX: escape/quote bad hrefs, e.g., containing newlines?
-    r.addTrailer(`[${num}]: ${this.href}`);
+    // Alternatively could render children into a new BlockRendering object
+    let childText = "";
+    let childRenderingValid = true;
+    for (let c of this.copyOfChildren()) {
+      if (typeof c === "string") {
+        childText += c;
+      } else {
+        childRenderingValid = false;
+        break;
+      }
+    }
+    if (childRenderingValid && childText === this.href) {
+      r.append("<");
+      super.render(r);
+      r.append(">");
+    } else {
+      const id = r.getLinkId(this.href);
+      r.append("[");
+      super.render(r);
+      r.append(`][${id}]`);
+    }
   }
 
   href: string;

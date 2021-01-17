@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 0.0.8
+
+  - Better link handling: multiple links to the same destination do not
+    result in duplicate labels, and autolinks are used when the link text
+    matches the destination.
+
 ## Version 0.0.7
 
   - Re-release of 0.0.6 with `README.md` included in built package

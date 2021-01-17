@@ -17,7 +17,7 @@ get the correct length? Is it a problem about unicode?
 
 **SOLVED**
 
-I used this library: [https://github.com/orling/grapheme-splitter][1]
+I used this library: <https://github.com/orling/grapheme-splitter>
 
 I tried that:
 
@@ -26,5 +26,3 @@ I tried that:
     console.log(splitter.splitGraphemes(bio).length);
 
 and the length is 37. It works very well!
-
-[1]: https://github.com/orling/grapheme-splitter

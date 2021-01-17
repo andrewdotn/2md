@@ -143,6 +143,17 @@ export class BlockRendering {
     this.trailers.push(s);
   }
 
+  getLinkId(linkTarget: string): number {
+    if (this.seenLinks.has(linkTarget)) {
+      return this.seenLinks.get(linkTarget)!;
+    }
+    const id = this.linkCounter++;
+    this.seenLinks.set(linkTarget, id);
+    // XXX: escape/quote bad hrefs, e.g., containing newlines?
+    this.addTrailer(`[${id}]: ${linkTarget}`);
+    return id;
+  }
+
   finish(): string {
     let ret = new TextRendering(this.outputBlocks).toText();
 
@@ -171,5 +182,6 @@ export class BlockRendering {
   private _prefixStack: Prefix[] = [];
   outputBlocks: OutputBlock[] = [];
   linkCounter = 1;
+  seenLinks = new Map<string, number>();
   trailers: string[] = [];
 }

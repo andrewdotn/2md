@@ -96,14 +96,14 @@ The current release process, to be automated later, is:
 
  4. Commit to git, and `git tag vA.B.C`
 
- 5. `git push --atomic $REMOTE main vA.B.C`
+ 5. In the `core` directory, `yarn run package` and inspect tarball
+
+ 6. `git push --atomic $REMOTE main vA.B.C`
 
     Optional: figure out automation to put `CHANGELOG.md` excerpt into
     auto-created [GitHub releases][gh-release].
 
     [gh-release]: https://github.com/andrewdotn/2md/releases
-
- 6. In the `core` directory, `yarn run package` and inspect tarball
 
  7. `npm publish 2md-vA.B.C.tgz`
 
@@ -132,3 +132,12 @@ The current release process, to be automated later, is:
     them).
     </blockquote>
     </details>
+
+ 9. For the precompiled version, run `yarn dist` in `core` and copy
+    `2md.js` to `~/bin`. It relies on a shell wrapper:
+
+        #!/bin/bash
+
+        DIR="$(dirname -- "${0}")"
+
+        exec node "${DIR}/2md.js" "${@}"

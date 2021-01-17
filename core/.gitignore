@@ -2,3 +2,5 @@
 2md-*.tgz
 /dist/
 /types/
+README.md
+doc/demo.gif

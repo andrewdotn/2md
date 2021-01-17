@@ -1,15 +1,20 @@
 {
   "name": "2md",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "license": "Apache-2.0",
   "description": "convert formatted text to markdown",
-  "homepage": "https://github.com/andrewdotn/2md",
+  "homepage": "https://2md.ca",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/andrewdotn/2md"
+  },
   "keywords": [
     "markdown",
     "clipboard"
   ],
   "files": [
     "lib/**/*.js",
+    "doc/demo.gif",
     "types/src/public/*.d.ts"
   ],
   "main": "lib/public/api.js",

@@ -91,25 +91,28 @@ The current release process, to be automated later, is:
 
  2. Update `CHANGELOG.md`
 
- 3. Commit to git, and `git tag vA.B.C`
+ 3. Copy `README.md` and any referenced images such as `doc/demo.gif` into
+    the `core` folder
 
- 4. `git push --tags $REMOTE main`
+ 4. Commit to git, and `git tag vA.B.C`
+
+ 5. `git push --follow-tags $REMOTE main`
 
     Optional: figure out automation to put `CHANGELOG.md` excerpt into
     auto-created [GitHub releases][gh-release].
 
     [gh-release]: https://github.com/andrewdotn/2md/releases
 
- 5. In the `core` directory, `yarn run package` and inspect tarball
+ 6. In the `core` directory, `yarn run package` and inspect tarball
 
- 6. `npm publish 2md-vA.B.C.tgz`
+ 7. `npm publish 2md-vA.B.C.tgz`
 
     If publishing a pre-release, add `npm publish --tag next` to [set the
     correct npm tag][npm-next].
 
     [npm-next]: https://medium.com/@mbostock/prereleases-and-npm-e778fc5e2420
 
- 7. Bump version and add `-pre` version suffix in `core/package.json`;
+ 8. Bump version and add `-pre` version suffix in `core/package.json`;
     update the `2md` dependency version in `website/package.json` as well
 
     <details>

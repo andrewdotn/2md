@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.0.7
+
+  - Re-release of 0.0.6 with `README.md` included in built package
+
 ## Version 0.0.6
 
   - Attempt to fix issues with release process

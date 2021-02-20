@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", async function() {
                   <pre className="border bg-light markdown-output">
                     {markdown}
                   </pre>
+                  <div style={{ clear: "both" }}></div>
                   <div className="row">
                     <div className="col-md-6">
                       <b>2020-04-04</b>:{" "}

@@ -7,6 +7,38 @@ import { main as genFixtures } from "./gen-fixtures";
 // This file is using the babel settings for a browser
 import "regenerator-runtime";
 
+/**
+ * The error
+ *
+ *     2md/node_modules/2md/src/parse.ts: Unknown version 14.15.5 of Node.js
+ *
+ * comes about because parcel tries to load the env-preset stuff for the .ts
+ * files in the core package, and that includes the bugfix portion of the URL,
+ * which isn’t normally considered by browserslist.
+ *
+ * Add an alias to work around that.
+ */
+function workaroundBrowserslistNodeReleasesStuff() {
+  const b = require("browserslist");
+  const versionMatch = /^v([^.]+)\.([^.]+)\.([^.]+)$/.exec(process.version);
+  if (!versionMatch) {
+    throw new Error("Unable to determine node version");
+  }
+  const major = versionMatch[1];
+  const minor = versionMatch[2];
+  const micro = versionMatch[3];
+  // b.aliases[`node ${versionMatch[1]}.${versionMatch[2]}`] = `current node`;
+
+  const jsReleases = require("node-releases/data/processed/envs.json");
+  const curRelease = jsReleases.find(r => r.version === `${major}.${minor}.0`);
+  console.log(curRelease);
+  jsReleases.push({
+    ...curRelease,
+    version: `${major}.${minor}.${micro}`
+  });
+  console.log(jsReleases[jsReleases.length - 1]);
+}
+
 async function main() {
   const argv = yargs
     .strict()
@@ -15,6 +47,8 @@ async function main() {
   const app = express();
 
   const g = genFixtures();
+
+  workaroundBrowserslistNodeReleasesStuff();
 
   const docDir = pathResolve(__dirname, "..", "..", "doc");
   app.use("/doc", express.static(docDir));

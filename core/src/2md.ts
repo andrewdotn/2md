@@ -83,20 +83,20 @@ export abstract class IrNode {
    * What node.children = node.children[0].children would do if children weren’t
    * private, and if that could maintain invariants.
    */
-  replaceChildWithItsChildren() {
-    if (this.childCount() !== 1) {
-      throw new Error("can only use if node has a single child");
+  replaceWithChildren() {
+    if (!this.parent) {
+      throw new Error("can’t replace root node");
     }
-    const child = this.child(0);
-    if (typeof child === "string") {
-      throw new Error("child must be node, not string");
-    }
-    const copy = child.copyOfChildren();
+    let index = this.parent.children.indexOf(this);
+
+    const copy = this.copyOfChildren();
     while (this.hasChildren()) {
       this.removeChild(0);
     }
+    this.parent.removeChild(index);
     for (let c of copy) {
-      this.push(c);
+      this.parent.insertChild(index, c);
+      index++;
     }
   }
 

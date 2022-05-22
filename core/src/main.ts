@@ -60,6 +60,11 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
       type: "boolean",
       default: true,
       description: "Wrap the output in a quote"
+    })
+    .option("links", {
+      type: "boolean",
+      default: true,
+      description: "Include hyperlinks in output"
     }).argv;
 
   let input: string;
@@ -82,7 +87,8 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`
 
   const outputFormat: OutputFormat = <OutputFormat>argv.outputFormat;
   const parseOptions: ParseOptions = {
-    quote: <boolean>argv.quote
+    quote: <boolean>argv.quote,
+    links: <boolean>argv.links
   };
 
   let output: string;

@@ -1,6 +1,6 @@
 {
   "name": "2md",
-  "version": "0.0.8",
+  "version": "0.0.9-pre",
   "license": "Apache-2.0",
   "description": "convert formatted text to markdown",
   "homepage": "https://2md.ca",
@@ -28,9 +28,6 @@
     "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts'",
     "package": "rm -rf types && tsc --project tsconfig-publish.json && rm -rf lib && babel --extensions=.ts --source-maps=false -d lib src && find lib \\( -name '*-test.js' -o -name '*.d.js' \\) -print0 | xargs -0 rm && yarn pack",
     "dist": "parcel build --bundle-node-modules --target=node -o 2md.js src/parcel-main.ts"
-  },
-  "engines": {
-    "node": ">=12.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",

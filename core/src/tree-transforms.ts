@@ -1,12 +1,15 @@
 import { IrNode, NumberedListItem, Separator } from "./2md";
 
-export function applyTreeTransforms(root: IrNode) {
+export function applyTreeTransforms(root: IrNode, { removeLinks = false }) {
   visitPre(root, concatenateStrings);
   visitPre(root, replaceEmDashes);
   visitPre(root, removeEmptyLinks);
   visitPre(root, collapseCodeInsidePre);
   visitPre(root, numberLists);
   visitPre(root, twoBrsMakesOneSeparator);
+  if (removeLinks) {
+    visitPre(root, removeAllLinks);
+  }
 }
 
 /**
@@ -70,6 +73,24 @@ function removeEmptyLinks(node: IrNode) {
 }
 
 /**
+ *  Strip out all links. Useful when a short excerpt has a bunch of links that
+ *  you’re not interested in quoting.
+ */
+function removeAllLinks(node: IrNode) {
+  for (let i = 0; i < node.childCount(); i++) {
+    const c = node.child(i);
+    if (typeof c !== "string" && c.name === "A") {
+      c.replaceWithChildren();
+
+      // Since we just deleted the element at the current index, decrement
+      // the loop index, otherwise we’ll miss the next element which has
+      // shifted down into the current position.
+      i--;
+    }
+  }
+}
+
+/**
  * <pre><code>foo</code></pre> -> <pre>foo</pre>
  */
 function collapseCodeInsidePre(node: IrNode) {
@@ -80,7 +101,7 @@ function collapseCodeInsidePre(node: IrNode) {
   if (node.childCount() === 1) {
     const c = node.child(0);
     if (typeof c !== "string" && c.name === "Code") {
-      node.replaceChildWithItsChildren();
+      c.replaceWithChildren();
     }
   }
 }

@@ -157,4 +157,45 @@ describe("2md", function() {
       expect(rendering.finish()).to.eql("> [Top][1]\n>\n> [1]: #top\n");
     });
   });
+
+  describe("--no-links", function() {
+    it("skips links if told to", function() {
+      const intermediate = parse(`foo <a href="blah">bar</a>`, {
+        links: false
+      });
+      const rendering = new BlockRendering();
+      intermediate.render(rendering);
+      expect(rendering.finish()).to.eql(`foo bar\n`);
+    });
+
+    it("maintains formatting when stripping links", function() {
+      const intermediate = parse(`foo <a href="blah">bar <i>baz</i></a>`, {
+        links: false
+      });
+      const rendering = new BlockRendering();
+      intermediate.render(rendering);
+      expect(rendering.finish()).to.eql(`foo bar *baz*\n`);
+    });
+
+    it("can strip recursive links correctly", function() {
+      const intermediate = parse(
+        `foo <a href="blah">bar <a href="bar">baz <b>2</b></a></a>`,
+        {
+          links: false
+        }
+      );
+      const rendering = new BlockRendering();
+      intermediate.render(rendering);
+      expect(rendering.finish()).to.eql(`foo bar baz **2**\n`);
+    });
+
+    it("works at the top level too", function() {
+      const intermediate = parse(`<a href="blah">foo<a href="bar">`, {
+        links: false
+      });
+      const rendering = new BlockRendering();
+      intermediate.render(rendering);
+      expect(rendering.finish()).to.eql(`foo\n`);
+    });
+  });
 });

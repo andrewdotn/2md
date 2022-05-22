@@ -102,7 +102,8 @@ function parse1(irNode: IrNode, htmlNode: Node) {
 }
 
 const defaultParseOptions = {
-  quote: false
+  quote: false,
+  links: true
 };
 
 export type ParseOptions = Partial<typeof defaultParseOptions>;
@@ -140,7 +141,7 @@ export function parseToIr(
   }
 
   if (!skipTreeTransforms) {
-    applyTreeTransforms(root);
+    applyTreeTransforms(root, { removeLinks: !options.links });
   }
 
   return root;

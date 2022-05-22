@@ -2,6 +2,17 @@
 # yarn lockfile v1
 
 
+"2md@0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/2md/-/2md-0.0.8.tgz#e8bb674c600a5f760dbcac6bac9aed8b17bfd22d"
+  integrity sha512-10wjOWRUyPRoHkllNxOP0CsTOU/T316tUORypuOYZExakziuPNBeMH8sIctO9avINQ11yEiNN4oBPyZ37HXnDA==
+  dependencies:
+    fs-extra "^9.0.0"
+    grapheme-splitter "^1.0.4"
+    jsdom "^16.2.1"
+    lodash "^4.17.19"
+    yargs "^15.3.1"
+
 "@babel/cli@^7.6.4":
   version "7.8.4"
   resolved "https://registry.yarnpkg.com/@babel/cli/-/cli-7.8.4.tgz#505fb053721a98777b2b175323ea4f090b7d3c1c"
@@ -2113,9 +2124,9 @@ color-name@^1.0.0, color-name@~1.1.4:
   integrity sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==
 
 color-string@^1.5.2:
-  version "1.5.3"
-  resolved "https://registry.yarnpkg.com/color-string/-/color-string-1.5.3.tgz#c9bbc5f01b58b5492f3d6857459cb6590ce204cc"
-  integrity sha512-dC2C5qeWoYkxki5UAXapdjqO672AM4vZuPGRQfO8b5HKuKGBbKWpITyDYN7TOFKvRW7kOgAn3746clDBMDJyQw==
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/color-string/-/color-string-1.9.1.tgz#4467f9146f036f855b764dfb5bf8582bf342c7a4"
+  integrity sha512-shrVawQFojnZv6xM40anx4CkoDP+fZsw/ZerEMsW/pyzsRbElpsL/DBVW7q3ExxwusdNXI3lXpuhEZkzs8p5Eg==
   dependencies:
     color-name "^1.0.0"
     simple-swizzle "^0.2.2"
@@ -4607,7 +4618,7 @@ node-environment-flags@1.0.6:
     object.getownpropertydescriptors "^2.0.3"
     semver "^5.7.0"
 
-node-forge@0.10.0, node-forge@^0.7.1:
+node-forge@^0.10.0, node-forge@^0.7.1:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
   integrity sha512-PPmu8eEeG9saEUvI97fm4OYxXVB6bFvyNTyiUOBichBpFG8A1Ljw3bY62+5oOjDEMHRnd0Y7HQ+x7uzxOzC6JA==

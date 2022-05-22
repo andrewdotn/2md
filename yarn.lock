@@ -2,6 +2,17 @@
 # yarn lockfile v1
 
 
+"2md@0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/2md/-/2md-0.0.8.tgz#e8bb674c600a5f760dbcac6bac9aed8b17bfd22d"
+  integrity sha512-10wjOWRUyPRoHkllNxOP0CsTOU/T316tUORypuOYZExakziuPNBeMH8sIctO9avINQ11yEiNN4oBPyZ37HXnDA==
+  dependencies:
+    fs-extra "^9.0.0"
+    grapheme-splitter "^1.0.4"
+    jsdom "^16.2.1"
+    lodash "^4.17.19"
+    yargs "^15.3.1"
+
 "@babel/cli@^7.6.4":
   version "7.8.4"
   resolved "https://registry.yarnpkg.com/@babel/cli/-/cli-7.8.4.tgz#505fb053721a98777b2b175323ea4f090b7d3c1c"
@@ -4607,7 +4618,7 @@ node-environment-flags@1.0.6:
     object.getownpropertydescriptors "^2.0.3"
     semver "^5.7.0"
 
-node-forge@0.10.0, node-forge@^0.7.1:
+node-forge@^0.10.0, node-forge@^0.7.1:
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-0.10.0.tgz#32dea2afb3e9926f02ee5ce8794902691a676bf3"
   integrity sha512-PPmu8eEeG9saEUvI97fm4OYxXVB6bFvyNTyiUOBichBpFG8A1Ljw3bY62+5oOjDEMHRnd0Y7HQ+x7uzxOzC6JA==
@@ -7200,9 +7211,9 @@ wrappy@1:
   integrity sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=
 
 ws@^5.1.1:
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-5.2.2.tgz#dffef14866b8e8dc9133582514d1befaf96e980f"
-  integrity sha512-jaHFD6PFv6UgoIVda6qZllptQsMlDEJkTQcybzzXDYM1XO9Y8em691FGMPmM46WGyLU4z9KMgQN+qrux/nhlHA==
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-5.2.3.tgz#05541053414921bc29c63bee14b8b0dd50b07b3d"
+  integrity sha512-jZArVERrMsKUatIdnLzqvcfydI85dvd/Fp1u/VOpfdDWQ4c9qWXe+VIeAbQ5FrDwciAkr+lzofXLz3Kuf26AOA==
   dependencies:
     async-limiter "~1.0.0"
 

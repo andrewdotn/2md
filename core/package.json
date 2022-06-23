@@ -55,7 +55,7 @@
   "dependencies": {
     "fs-extra": "^9.0.0",
     "grapheme-splitter": "^1.0.4",
-    "jsdom": "^16.2.1",
+    "jsdom": "^16.5.0",
     "lodash": "^4.17.19",
     "yargs": "^15.3.1"
   },

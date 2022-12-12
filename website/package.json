@@ -33,7 +33,7 @@
     "classnames": "^2.2.6",
     "copy-to-clipboard": "^3.3.1",
     "endent": "^1.4.1",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "fs-extra": "^9.0.0",
     "parcel": "^1.12.4",
     "prettier": "^1.19.1",

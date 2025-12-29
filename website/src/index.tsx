@@ -1,11 +1,9 @@
-import "regenerator-runtime";
-
 import { render } from "react-dom";
 import React from "react";
 import { ErrorBoundary } from "./demo/error-boundary";
 import { ToMd } from "./ToMd";
 
-document.addEventListener("DOMContentLoaded", async function() {
+document.addEventListener("DOMContentLoaded", async function () {
   const appDiv = document.getElementById("app");
   render(
     <React.StrictMode>
@@ -65,6 +63,6 @@ document.addEventListener("DOMContentLoaded", async function() {
         </div>
       </ErrorBoundary>
     </React.StrictMode>,
-    appDiv
+    appDiv,
   );
 });

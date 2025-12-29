@@ -1,4 +1,4 @@
-<!-- Copyright © 2020 Andrew Neitsch all rights reserved. -->
+{/* Copyright © 2020 Andrew Neitsch all rights reserved. */}
 
 import { PauseableImage } from './pauseable-image';
 import {
@@ -78,15 +78,15 @@ lot of learning is the accumulation of low-level tricks over many years. I
 love reading about those tricks in case they come in handy some day, and
 enjoy sharing them too.
 
-<!-- wrapper is used to target styling for toc headings -->
+{/* wrapper is used to target styling for toc headings */}
 <div className="toc">
 
 ### Table of Contents
 
-<!--
+{/*
   -- the div end has to come after the next header because remark-toc
   -- replaces everything in this section with the table of contents
-  -->
+*/}
 
 ## Motivation
 </div>
@@ -333,19 +333,23 @@ to the `contentEditable` is your handle into the DOM tree.
 To get DOM objects from HTML *strings* inside a browser, you can create a
 new document and then set the body HTML:
 
-    const doc = document.implementation.createHTMLDocument();
-    doc.body.innerHTML = 'Hello, <b>world</b>';
-    doc.documentElement.outerHTML;
-    // returns "<html><head></head><body>Hello, <b>world</b></body></html>"
+```
+const doc = document.implementation.createHTMLDocument();
+doc.body.innerHTML = 'Hello, <b>world</b>';
+doc.documentElement.outerHTML;
+// returns "<html><head></head><body>Hello, <b>world</b></body></html>"
+```
 
 In node.js, the `jsdom` package provides a string-taking constructor
 directly, and returns objects with the same API that you’d get in the
 browser:
 
-    const { JSDOM } = require('jsdom');
-    const doc = new JSDOM('Hello, <b>world</b>').window.document;
-    doc.documentElement.outerHTML;
-    // returns "<html><head></head><body>Hello, <b>world</b></body></html>"
+```
+const { JSDOM } = require('jsdom');
+const doc = new JSDOM('Hello, <b>world</b>').window.document;
+doc.documentElement.outerHTML;
+// returns "<html><head></head><body>Hello, <b>world</b></body></html>"
+```
 
 At this point, you’ve got DOM `Node` objects with familiar APIs like
 `node.childNodes`, `node.appendChild()`, `node.replaceChild()`,
@@ -399,94 +403,96 @@ The code to actually do this is in `src/parse.ts`:
 
 The code:
 
-    function parse(doc: Node): IrNode {
-      const root = new Document([]);
+```
+function parse(doc: Node): IrNode {
+    const root = new Document([]);
 
-      for (let i = 0; i < doc.childNodes.length; i++) {
-        parse1(root, doc.childNodes[i]);
-      }
+    for (let i = 0; i < doc.childNodes.length; i++) {
+    parse1(root, doc.childNodes[i]);
     }
+}
 
-    // This is the actual recursive function; I think I picked up the naming
-    // convention from Lisp. When a recursive function needs accumulators, `foo()`
-    // is the simplified API used by callers that does the initial setup, and
-    // `foo1()` recurses.
-    function parse1(irNode: IrNode, htmlNode: Node) {
-      if (
-        htmlNode.nodeType == htmlNode.TEXT_NODE &&
-        htmlNode.textContent !== null
-      ) {
-        if (
-          htmlNode.textContent !== "\n" ||
-          irNode.isOrHasParentNamed("Preformatted")
-        ) {
-          irNode.push(htmlNode.textContent);
-        }
-      } else if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
-        const e = <Element>htmlNode;
-        let receiver = irNode;
-        switch (htmlNode.nodeName) {
-          case "H1":
-          case "H2":
-          case "H3":
-          case "H4":
-          case "H5":
-          case "H6":
-            receiver = new Heading([], {
-              level: extractHeadingLevel(htmlNode.nodeName)
-            });
-            break;
-          case "B":
-          case "STRONG":
-            receiver = new Bold([]);
-            break;
-          case "I":
-          case "EM":
-            receiver = new I([]);
-            break;
-          case "OL":
-            receiver = new OrderedList([]);
-            break;
-          case "LI":
-            receiver = new ListItem([]);
-            break;
-          case "A":
-            const href = e.getAttribute("href");
-            if (href) {
-              receiver = new A([], { href });
-            }
-            break;
-          case "PRE":
-            receiver = new Preformatted([]);
-            break;
-          case "P":
-          // There’s no standard markdown representation for these, but putting them
-          // on separate lines is better than jamming them together in a single
-          // paragraph.
-          case "DL":
-          case "DT":
-            receiver = new P([]);
-            break;
-          case "BLOCKQUOTE":
-            receiver = new Blockquote([]);
-            break;
-          case "TT":
-          case "CODE":
-            receiver = new Code([]);
-            break;
-          case "BR":
-            receiver = new Br([]);
-            break;
-        }
-        if (irNode !== receiver) irNode.push(receiver);
-
-        // Recurse
-        for (let i = 0; i < htmlNode.childNodes.length; i++) {
-          const c = htmlNode.childNodes[i];
-          parse1(receiver, c);
-        }
-      }
+// This is the actual recursive function; I think I picked up the naming
+// convention from Lisp. When a recursive function needs accumulators, `foo()`
+// is the simplified API used by callers that does the initial setup, and
+// `foo1()` recurses.
+function parse1(irNode: IrNode, htmlNode: Node) {
+    if (
+    htmlNode.nodeType == htmlNode.TEXT_NODE &&
+    htmlNode.textContent !== null
+    ) {
+    if (
+        htmlNode.textContent !== "\n" ||
+        irNode.isOrHasParentNamed("Preformatted")
+    ) {
+        irNode.push(htmlNode.textContent);
     }
+    } else if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
+    const e = <Element>htmlNode;
+    let receiver = irNode;
+    switch (htmlNode.nodeName) {
+        case "H1":
+        case "H2":
+        case "H3":
+        case "H4":
+        case "H5":
+        case "H6":
+        receiver = new Heading([], {
+            level: extractHeadingLevel(htmlNode.nodeName)
+        });
+        break;
+        case "B":
+        case "STRONG":
+        receiver = new Bold([]);
+        break;
+        case "I":
+        case "EM":
+        receiver = new I([]);
+        break;
+        case "OL":
+        receiver = new OrderedList([]);
+        break;
+        case "LI":
+        receiver = new ListItem([]);
+        break;
+        case "A":
+        const href = e.getAttribute("href");
+        if (href) {
+            receiver = new A([], { href });
+        }
+        break;
+        case "PRE":
+        receiver = new Preformatted([]);
+        break;
+        case "P":
+        // There’s no standard markdown representation for these, but putting them
+        // on separate lines is better than jamming them together in a single
+        // paragraph.
+        case "DL":
+        case "DT":
+        receiver = new P([]);
+        break;
+        case "BLOCKQUOTE":
+        receiver = new Blockquote([]);
+        break;
+        case "TT":
+        case "CODE":
+        receiver = new Code([]);
+        break;
+        case "BR":
+        receiver = new Br([]);
+        break;
+    }
+    if (irNode !== receiver) irNode.push(receiver);
+
+    // Recurse
+    for (let i = 0; i < htmlNode.childNodes.length; i++) {
+        const c = htmlNode.childNodes[i];
+        parse1(receiver, c);
+    }
+    }
+}
+```
 
 The result is a tree, a lot like the DOM tree, but with only about a dozen
 possible node types, only three of which can have any attributes.
@@ -509,9 +515,11 @@ Here are some examples of tree transform functions from
     …/&gt;</code>, and *code blocks*, typically designated with a
     four-space-indent inside markdown source
 
-        function foo () {
-            ...
-        }
+    ```
+    function foo () {
+        ...
+    }
+    ```
 
     that gets rendered into HTML as `<pre><code>…</code></pre>`.
 
@@ -529,18 +537,20 @@ Here are some examples of tree transform functions from
 
     The code to do that is
 
-        function collapseCodeInsidePre(node: IrNode) {
-          if (node.name !== "Preformatted") {
-            return;
-          }
-
-          if (node.childCount() === 1) {
-            const c = node.child(0);
-            if (typeof c !== "string" && c.name === "Code") {
-              node.replaceChildWithItsChildren();
-            }
-          }
+    ```
+    function collapseCodeInsidePre(node: IrNode) {
+        if (node.name !== "Preformatted") {
+        return;
         }
+
+        if (node.childCount() === 1) {
+        const c = node.child(0);
+        if (typeof c !== "string" && c.name === "Code") {
+            node.replaceChildWithItsChildren();
+        }
+        }
+    }
+    ```
 
     which is called from a wrapper function that handles the traversal
     boilerplate.
@@ -560,24 +570,26 @@ Here are some examples of tree transform functions from
     Overflow’ examples, where each `<span … />` for syntax highlighting
     ends up being a separate string without this optimization.
 
-        /**
-         * If two subsequent nodes are strings, concatenate them. This optimization pass
-         * should be quick, and is here entirely to make unit test input cleaner.
-         */
-        function concatenateStrings(node: IrNode) {
-          for (let i = 0; i < node.childCount() - 1; i++) {
-            const c0 = node.child(i);
-            const c1 = node.child(i + 1);
-            if (typeof c0 === "string" && typeof c1 === "string") {
-              node.setChild(i, c0 + c1);
-              node.removeChild(i + 1);
-              // Since we just deleted the element at the current index, decrement
-              // the loop index, otherwise we’ll miss the next element which has
-              // shifted down into the current position.
-              i--;
-            }
-          }
+    ```
+    /**
+        * If two subsequent nodes are strings, concatenate them. This optimization pass
+        * should be quick, and is here entirely to make unit test input cleaner.
+        */
+    function concatenateStrings(node: IrNode) {
+        for (let i = 0; i < node.childCount() - 1; i++) {
+        const c0 = node.child(i);
+        const c1 = node.child(i + 1);
+        if (typeof c0 === "string" && typeof c1 === "string") {
+            node.setChild(i, c0 + c1);
+            node.removeChild(i + 1);
+            // Since we just deleted the element at the current index, decrement
+            // the loop index, otherwise we’ll miss the next element which has
+            // shifted down into the current position.
+            i--;
         }
+        }
+    }
+    ```
 
 With all that and more, the output is the same Ir tree as before, now a bit
 more markdown-ish.
@@ -594,15 +606,17 @@ markdown.
 
 All the Ir classes are defined in `src/2md.ts`, and here’s one of them:
 
-    export class Code extends IrNode {
-      static irName: NodeName = "Code";
+```
+export class Code extends IrNode {
+    static irName: NodeName = "Code";
 
-      render(r: BlockRendering) {
-        r.append("`");
-        super.render(r);
-        r.append("`");
-      }
+    render(r: BlockRendering) {
+    r.append("`");
+    super.render(r);
+    r.append("`");
     }
+}
+```
 
 Pretty easy! To output an inline code block: output a <code>&#96;</code>
 character, call the superclass `render()` method to render any children of
@@ -610,16 +624,18 @@ this node, and then output another <code>&#96;</code> character.
 
 That example uses inline markdown. What about a block?
 
-    export class ListItem extends IrNode {
-      static irName: NodeName = "ListItem";
+```
+export class ListItem extends IrNode {
+    static irName: NodeName = "ListItem";
 
-      render(r: BlockRendering) {
-        const prefix = new Prefix("  - ", "    ");
-        r.pushPrefix(prefix);
-        super.render(r);
-        r.popPrefix(prefix);
-      }
+    render(r: BlockRendering) {
+    const prefix = new Prefix("  - ", "    ");
+    r.pushPrefix(prefix);
+    super.render(r);
+    r.popPrefix(prefix);
     }
+}
+```
 
 Pretty straightforward: add a Prefix of `"  - "` for the first line of the
 bullet point and `"    "` for subsequent lines, recursively render the
@@ -627,15 +643,17 @@ bullet point and `"    "` for subsequent lines, recursively render the
 
 The interface for `BlockRendering` is pretty small:
 
-    export declare class BlockRendering {
-      append(s: string, newline?: boolean): void;
-      pushPrefix(prefix: Prefix, wrapOptions?: BlockOptions): void;
-      popPrefix(prefix: Prefix): void;
-      /** Used for collecting link info to add on at the end */
-      addTrailer(s: string): void;
+```
+export declare class BlockRendering {
+    append(s: string, newline?: boolean): void;
+    pushPrefix(prefix: Prefix, wrapOptions?: BlockOptions): void;
+    popPrefix(prefix: Prefix): void;
+    /** Used for collecting link info to add on at the end */
+    addTrailer(s: string): void;
 
-      finish(): string;
-    }
+    finish(): string;
+}
+```
 
 At this point, it may look like it’s possible to write out the final
 markdown string, but my attempts at that were problematic. Sure, a lot of
@@ -647,7 +665,9 @@ Nesting. Nesting gets complicated.
 For example, if there’s a code block in a bulleted list inside a
 blockquote, the start of the line is
 
-    >   -     foo
+```
+>   -     foo
+```
 
 which renders back to HTML as
 
@@ -657,11 +677,13 @@ but if that same code block starts on a later line of the bullet point,
 there’s no bullet-point marker on the same line as the start of the code
 block:
 
-    >   - Here is some code:
-    >
-    >         foo
-    >
-    > …
+```
+>   - Here is some code:
+>
+>         foo
+>
+> …
+```
 
 and that renders back to HTML as
 
@@ -693,41 +715,43 @@ The Prefix class is fairly simple: the text to use on the first line, the
 text to use on subsequent lines, and whether or not it’s already been
 rendered.
 
-    /**
-     * A string that gets prepended to each line of an output block in Markdown,
-     * e.g., `#` or `>`. The first line is often different from subsequent lines,
-     * for example with a bulleted list that is simply indented on subsequent lines.
-     *
-     * You should always make a new prefix instead of caching one, because it
-     * contains state to track whether the first line has been printed or not.
-     */
-    export class Prefix {
-      readonly first: string;
-      readonly subsequent: string;
-      private _rendered = false;
+```
+/**
+    * A string that gets prepended to each line of an output block in Markdown,
+    * e.g., `#` or `>`. The first line is often different from subsequent lines,
+    * for example with a bulleted list that is simply indented on subsequent lines.
+    *
+    * You should always make a new prefix instead of caching one, because it
+    * contains state to track whether the first line has been printed or not.
+    */
+export class Prefix {
+    readonly first: string;
+    readonly subsequent: string;
+    private _rendered = false;
 
-      constructor(first: string, subsequent?: string) {
-        this.first = first;
-        this.subsequent = subsequent !== undefined ? subsequent : first;
-      }
-
-      equals(other: Prefix): boolean {
-        return this.first === other.first && this.subsequent === other.subsequent;
-      }
-
-      static render(prefixStack: Prefix[]): string {
-        let ret = "";
-        for (let p of prefixStack) {
-          if (!p._rendered) {
-            p._rendered = true;
-            ret += p.first;
-          } else {
-            ret += p.subsequent;
-          }
-        }
-        return ret;
-      }
+    constructor(first: string, subsequent?: string) {
+    this.first = first;
+    this.subsequent = subsequent !== undefined ? subsequent : first;
     }
+
+    equals(other: Prefix): boolean {
+    return this.first === other.first && this.subsequent === other.subsequent;
+    }
+
+    static render(prefixStack: Prefix[]): string {
+    let ret = "";
+    for (let p of prefixStack) {
+        if (!p._rendered) {
+        p._rendered = true;
+        ret += p.first;
+        } else {
+        ret += p.subsequent;
+        }
+    }
+    return ret;
+    }
+}
+```
 
 With this structure, we can be sure that when a block, for example a bullet
 point, requires a different line-start on its first line, that first line
@@ -776,16 +800,18 @@ simple to start.
 Then I worked on the Ir stuff to pass a single unit test to turn that
 document into Ir nodes:
 
-    it("can parse the first sample", async function() {
-      const html = await fixture("quote1.html");
-      const expected = new Document([
-        new Heading(["The end of 32-bit apps (and other removals)"], {
-          level: 2
-        }),
+```
+it("can parse the first sample", async function() {
+    const html = await fixture("quote1.html");
+    const expected = new Document([
+    new Heading(["The end of 32-bit apps (and other removals)"], {
+        level: 2
+    }),
 
-        new P([
-          "Mac hardware and macOS made the jump from 32 bits to 64 bits a long" +
-          ...
+    new P([
+        "Mac hardware and macOS made the jump from 32 bits to 64 bits a long" +
+        ...
+```
 
 with the expectation that those Ir nodes could then append their contents
 to a string. But I didn’t try to do anything on that front until that first
@@ -1038,14 +1064,16 @@ number #119,998 in decimal. Its code point does not fit into 16 bits, so
 JavaScript thinks it’s a 2-character string, composed of the surrogates
 0xD835 and 0xDCBE:
 
-    > i = '𝒾'
-    '𝒾'
-    > i.length
-    2
-    > i.charCodeAt(0).toString(16)
-    'd835'
-    > i.charCodeAt(1).toString(16)
-    'dcbe'
+```
+> i = '𝒾'
+'𝒾'
+> i.length
+2
+> i.charCodeAt(0).toString(16)
+'d835'
+> i.charCodeAt(1).toString(16)
+'dcbe'
+```
 
 Line-wrapping should account for that when measuring the width of words.
 
@@ -1082,9 +1110,11 @@ thanks to surrogates, is termed a *grapheme*.
 
 I just used the grapheme-splitter package to measure word length:
 
-    const splitter = new GraphemeSplitter()
-    …
-    const length = splitter.countGraphemes(text.substring(…));
+```
+const splitter = new GraphemeSplitter()
+…
+const length = splitter.countGraphemes(text.substring(…));
+```
 
 and it does its job well, accounting for both surrogates and combining
 characters. It would be good to add a call here to `wcswidth()` to account
@@ -1164,9 +1194,11 @@ library wasn’t installed, in which case it thought there was a missing
 dependency, or it would fail to bundle the canvas module if it *was*
 installed; problems that were rectified by adding
 
-    "alias": {
-      "canvas": "./src/canvas-shim.js"
-    },
+```
+"alias": {
+    "canvas": "./src/canvas-shim.js"
+},
+```
 
 where `src/canvas-shim.js` contains `module.exports = {};`
 
@@ -1242,12 +1274,16 @@ AppleScript][mac-clipboard]:
 
 [mac-clipboard]: https://stackoverflow.com/q/17217450/14558
 
-    $ osascript -e 'the clipboard as «class HTML»'
-    «data HTML3C7370616E207374796C653D22…223E68656C6C6F20776F726C643C2F7370616E3E»
+```
+$ osascript -e 'the clipboard as «class HTML»'
+«data HTML3C7370616E207374796C653D22…223E68656C6C6F20776F726C643C2F7370616E3E»
+```
 
 After unhexlifying that, it’s plain old HTML:
 
-    <span style="">hello world</span>
+```
+<span style="">hello world</span>
+```
 
 This would likely run faster if there was some native code to read the
 clipboard directly, but figuring out how to do that with node really didn’t
@@ -1297,9 +1333,11 @@ proxy-only network.
  4. Start a DHCP server on the linux VM. All it’ll do is give out IP
     addresses, so `/etc/dhcp/dhcpd.conf` can be as simple as
 
-        subnet 192.168.237.0 netmask 255.255.255.0 {
-            range 192.168.237.10 192.168.237.100;
-        }
+    ```
+    subnet 192.168.237.0 netmask 255.255.255.0 {
+        range 192.168.237.10 192.168.237.100;
+    }
+    ```
 
     There’s no need to specify a router or nameserver because there won’t
     be any on this network.
@@ -1309,29 +1347,31 @@ proxy-only network.
     domains which will be allowed through the proxy, with everything else
     blocked.
 
-        --- squid.conf.default
-        +++ squid.conf
-        # Example rule allowing access from your local networks.
-        # Adapt localnet in the ACL section to list your (internal) IP networks
-        # from where browsing should be allowed
-        -http_access allow localnet
-        -http_access allow localhost
+    ```
+    --- squid.conf.default
+    +++ squid.conf
+    # Example rule allowing access from your local networks.
+    # Adapt localnet in the ACL section to list your (internal) IP networks
+    # from where browsing should be allowed
+    -http_access allow localnet
+    -http_access allow localhost
 
-        +acl allowlist dstdomain .debian.org
-        +acl allowlist dstdomain .nodejs.org
-        +acl allowlist dstdomain .npmjs.org
-        +acl allowlist dstdomain .yarnpkg.com
-        +
-        +# Windows update only
-        +acl allowlist dstdomain .update.microsoft.com
-        +acl allowlist dstdomain .download.windowsupdate.com
-        +acl allowlist dstdomain .delivery.mp.microsoft.com
-        +acl allowlist dstdomain .ctldl.windowsupdate.com
-        +
-        +http_access allow allowlist
-        +
-        # And finally deny all other access to this proxy
-        http_access deny all
+    +acl allowlist dstdomain .debian.org
+    +acl allowlist dstdomain .nodejs.org
+    +acl allowlist dstdomain .npmjs.org
+    +acl allowlist dstdomain .yarnpkg.com
+    +
+    +# Windows update only
+    +acl allowlist dstdomain .update.microsoft.com
+    +acl allowlist dstdomain .download.windowsupdate.com
+    +acl allowlist dstdomain .delivery.mp.microsoft.com
+    +acl allowlist dstdomain .ctldl.windowsupdate.com
+    +
+    +http_access allow allowlist
+    +
+    # And finally deny all other access to this proxy
+    http_access deny all
+    ```
 
     The update domains here are a subset of those [documented by
     microsoft][ms-update]; only enough to get windows update running for
@@ -1431,17 +1471,19 @@ getting HTML off the clipboard.
 The CF_HTML text format is [documented][CF_HTML], and should be easy to get
 with powershell:
 
-    C:\Users\admin>powershell Get-Clipboard -TextFormatType Html
-    Version:0.9
-    StartHTML:00000131
-    EndHTML:00000414
-    StartFragment:00000165
-    EndFragment:00000378
-    SourceURL:https://nodejs.org/en/
-    <html><body>
-    <!--StartFragment--><p>Node.jsÂ® is a JavaScript runtime built on <a
-    href="https://v8.dev/">Chrome's V8 JavaScript engine</a>.</p>
-    …
+```
+C:\Users\admin>powershell Get-Clipboard -TextFormatType Html
+Version:0.9
+StartHTML:00000131
+EndHTML:00000414
+StartFragment:00000165
+EndFragment:00000378
+SourceURL:https://nodejs.org/en/
+<html><body>
+<--StartFragment--><p>Node.jsÂ® is a JavaScript runtime built on <a
+href="https://v8.dev/">Chrome's V8 JavaScript engine</a>.</p>
+…
+```
 
 [CF_HTML]: https://docs.microsoft.com/en-us/windows/win32/dataxchg/html-clipboard-format
 
@@ -1461,14 +1503,16 @@ out][ftfy-demo] how to unscramble this.]*
 
 Is it a codepage issue? Let’s try putting the terminal into UTF-8 mode:
 
-    C:\Users\admin>chcp 65001
-    Active code page: 65001
+```
+C:\Users\admin>chcp 65001
+Active code page: 65001
 
-    C:\Users\admin>powershell Get-Clipboard -TextFormatType Html
-    Version:0.9
-    …
-    <!--StartFragment--><p>Node.jsAr is a JavaScript runtime built on <a
-    …
+C:\Users\admin>powershell Get-Clipboard -TextFormatType Html
+Version:0.9
+…
+<!--StartFragment--><p>Node.jsAr is a JavaScript runtime built on <a
+…
+```
 
 Oops, that’s *significantly* worse.
 

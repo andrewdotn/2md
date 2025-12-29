@@ -3,17 +3,17 @@
 $grid-breakpoints: (
   xs: 0,
   sm: 480px,
-  md: 768px
+  md: 768px,
 );
 
 $container-max-widths: (
   sm: 420px,
-  md: 600px
+  md: 600px,
 );
 
 $code-color: #067a1e;
 
-@import "~bootstrap/scss/bootstrap.scss";
+@import "bootstrap/scss/bootstrap.scss";
 
 pre {
   overflow: visible;

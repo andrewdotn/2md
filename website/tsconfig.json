@@ -13,6 +13,7 @@
     "target": "esnext",
     "noUnusedLocals": true,
     "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "allowImportingTsExtensions": true,
   }
 }

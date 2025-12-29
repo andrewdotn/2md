@@ -4,6 +4,7 @@ import { parseToIr } from "2md/src/parse";
 import { BlockRendering } from "2md/src/render";
 import { renderToStaticMarkup } from "react-dom/server";
 import copy from "copy-to-clipboard";
+import { parse as parse5 } from "parse5";
 
 interface ToMdProps {
   render: (options: {
@@ -37,11 +38,11 @@ export class ToMd extends Component<ToMdProps, ToMdState> {
         <p>
           Paste <i>formatted</i> text here to see it turned into Markdown.
         </p>
-      </div>
+      </div>,
     );
     this.state = {
       doc: div,
-      quote: false
+      quote: false,
     };
   }
 
@@ -50,7 +51,7 @@ export class ToMd extends Component<ToMdProps, ToMdState> {
   };
 
   toggleQuote = () => {
-    this.setState(s => ({ quote: !s.quote }));
+    this.setState((s) => ({ quote: !s.quote }));
   };
 
   copyToClipboard = (data: string) => {
@@ -58,10 +59,13 @@ export class ToMd extends Component<ToMdProps, ToMdState> {
   };
 
   render() {
+    const editorHtml = this.state.doc?.innerHTML ?? "";
+    const parsed = parse5(editorHtml);
+
     let markdown = "";
     if (this.state.doc) {
-      const intermediate = parseToIr(this.state.doc, {
-        quote: this.state.quote
+      const intermediate = parseToIr(parsed, {
+        quote: this.state.quote,
       });
       const rendered = new BlockRendering();
       intermediate.render(rendered);
@@ -74,7 +78,7 @@ export class ToMd extends Component<ToMdProps, ToMdState> {
         <ContentEditable
           className="border border-primary my-4"
           onInput={this.setHtml}
-          value={this.state.doc?.innerHTML}
+          value={editorHtml}
         />
       ),
       toggleQuote: (
@@ -85,7 +89,7 @@ export class ToMd extends Component<ToMdProps, ToMdState> {
           checked={this.state.quote}
         />
       ),
-      markdown
+      markdown,
     });
   }
 }

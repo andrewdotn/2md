@@ -9,11 +9,13 @@ import { fixtures } from "../generated-fixtures";
 import { IrView } from "../demo/ir-view";
 import { BlockView } from "../demo/block-view";
 import { Fixture } from "../gen-fixtures";
+import { parse as parse5 } from "parse5";
+import type { ChildNode } from "parse5/dist/tree-adapters/default";
 
 interface DemoFlowState {
   rawHtml?: string;
   selectedFixture?: Fixture;
-  dom?: Node;
+  dom?: ChildNode;
   intermediate?: IrNode;
   untransformedIntermediate?: IrNode;
   markdown?: string;
@@ -24,7 +26,7 @@ interface DemoFlowState {
 
 export const DemoContext = React.createContext({
   setHtml: () => {},
-  setFixture: () => {}
+  setFixture: () => {},
 } as DemoFlowState);
 
 export class DemoFlow extends Component<{}, DemoFlowState> {
@@ -36,19 +38,16 @@ export class DemoFlow extends Component<{}, DemoFlowState> {
       setHtml: this.setHtml,
       setFixture: this.setFixture,
       selectedFixture: defaultFixture,
-      ...this.computeState(defaultFixture.html)
+      ...this.computeState(defaultFixture.html),
     };
   }
 
   computeState = (rawHtml: string) => {
-    const doc = document.implementation.createHTMLDocument();
-    const div = doc.createElement("div");
-    doc.body.appendChild(div);
-    div.innerHTML = rawHtml;
-
-    const dom = doc;
+    const doc = parse5(rawHtml);
+    const dom = doc.childNodes[0];
 
     const intermediate = parseToIr(doc, {});
+
     const untransformedIntermediate = parseToIr(doc, {}, true);
     const rendered = new BlockRendering();
     intermediate.render(rendered);
@@ -60,21 +59,21 @@ export class DemoFlow extends Component<{}, DemoFlowState> {
       intermediate,
       untransformedIntermediate,
       rendered: rendered.outputBlocks,
-      markdown
+      markdown,
     };
   };
 
   setHtml = (rawHtml: string) => {
     this.setState({
       selectedFixture: undefined,
-      ...this.computeState(rawHtml)
+      ...this.computeState(rawHtml),
     });
   };
 
   setFixture = (newFixture: Fixture) => {
     this.setState({
       selectedFixture: newFixture,
-      ...this.computeState(newFixture.html)
+      ...this.computeState(newFixture.html),
     });
   };
 
@@ -127,7 +126,7 @@ export function DemoHtmlEditor() {
             // it. https://stackoverflow.com/a/35906942/14558
             className="w-100 align-bottom"
             rows={10}
-            onChange={e => setHtml(e.currentTarget.value)}
+            onChange={(e) => setHtml(e.currentTarget.value)}
             value={rawHtml}
           />
         )}

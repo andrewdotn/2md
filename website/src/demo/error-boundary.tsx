@@ -13,7 +13,7 @@ export class ErrorBoundary extends Component<{}, ErrorBoundaryState> {
     const newState: ErrorBoundaryState = {
       error,
       errorInfo,
-      errorString: error.toString()
+      errorString: error.toString(),
     };
 
     const stack = errorInfo.componentStack;

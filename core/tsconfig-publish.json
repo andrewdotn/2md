@@ -1,9 +1,11 @@
 {
   "extends": "./tsconfig.json",
+  "exclude": ["scratch", "**/*-test.ts"],
   "compilerOptions": {
-    "outDir": "types",
+    "rewriteRelativeImportExtensions": true,
+    "outDir": "lib",
+    "rootDir": "./src",
     "declaration": true,
-    "noEmit": false,
-    "emitDeclarationOnly": true
+    "noEmit": false
   }
 }

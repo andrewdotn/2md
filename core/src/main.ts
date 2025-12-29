@@ -6,9 +6,10 @@ import { appendFile, readFile } from "fs/promises";
 import { inspect } from "util";
 import { join as pathJoin } from "path";
 import { readClipboard } from "./clipboard.ts";
-import { parseHtml, parse } from "./parse-with-jsdom.ts";
+import { parse, parseHtml } from "./parse-with-jsdom.ts";
 import { fileURLToPath } from "node:url";
 import { pathExists } from "./fs-util.ts";
+import { serialize } from "parse5";
 
 export function toMd(html: string, options?: ParseOptions): string {
   const intermediate = parse(html, options);
@@ -112,8 +113,8 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`,
       break;
     }
     case "html": {
-      const firstElement = parseHtml(input).firstElementChild;
-      output = firstElement === null ? "" : firstElement.outerHTML;
+      const parsed = parseHtml(input);
+      output = serialize(parsed);
       break;
     }
 
@@ -145,7 +146,18 @@ Converts formatted text to markdown. Defaults to reading the clipboard.`,
   console.log(output);
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+let hasRequire = true;
+try {
+  // This blows up in ESM mode.
+  require;
+} catch {
+  hasRequire = false;
+}
+
+if (
+  (hasRequire && require.main === module) ||
+  (import.meta?.url && process.argv[1] === fileURLToPath(import.meta.url))
+) {
   main().catch((e) => {
     console.error(e);
     process.exit(1);

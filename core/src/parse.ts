@@ -15,9 +15,16 @@ import {
 } from "./2md.ts";
 import type { HeadingLevel } from "./2md.ts";
 import { applyTreeTransforms } from "./tree-transforms.ts";
+import type {
+  Document as Parse5Document,
+  ChildNode,
+  Element,
+} from "parse5/dist/tree-adapters/default";
+import { defaultTreeAdapter as adapter } from "parse5";
+import { getAttribute, removeAttribute } from "@parse5/tools";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
-  if (!/^H[1-6]$/.test(nodeName)) throw new Error("Not a heading");
+  if (!/^h[1-6]$/.test(nodeName)) throw new Error("Not a heading");
   return (nodeName.charCodeAt(1) - "0".charCodeAt(0)) as HeadingLevel;
 }
 
@@ -25,21 +32,15 @@ function extractHeadingLevel(nodeName: string): HeadingLevel {
 // convention from Lisp. When a recursive function needs accumulators, `foo()`
 // is the simplified API used by callers that does the initial setup, and
 // `foo1()` recurses.
-function parse1(irNode: IrNode, htmlNode: Node) {
-  if (
-    htmlNode.nodeType == htmlNode.TEXT_NODE &&
-    htmlNode.textContent !== null
-  ) {
-    if (
-      htmlNode.textContent !== "\n" ||
-      irNode.isOrHasParentNamed("Preformatted")
-    ) {
-      irNode.push(htmlNode.textContent);
+function parse1(irNode: IrNode, htmlNode: ChildNode) {
+  if (adapter.isTextNode(htmlNode) && htmlNode.value !== null) {
+    if (htmlNode.value !== "\n" || irNode.isOrHasParentNamed("Preformatted")) {
+      irNode.push(htmlNode.value);
     }
-  } else if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
+  } else if (adapter.isElementNode(htmlNode)) {
     const e = htmlNode as Element;
     let receiver = irNode;
-    switch (htmlNode.nodeName) {
+    switch (htmlNode.nodeName.toUpperCase()) {
       case "H1":
       case "H2":
       case "H3":
@@ -65,7 +66,7 @@ function parse1(irNode: IrNode, htmlNode: Node) {
         receiver = new ListItem([]);
         break;
       case "A":
-        const href = e.getAttribute("href");
+        const href = getAttribute(e, "href");
         if (href) {
           receiver = new A([], { href });
         }
@@ -110,11 +111,11 @@ export type ParseOptions = Partial<typeof defaultParseOptions>;
 
 // For debugging input HTML
 // @ts-ignore
-function stripStyles(htmlNode: Node) {
-  if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
+function stripStyles(htmlNode: ChildNode) {
+  if (adapter.isElementNode(htmlNode)) {
     const e = htmlNode as Element;
-    e.removeAttribute("style");
-    e.removeAttribute("class");
+    removeAttribute(e, "style");
+    removeAttribute(e, "class");
     for (let i = 0; i < e.childNodes.length; i++) {
       stripStyles(e.childNodes[i]);
     }
@@ -122,7 +123,7 @@ function stripStyles(htmlNode: Node) {
 }
 
 export function parseToIr(
-  doc: Node,
+  doc: Parse5Document,
   options: ParseOptions,
   skipTreeTransforms = false,
 ): IrNode {
@@ -147,7 +148,7 @@ export function parseToIr(
   return root;
 }
 
-export function parse(element: Element, options?: ParseOptions): IrNode {
+export function parse(element: Parse5Document, options?: ParseOptions): IrNode {
   options = { ...defaultParseOptions, ...options };
 
   return parseToIr(element, options);

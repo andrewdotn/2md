@@ -4,7 +4,7 @@
 // breaks a local bundling with parcel, because the shebang gets embedded
 // deep inside the file and node chokes on that.
 
-import { main } from "./main";
+import { main } from "./main.ts";
 
 main().catch((e) => {
   console.error(e);

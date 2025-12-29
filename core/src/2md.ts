@@ -109,19 +109,6 @@ export abstract class IrNode {
     this.children = [];
   }
 
-  replaceChild(i: number, replacement: IrNode | string) {
-    const removed = this.children[i];
-    if (removed instanceof IrNode) {
-      // in case there’s a reference somewhere?
-      removed.parent = undefined;
-    }
-    if (replacement instanceof IrNode) {
-      replacement.parent = this;
-    }
-
-    this.children[i] = replacement;
-  }
-
   render(r: BlockRendering) {
     for (let c of this.children) {
       if (typeof c === "string") {

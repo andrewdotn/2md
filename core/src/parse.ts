@@ -6,19 +6,19 @@ import {
   Code,
   Document,
   Heading,
-  HeadingLevel,
   I,
   IrNode,
   ListItem,
   OrderedList,
   P,
-  Preformatted
-} from "./2md";
-import { applyTreeTransforms } from "./tree-transforms";
+  Preformatted,
+} from "./2md.ts";
+import type { HeadingLevel } from "./2md.ts";
+import { applyTreeTransforms } from "./tree-transforms.ts";
 
 function extractHeadingLevel(nodeName: string): HeadingLevel {
   if (!/^H[1-6]$/.test(nodeName)) throw new Error("Not a heading");
-  return <HeadingLevel>(nodeName.charCodeAt(1) - "0".charCodeAt(0));
+  return (nodeName.charCodeAt(1) - "0".charCodeAt(0)) as HeadingLevel;
 }
 
 // This is the actual recursive function; I think I picked up the naming
@@ -37,7 +37,7 @@ function parse1(irNode: IrNode, htmlNode: Node) {
       irNode.push(htmlNode.textContent);
     }
   } else if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
-    const e = <Element>htmlNode;
+    const e = htmlNode as Element;
     let receiver = irNode;
     switch (htmlNode.nodeName) {
       case "H1":
@@ -47,7 +47,7 @@ function parse1(irNode: IrNode, htmlNode: Node) {
       case "H5":
       case "H6":
         receiver = new Heading([], {
-          level: extractHeadingLevel(htmlNode.nodeName)
+          level: extractHeadingLevel(htmlNode.nodeName),
         });
         break;
       case "B":
@@ -103,7 +103,7 @@ function parse1(irNode: IrNode, htmlNode: Node) {
 
 const defaultParseOptions = {
   quote: false,
-  links: true
+  links: true,
 };
 
 export type ParseOptions = Partial<typeof defaultParseOptions>;
@@ -112,7 +112,7 @@ export type ParseOptions = Partial<typeof defaultParseOptions>;
 // @ts-ignore
 function stripStyles(htmlNode: Node) {
   if (htmlNode.nodeType == htmlNode.ELEMENT_NODE) {
-    const e = <Element>htmlNode;
+    const e = htmlNode as Element;
     e.removeAttribute("style");
     e.removeAttribute("class");
     for (let i = 0; i < e.childNodes.length; i++) {
@@ -124,7 +124,7 @@ function stripStyles(htmlNode: Node) {
 export function parseToIr(
   doc: Node,
   options: ParseOptions,
-  skipTreeTransforms = false
+  skipTreeTransforms = false,
 ): IrNode {
   const root = new Document([]);
   let parseRoot = root;

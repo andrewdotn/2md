@@ -91,10 +91,10 @@ The current release process, to be automated later, is:
 
  2. Update `CHANGELOG.md`
 
- 3. Copy `README.md` and any referenced images such as `doc/demo.gif` into
-    the `core` folder
+ 3. Commit to git, and `git tag vA.B.C`
 
- 4. Commit to git, and `git tag vA.B.C`
+ 4. Copy `README.md` and any referenced images such as `doc/demo.gif` into
+    the `core` folder
 
  5. In the `core` directory, `yarn run package` and inspect tarball
 

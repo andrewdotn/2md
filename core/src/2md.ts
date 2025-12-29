@@ -1,6 +1,6 @@
-import { BlockRendering, Prefix } from "./render";
-import { tuple } from "./tuple";
-import { includes, last } from "lodash";
+import { BlockRendering, Prefix } from "./render.ts";
+import { tuple } from "./tuple.ts";
+import { includes, last } from "lodash-es";
 
 /**
  * Intermediate representation of the document. We use vanilla computing science
@@ -131,9 +131,9 @@ const nodeNames = tuple(
   "NumberedListItem",
   "OrderedList",
   "P",
-  "Blockquote"
+  "Blockquote",
 );
-type NodeName = typeof nodeNames[number];
+type NodeName = (typeof nodeNames)[number];
 
 export class Document extends IrNode {
   static irName: NodeName = "Document";
@@ -146,7 +146,7 @@ export class Heading extends IrNode {
 
   constructor(
     children: (IrNode | string)[],
-    { level }: { level: HeadingLevel }
+    { level }: { level: HeadingLevel },
   ) {
     super(children);
     this.level = level;

@@ -1,14 +1,14 @@
-import { fixtureBuffer } from "./main-test";
+import { fixtureBuffer } from "./main-test.ts";
 import { expect } from "chai";
-import { unMojibake } from "./clipboard";
+import { unMojibake } from "./clipboard.ts";
 
-describe("windows clipboard", function() {
-  it("can sort out encodings", async function() {
+describe("windows clipboard", function () {
+  it("can sort out encodings", async function () {
     // Actual output from Get-Clipboard -TextFormatType Html > outFile
     const x = await fixtureBuffer("windows-paste1.cf_html");
     expect(unMojibake(x)).to.include("föò ∞");
     expect(unMojibake(x)).to.include(
-      "The quick brown 🦊 jumped over the lazy dogs"
+      "The quick brown 🦊 jumped over the lazy dogs",
     );
   });
 });

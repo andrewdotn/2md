@@ -1,12 +1,12 @@
 import { randomBytes } from "crypto";
-import { run } from "./run";
+import { run } from "./run.ts";
 import { expect } from "chai";
 
-describe("run", function() {
-  it("raises an error if the command does not exist", async function() {
+describe("run", function () {
+  it("raises an error if the command does not exist", async function () {
     const dummyCommand = randomBytes(10).toString("hex");
     let thrown = false;
-    let error: Error = new Error();
+    let error: any = new Error();
     try {
       await run([dummyCommand]);
     } catch (e) {

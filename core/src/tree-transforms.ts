@@ -1,4 +1,4 @@
-import { IrNode, NumberedListItem, Separator } from "./2md";
+import { IrNode, NumberedListItem, Separator } from "./2md.ts";
 
 export function applyTreeTransforms(root: IrNode, { removeLinks = false }) {
   visitPre(root, concatenateStrings);
@@ -111,10 +111,10 @@ function numberLists(node: IrNode) {
     let counter = 1;
     const c = node.child(i);
     if (typeof c !== "string" && c.name === "OrderedList") {
-      const newChildren = c.copyOfChildren().map(n => {
+      const newChildren = c.copyOfChildren().map((n) => {
         if (typeof n !== "string" && n.name === "ListItem") {
           return new NumberedListItem(n.copyOfChildren(), {
-            number: counter++
+            number: counter++,
           });
         } else {
           return n;

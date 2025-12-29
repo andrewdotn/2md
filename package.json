@@ -5,8 +5,14 @@
       "website"
     ]
   },
-  "resolutions": {
-    "**/node-forge": "^0.10.0"
+  "private": true,
+  "volta": {
+    "node": "24.12.0",
+    "yarn": "4.12.0"
   },
-  "private": true
+  "resolutions": {
+    "@types/qs": "^6.14.0",
+    "@types/express-serve-static-core": "5.1.0",
+    "deasync": "0.1.31"
+  }
 }

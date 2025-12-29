@@ -1,7 +1,19 @@
-import { Prefix } from "./render";
+import { Prefix } from "./render.ts";
 import GraphemeSplitter from "grapheme-splitter";
 
-function* wordPieces(s: string): Generator<RegExpExecArray> {
+/** See {@link RegExpExecArray}. */
+interface RegExpExecArrayLike extends Array<string> {
+  /**
+   * The index of the search at which the result was found.
+   */
+  index: number;
+  /**
+   * A copy of the search string.
+   */
+  input: string;
+}
+
+function* wordPieces(s: string): Generator<RegExpExecArrayLike> {
   const wordRegex = /\S+|\n/g;
   let lastIndex = 0;
   for (let m = wordRegex.exec(s); m !== null; m = wordRegex.exec(s)) {
@@ -11,7 +23,7 @@ function* wordPieces(s: string): Generator<RegExpExecArray> {
   if (lastIndex < s.length) {
     yield Object.assign([s.substring(lastIndex)], {
       index: lastIndex,
-      input: s
+      input: s,
     });
   }
 }
@@ -29,7 +41,7 @@ const defaultBlockOptions = {
   acceptsTrailers: false,
   maxWidth: 80,
   preserveNewlines: false,
-  endsWithHardBreak: false
+  endsWithHardBreak: false,
 };
 
 export type BlockOptions = Partial<typeof defaultBlockOptions>;
@@ -38,7 +50,7 @@ class Wrap {
   constructor(s: string, prefixStack: Prefix[], options: BlockOptions) {
     const { maxWidth, preserveNewlines } = {
       ...defaultBlockOptions,
-      ...options
+      ...options,
     };
     this.text = s;
     this.prefixStack = prefixStack;
@@ -69,7 +81,7 @@ class Wrap {
       const word = m[0];
       const matchEnd = m.index + word.length;
       const matchLength = splitter.countGraphemes(
-        text.substring(lastMatchEnd, matchEnd)
+        text.substring(lastMatchEnd, matchEnd),
       );
 
       if (
@@ -130,7 +142,7 @@ class Wrap {
 export function wrap(
   s: string,
   prefixStack: Prefix[],
-  options: BlockOptions = {}
+  options: BlockOptions = {},
 ) {
   return new Wrap(s, prefixStack, options).wrap();
 }

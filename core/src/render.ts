@@ -1,5 +1,6 @@
-import { last } from "lodash";
-import { wrap, BlockOptions } from "./wrap";
+import { last } from "lodash-es";
+import type { BlockOptions } from "./wrap.ts";
+import { wrap } from "./wrap.ts";
 
 /**
  * A string that gets prepended to each line of an output block in Markdown,
@@ -66,9 +67,7 @@ export class OutputBlock {
   isHeading() {
     if (this.prefixStack.length === 0) return false;
 
-    return last(this.prefixStack)!
-      .first.trimRight()
-      .endsWith("#");
+    return last(this.prefixStack)!.first.trimRight().endsWith("#");
   }
 
   prefixStack: Prefix[];
@@ -126,7 +125,7 @@ export class BlockRendering {
   pushPrefix(prefix: Prefix, wrapOptions?: BlockOptions) {
     this._prefixStack.push(prefix);
     this.outputBlocks.push(
-      new OutputBlock(this._prefixStack.slice(), wrapOptions)
+      new OutputBlock(this._prefixStack.slice(), wrapOptions),
     );
   }
 

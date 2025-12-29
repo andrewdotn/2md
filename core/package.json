@@ -1,12 +1,13 @@
 {
   "name": "2md",
+  "type": "module",
   "version": "0.0.9-pre",
   "license": "Apache-2.0",
   "description": "convert formatted text to markdown",
   "homepage": "https://2md.ca",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/andrewdotn/2md"
+    "type": "git",
+    "url": "https://github.com/andrewdotn/2md"
   },
   "keywords": [
     "markdown",
@@ -19,11 +20,9 @@
   ],
   "main": "lib/public/api.js",
   "types": "types/src/public/api.d.ts",
-  "bin": {
-    "2md": "lib/npm-main.js"
-  },
+  "bin": "lib/npm-main.js",
   "scripts": {
-    "test": "tsc && yarn run pretty:check && mocha -r ./babel-register --exclude 'node_modules/**' 'src/**/*-test.ts' && yarn audit",
+    "test": "tsc && yarn run pretty:check && mocha --exclude 'node_modules/**' 'src/**/*-test.ts' && yarn npm audit",
     "pretty": "prettier --write '*.js' '*.json' 'src/**/*.ts'",
     "pretty:check": "prettier --check '*.js' '*.json' 'src/**/*.ts'",
     "package": "rm -rf types && tsc --project tsconfig-publish.json && rm -rf lib && babel --extensions=.ts --source-maps=false -d lib src && find lib \\( -name '*-test.js' -o -name '*.d.js' \\) -print0 | xargs -0 rm && yarn pack",
@@ -36,31 +35,35 @@
     "@babel/preset-typescript": "^7.9.0",
     "@babel/register": "^7.9.0",
     "@types/chai": "^4.2.11",
-    "@types/fs-extra": "^8.1.0",
     "@types/jsdom": "^16.1.0",
-    "@types/lodash": "^4.14.144",
+    "@types/lodash-es": "^4.17.12",
     "@types/mocha": "^7.0.2",
+    "@types/node": "^24.0.0",
     "@types/prettier": "^1.19.0",
     "@types/yargs": "^15.0.4",
     "chai": "^4.2.0",
     "endent": "^1.4.1",
     "mocha": "^7.1.1",
+    "node-gyp": "^12.1.0",
     "parcel": "^1.12.4",
-    "prettier": "^1.19.1",
-    "remark": "^11.0.1",
-    "remark-html": "^11.0.1",
+    "prettier": "^3.7.4",
+    "remark": "^13.0.0",
+    "remark-html": "^13.0.2",
     "tslib": "^1.11.1",
-    "typescript": "^3.8.3"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "fs-extra": "^9.0.0",
     "grapheme-splitter": "^1.0.4",
     "jsdom": "^16.2.1",
-    "lodash": "^4.17.19",
+    "lodash-es": "^4.17.22",
     "yargs": "^15.3.1"
   },
   "alias": {
     "canvas": false
   },
-  "browserslist": "current node"
+  "browserslist": "current node",
+  "volta": {
+    "node": "24.12.0",
+    "yarn": "4.12.0"
+  }
 }

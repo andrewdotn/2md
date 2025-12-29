@@ -1,12 +1,13 @@
-import { run } from "./run";
-import { pathExists, readFile, unlink } from "fs-extra";
+import { run } from "./run.ts";
+import { readFile, unlink } from "fs/promises";
+import { pathExists } from "./fs-util.ts";
 
 export async function readClipboard() {
   for (const c of [readClipboardMac, readClipboardUnix, readClipboardWindows]) {
     try {
       return await c();
     } catch (e) {
-      if (e.code === "ENOENT") {
+      if (e instanceof Error && "code" in e && e.code === "ENOENT") {
         continue;
       }
       throw e;
@@ -14,7 +15,7 @@ export async function readClipboard() {
   }
   throw new Error(
     "Unable to find a clipboard-reading program, please try" +
-      " file input instead"
+      " file input instead",
   );
 }
 
@@ -28,7 +29,7 @@ async function readClipboardMac() {
   const osaOutput = await run([
     "osascript",
     "-e",
-    "the clipboard as «class HTML»"
+    "the clipboard as «class HTML»",
   ]);
   const hexEncodedHtml = osaOutput.stdout;
   const match = /^«data HTML((?:[0-9A-F]{2})+)»$\n/m.exec(hexEncodedHtml);
@@ -45,7 +46,7 @@ async function readClipboardUnix() {
     "-selection",
     "clipboard",
     "-t",
-    "text/html"
+    "text/html",
   ]);
   if ((output.stderr ?? "") !== "") {
     throw new Error(`xclip printed an error: ${output.stderr}`);
@@ -63,7 +64,7 @@ async function readClipboardWindows() {
       $tmp = New-TemporaryFile
       Get-Clipboard -TextFormatType Html > $tmp
       $tmp.ToString()
-      `
+      `,
   ]);
   const tmpfileName = output.stdout.trim();
   if ((output.stderr ?? "") !== "") {
@@ -116,7 +117,7 @@ const cp1252Inverse: { [unicode: number]: number } = {
   0x203a: 0x9b,
   0x153: 0x9c,
   0x17e: 0x9e,
-  0x178: 0x9f
+  0x178: 0x9f,
 };
 
 /* Turn a UTF-8+cp1252+UTF-16LE+BOM-encoded mess into a UTF-8 string. */
@@ -135,7 +136,7 @@ export function unMojibake(s: Buffer) {
       const v = cp1252Inverse[array[i]];
       if (v === undefined) {
         throw new Error(
-          `unknown cp1252 code point at ${i}: 0x${array[i].toString(16)}`
+          `unknown cp1252 code point at ${i}: 0x${array[i].toString(16)}`,
         );
       }
       array[i] = v;

@@ -9,7 +9,7 @@ import { toMd as toMdInternal } from "../main";
  */
 export function toMd(
   html: string,
-  { quote }: { quote?: boolean } = {}
+  { quote }: { quote?: boolean } = {},
 ): string {
   return toMdInternal(html, { quote });
 }

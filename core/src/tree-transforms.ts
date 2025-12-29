@@ -103,6 +103,26 @@ function collapseCodeInsidePre(node: IrNode) {
     if (typeof c !== "string" && c.name === "Code") {
       c.replaceWithChildren();
     }
+    return;
+  }
+
+  let found = false;
+  const newChildren: (IrNode | string)[] = [];
+  node.copyOfChildren().forEach((child, index) => {
+    if (child instanceof IrNode && child.name === "Code") {
+      found = true;
+      for (const c of child.copyOfChildren()) {
+        newChildren.push(c);
+      }
+    } else {
+      newChildren.push(child);
+    }
+  });
+  if (found) {
+    node.clearChildren();
+    for (const c of newChildren) {
+      node.push(c);
+    }
   }
 }
 

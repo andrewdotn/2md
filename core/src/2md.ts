@@ -100,6 +100,28 @@ export abstract class IrNode {
     }
   }
 
+  clearChildren() {
+    for (const c of this.children) {
+      if (c instanceof IrNode) {
+        c.parent = undefined;
+      }
+    }
+    this.children = [];
+  }
+
+  replaceChild(i: number, replacement: IrNode | string) {
+    const removed = this.children[i];
+    if (removed instanceof IrNode) {
+      // in case there’s a reference somewhere?
+      removed.parent = undefined;
+    }
+    if (replacement instanceof IrNode) {
+      replacement.parent = this;
+    }
+
+    this.children[i] = replacement;
+  }
+
   render(r: BlockRendering) {
     for (let c of this.children) {
       if (typeof c === "string") {

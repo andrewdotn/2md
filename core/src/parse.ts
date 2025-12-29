@@ -148,8 +148,8 @@ export function parseToIr(
   return root;
 }
 
-export function parse(element: Parse5Document, options?: ParseOptions): IrNode {
+export function parse(doc: Parse5Document, options?: ParseOptions): IrNode {
   options = { ...defaultParseOptions, ...options };
 
-  return parseToIr(element, options);
+  return parseToIr(doc, options);
 }

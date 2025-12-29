@@ -15,7 +15,7 @@ import {
   Preformatted,
 } from "./2md.ts";
 import { BlockRendering } from "./render.ts";
-import { parse } from "./parse-with-jsdom.ts";
+import { parse } from "./parse-with-parse5.ts";
 import { fileURLToPath } from "node:url";
 
 export async function fixtureBuffer(filename: string): Promise<Buffer> {
@@ -149,6 +149,12 @@ describe("2md", function () {
 
     it("turns two brs into a newline", async function () {
       expect(toMd(await fixture("two-br.html"))).to.eql("foo\n\nbar\n\nbaz\n");
+    });
+
+    it("doesn’t `` code inside a pre", async function () {
+      expect(toMd(await fixture("quote29.html"), { quote: false })).to.eql(
+        await fixture("quote29.md"),
+      );
     });
   });
 

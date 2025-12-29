@@ -6,7 +6,7 @@ import { appendFile, readFile } from "fs/promises";
 import { inspect } from "util";
 import { join as pathJoin } from "path";
 import { readClipboard } from "./clipboard.ts";
-import { parse, parseHtml } from "./parse-with-jsdom.ts";
+import { parse, parseHtml } from "./parse-with-parse5.ts";
 import { fileURLToPath } from "node:url";
 import { pathExists } from "./fs-util.ts";
 import { serialize } from "parse5";
